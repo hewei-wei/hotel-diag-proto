@@ -234,6 +234,7 @@
   .gb-radio{display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--ink-2);white-space:nowrap}
   .gb-radio input{accent-color:var(--primary);margin:0}
   .gb-thumb{width:60px;height:60px;border-radius:var(--r-sm);background:linear-gradient(135deg,#c7d2fe,#e0e7ff);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--primary);flex-shrink:0}
+  .gb-thumb.on{outline:2px solid var(--primary);outline-offset:1px;font-weight:700}
   .gb-upload{width:60px;height:60px;border:1px dashed var(--ink-4);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:11px;cursor:pointer;flex-shrink:0;background:var(--surface)}
   .gb-req{color:#b91c1c}
   .gb-hol{width:100%;background:var(--surface-2);border-radius:var(--r-sm);padding:9px 12px;display:flex;flex-wrap:wrap;gap:6px 16px}
@@ -431,7 +432,7 @@
       ['接站服务','对照携程用户端“服务及设施”，接站服务配置完整','fail','接站服务补充任务','信息完善'],
       ['酒店设施通用规则','以携程用户端为采集边界，按抖音字段逐项核对','fail','酒店设施信息核对任务','信息完善']]},
     {name:'门店装修',path:'店铺管理 › 店铺装修 › 门店装修',items:[
-      ['装修审核不通过','「门店装修」无审核未通过标识','fail','门店装修审核整改任务','信息完善'],
+      ['装修审核不通过','「门店装修 › 门店主页 › 头图和相册」存在审核不通过标识，AI 点击“去设置”读取失败原因与被驳回图片','fail','门店装修审核整改任务','信息完善'],
       ['外显小图','外显小图与携程「外观」类别图片比对不一致','fail','外显小图替换建议任务','图片替换'],
       ['头图和相册','门店头图与商家相册均已上传图片','fail','头图相册补充任务','图片替换']]},
     {name:'房型管理',path:'商品与货架 › 房型管理 › 房型管理',items:[
@@ -634,8 +635,8 @@
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auditPick=0;go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auditPick=0;go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
   function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
@@ -647,7 +648,7 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auditPick=0;go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -704,6 +705,13 @@
     ['修改入口与生效范围','在「编辑日历房型」修改早餐份数是否要求重新维护价量态（近 3 个月内 30 天房价/房量）、修改对已生成未入住订单的影响，待确认。'],
     ['携程份数取值口径','携程早餐展示为“无早/单早/双早/三早”，按 0/1/2/3 份映射；携程仅展示“含早”未标明份数时的取值口径待确认。']];
   const calTask=(advice,room)=>({advice,src:[['酒店','尚宽酒店（重庆西站华岩寺店）· 抖音来客'],['数据范围','日历房已上架 10 个 · 覆盖房型 6/6'],['早餐份数不一致','2 个房型 · 本任务仅处理当前房型']],ignore:'此次忽略',cal:{room},pends:CAL_PENDS});
+  /* 门店装修审核整改：规则待确认口径（与《抖音来客诊断规则表A》「装修审核不通过」一致） */
+  const AUDIT_PENDS=[
+    ['失败原因解读深度','平台仅返回简短驳回文案（如“图片不符合规范”）时，AI 是否需归类解读原因并逐条给出整改建议，待确认；当前任务页按抖音返回的原始原因展示。'],
+    ['多节点同时驳回的任务粒度','头图和相册、外显小图等多个装修节点同时审核不通过时，是合并为一条装修审核处理任务还是按节点拆分（Excel 未明确；日历房等节点已有“不合并”口径），待确认。当前按单一节点生成。'],
+    ['被驳回图片的定位粒度','抖音若仅返回节点级驳回结果、不指明具体被驳回图片时，如何定位单张图片（逐张读取审核状态或由用户指认），待确认。'],
+    ['删除后的空缺联动','被驳回图片删除后，若该相册类别张数不足、或被驳回的是门店头图导致头图为空，是否联动生成缺图补充任务，待确认。'],
+    ['审核结果跟踪口径','Excel 按“写入/提交校验成功后标记已完成”执行；重新提交后再次被驳回时是否重新生成任务、审核通过前是否需要跟踪，待确认。']];
   const taskDetailCfg={
     '悦享双床房近 7 天价格偏高':{advice:'携程用户端悦享双床房近 7 天均价 ¥428，抖音来客当前卖价 ¥519，价差 21%，价格竞争力不足。建议按携程近 7 天均价同步调整。',src:[['房型','悦享双床房'],['携程近 7 天均价','¥428'],['抖音来客当前卖价','¥519']],fields:[{label:'建议写入价格',input:'¥428',note:'已按携程近 7 天均价预填，可修改'}],ignore:'此次忽略'},
     '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式（酒店名称＝城市＋地标简称1＋地标简称2＋店），缺少地标简称。',src:[['当前名称','尚宽酒店'],['名称公式','城市＋地标简称1＋地标简称2＋店'],['建议名称','重庆西站华岩寺尚宽酒店店']],fields:[{label:'城市',options:['重庆']},{label:'地标简称1',options:['西站','华岩寺']}],ignore:'此次忽略'},
@@ -763,7 +771,14 @@
     '早餐份数修正·巨幕投影大床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，检出 2 个房型与携程不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「巨幕投影大床房」：早餐份数 0 份 → 携程当前 2 份。',
       {roomName:'巨幕投影大床房-重庆西站免费接送站2选1',roomId:'7659677410023846218',spec:'20-25㎡ · 1张1.8m大床 · 有窗 · 可住2人',calName:'巨幕投影大床房-重庆西站免费接送站2选1-0份早餐-限时免费退',calId:'18700426338190247',cur:'0',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
     '早餐份数修正·景观双床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，检出 2 个房型与携程不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「景观双床房」：早餐份数 1 份 → 携程当前 2 份。',
-      {roomName:'景观双床房-观龙门公园景观·免费早餐',roomId:'7659677622001534882',spec:'25-30㎡ · 2张1.35m单人床 · 有窗 · 可住2人',calName:'景观双床房-观龙门公园景观·免费早餐-1份早餐-阶梯退',calId:'18700427100226851',cur:'1',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'})
+      {roomName:'景观双床房-观龙门公园景观·免费早餐',roomId:'7659677622001534882',spec:'25-30㎡ · 2张1.35m单人床 · 有窗 · 可住2人',calName:'景观双床房-观龙门公园景观·免费早餐-1份早餐-阶梯退',calId:'18700427100226851',cur:'1',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
+    '门店装修审核整改任务':{advice:'抖音来客「门店装修 › 门店主页 › 头图和相册」存在审核不通过标识，其余装修模块（外显小图、直播导流、商家动态、官方公告、设施及服务）未见审核标识。AI 已点击“去设置”读取失败原因与被驳回图片：商家相册「房间」类别 1 张图片含促销文字与水印。请替换为合规图片或授权删除，确认后 AI 写入抖音来客并重新提交审核。',src:[['审核不通过节点','头图和相册 · 商家相册「房间」'],['失败原因','图片含促销文字与水印，不符合规范'],['被驳回图片','1 张 · 相册「房间」第 3 张'],['替换素材','携程「客房」类别图片']],ignore:'此次忽略',pends:AUDIT_PENDS,
+      audit:{
+        node:'头图和相册 · 商家相册「房间」',
+        reason:'图片含促销文字与水印，不符合平台图片规范（禁止水印、边框、二维码、大量文字）',
+        rejected:'房间 · 第 3 张',
+        cands:['大床房','双床房','卫生间']
+      }}
   };
   const replyStyles=['致歉＋整改说明','致歉＋补偿方案','情况说明＋整改时限'];
   /* 中差评逐条回复状态：replySel 每条评价选中的答复语序号，replyText 每条评价编辑框内容 */
@@ -777,6 +792,9 @@
   let gbSel={},gbPriv={};
   function setGbSel(k,v){gbSel[k]=v}
   function gbPrivToggle(i){gbPriv[i]=!gbPriv[i];render()}
+  /* 装修审核整改：auditPick 当前选中的携程替换图片序号 */
+  let auditPick=0;
+  function setAuditPick(i){auditPick=i;render()}
   /* 团购核对表单：与抖音来客「创建商品」表单一致，选择项为选择项、输入项为输入框，全部可修改 */
   const GROOMS=['商务大床房','悦享双床房','豪华景观双床房'];
   const GHOLIDAYS=[['中秋节','2026-09-25 至 09-27'],['国庆节','2026-10-01 至 10-07'],['元旦','2027-01-01 至 01-03'],['春节','2027-02-06 至 02-12'],['清明节','2027-04-03 至 04-05'],['劳动节','2027-05-01 至 05-05'],['端午节','2027-06-09 至 06-11']];
@@ -906,6 +924,26 @@
           ${gbRow('已选图片',ct.imgs.map(im=>`<span class="gb-thumb">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开携程${ct.cat}类别图片列表更换')">更换图片</a>`)}
         </div>`).join('')}
       </div>`
+      :c.audit?`<div class="section"><h3>2　审核不通过详情（读取自抖音来客「去设置」）</h3>
+        <p class="review-tip">缺少合规图片：审核不通过节点为「${c.audit.node}」，需替换或删除被驳回图片后重新提交审核；其余装修模块（外显小图、直播导流、商家动态、官方公告、设施及服务）未见审核不通过标识。</p>
+        <div class="gb-card">
+          <div class="gb-head"><b>商家相册「房间」<small>门店装修 › 门店主页 › 头图和相册</small></b><i class="tag red">审核不通过</i></div>
+          ${gbRow('失败原因',`<b>${c.audit.reason}</b>`)}
+          ${gbRow('被驳回图片',`<span class="gb-thumb">${c.audit.rejected}</span><i class="tag red">审核不通过</i><span class="gb-unit">删除该图片不影响相册内其余 2 张已通过图片</span>`)}
+        </div>
+      </div>
+      <div class="section"><h3>3　修改内容（可修改后提交）</h3>
+        <p class="review-tip">支持两种处理方式：替换为合规图片（可选携程素材或本地上传，可随时更换），或授权直接删除；确认后 AI 写入抖音来客对应节点并重新提交审核。</p>
+        <div class="gb-card">
+          ${gbRow('处理方式',`<label class="gb-radio"><input type="radio" name="au-way" checked>替换图片</label><label class="gb-radio"><input type="radio" name="au-way">删除图片</label><span class="gb-unit">选择“删除图片”时无需选图，直接点击下方「确认删除」</span>`)}
+          ${gbRow('修改内容',`<b>商家相册「房间」第 3 张：含水印图片 → 携程「客房」类别「${c.audit.cands[auditPick]}」图</b>`,true)}
+          ${gbRow('替换图片',c.audit.cands.map((im,j)=>`<span class="gb-thumb${auditPick===j?' on':''}" onclick="setAuditPick(${j})">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开本地文件选择图片直接上传')">＋ 本地上传</a><span class="gb-unit">已选携程「客房」类别图片，可点选更换或本地上传；规范：比例 4:3，无水印、无促销文字</span>`,true)}
+        </div>
+      </div>
+      <div class="section"><h3>4　本规则待确认事项（${c.pends.length} 项）</h3>
+        <p class="review-tip">以下为《抖音来客诊断规则表A》「装修审核不通过」规则尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
+        ${c.pends.map((p,i)=>`<div class="gb-kv"><small>待确认 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
+      </div>`
       :c.cal?`<div class="section"><h3>2　逐房型早餐份数比对结果</h3>
         <p class="review-tip">房型集合一致后，逐房型比较抖音日历房与携程的早餐份数：一致通过，不一致按房型单独生成任务。不同房型不合并提交，本任务仅处理标注「本任务」的房型。</p>
         ${CAL_CHECKS.map((o,i)=>`<div class="gb-kv"><small>房型 ${i+1}</small><div class="gb-ctl"><b>${o[0]}</b><span class="gb-unit">${o[1]}　<i class="tag ${o[2]==='pass'?'green':'red'}">${o[2]==='pass'?'通过':'需修改'}</i>${o[0]===c.cal.room.roomName?'　<i class="tag" style="background:var(--primary-soft);color:var(--primary)">本任务</i>':''}</span></div></div>`).join('')}
@@ -929,9 +967,10 @@
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
       actions=`${c.ignore==='暂无此设施'?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
+        ${c.audit?'<button class="btn btn-outline" onclick="finishTask(\'执行中\',\'已确认删除，AI 正在删除审核不通过图片\')">确认删除</button>':''}
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>
-        ${c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
+        ${c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.audit?'替换图片已提交，AI 正在写入抖音来客并重新提交审核':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
