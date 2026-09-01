@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>酒店新媒体营销平台 · PC端交互原型</title>
+<style>
+  :root{
+    /* 颜色令牌 */
+    --ink:#111827;--ink-2:#4b5563;--ink-3:#6b7280;--ink-4:#9ca3af;
+    --line:#e5e7eb;--line-soft:#f3f4f6;
+    --bg:#f6f7f9;--surface:#fff;--surface-2:#f9fafb;
+    --primary:#4f46e5;--primary-hover:#4338ca;--primary-soft:#eef2ff;--primary-line:#e0e7ff;
+    --ok:#065f46;--ok-bg:#ecfdf5;--ok-line:#d1fae5;
+    --warn:#92400e;--warn-bg:#fffbeb;--warn-line:#fde68a;
+    /* 间距令牌 */
+    --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;
+    /* 圆角 / 阴影 */
+    --r-sm:8px;--r-md:10px;--r-lg:14px;
+    --shadow-sm:0 1px 2px rgba(17,24,39,.05);
+    --shadow-md:0 4px 12px rgba(17,24,39,.08);
+    --shadow-lg:0 24px 48px rgba(17,24,39,.18);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-width:1240px;background:var(--bg);color:var(--ink);font-size:13px;line-height:1.6;
+    font-family:-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC",Arial,sans-serif}
+  button,input,select{font:inherit;color:inherit}
+  button{cursor:pointer;background:none;border:0;padding:0}
+  .hidden{display:none!important}
+
+  /* ===== 左侧导航 ===== */
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:232px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:20px 14px;z-index:10}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 20px}
+  .brand-mark{flex:none;width:34px;height:34px;border-radius:var(--r-sm);background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+  .brand b{font-size:14.5px;letter-spacing:.3px;display:block;line-height:1.3}
+  .brand small{display:block;font-size:11px;color:var(--ink-3);line-height:1.3}
+  .nav{flex:1;display:flex;flex-direction:column;gap:2px}
+  .nav button{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:var(--r-sm);font-size:13.5px;color:var(--ink-2);text-align:left}
+  .nav button i{flex:none;width:18px;text-align:center;font-style:normal;font-size:14px;color:var(--ink-4)}
+  .nav button:hover{background:var(--surface-2);color:var(--ink)}
+  .nav button.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
+  .nav button.active i{color:var(--primary)}
+  .nav button em{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#f43f5e;color:#fff;font-size:11px;font-style:normal;display:grid;place-items:center}
+  .nav p{margin:18px 12px 6px;font-size:11.5px;color:var(--ink-4);font-weight:600}
+
+  /* ===== 主区域 ===== */
+  .main-wrap{margin-left:232px;min-height:100vh}
+  .topbar{position:sticky;top:0;z-index:20;height:60px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px}
+  .topbar>div:first-child{display:flex;align-items:center;gap:10px}
+  .topbar b{font-size:15px}
+  .topbar small{font-size:12px;color:var(--ink-4)}
+  .account{display:flex;align-items:center;gap:10px;padding:4px 6px 4px 4px;border-radius:999px}
+  .account:hover{background:var(--surface-2)}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-weight:700;font-size:12px;display:grid;place-items:center}
+  .account-meta{display:flex;flex-direction:column;line-height:1.25}
+  .account-meta b{font-size:13px}
+  .account-meta small{font-size:11px;color:var(--ink-3)}
+  .account>span:last-child{color:var(--ink-4);font-size:11px}
+
+  /* ===== 内容区 ===== */
+  .page{padding:var(--s6) 32px 48px}
+  .page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s4);margin-bottom:var(--s5)}
+  .page-head h1{margin:0 0 4px;font-size:20px;font-weight:700}
+  .page-head p{margin:0;color:var(--ink-3);font-size:13px}
+  .page-head .tag{margin-top:6px}
+
+  /* 提示条 */
+  .notice{display:flex;gap:12px;align-items:flex-start;background:var(--primary-soft);border:1px solid var(--primary-line);border-radius:var(--r-md);padding:13px 16px;margin-bottom:var(--s5)}
+  .notice-icon{flex:none;width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:13px;font-style:normal;margin-top:1px}
+  .notice b{display:block;font-size:13.5px;color:var(--ink)}
+  .notice span{display:block;font-size:12.5px;color:var(--ink-2);margin-top:2px}
+
+  /* 面板：工具栏 + 表格 一体 */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);overflow:hidden}
+  .panel-toolbar{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;padding:14px 18px}
+  .search{flex:none;display:flex;align-items:center;gap:8px;width:300px;height:36px;padding:0 12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink-4)}
+  .search:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .search input{flex:1;border:0;outline:0;font-size:13px;color:var(--ink)}
+  .seg{display:flex;gap:2px;background:var(--line-soft);border-radius:var(--r-md);padding:3px}
+  .seg button{height:32px;padding:0 14px;border-radius:var(--r-sm);font-size:12.5px;color:var(--ink-3);display:flex;align-items:center;gap:7px}
+  .seg button:hover{color:var(--ink)}
+  .seg button.active{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:var(--shadow-sm)}
+  .seg button i{font-style:normal;font-size:11px;color:var(--ink-4);background:var(--line-soft);border-radius:999px;padding:0 7px;line-height:17px}
+  .seg button.active i{background:var(--primary-soft);color:var(--primary)}
+
+  /* 酒店表格 */
+  .grid-row{display:grid;grid-template-columns:minmax(180px,1.35fr) .95fr .95fr 1.2fr 1fr;align-items:center;gap:12px;padding:0 18px}
+  .table-head{height:44px;background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-3)}
+  .hotel-row{min-height:64px;border-bottom:1px solid var(--line-soft);transition:background .15s}
+  .hotel-row:last-child{border-bottom:0}
+  .hotel-row:hover{background:#fafbfc}
+  .hotel-name{font-size:14px;font-weight:600}
+  .badge{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 11px;border-radius:999px;font-size:12px;font-weight:500}
+  .badge i{width:6px;height:6px;border-radius:50%;font-style:normal}
+  .badge.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .badge.ok i{background:#10b981}
+  .badge.off{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+  .badge.off i{background:#f59e0b}
+  .badge.expired{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+  .badge.expired i{background:#f43f5e}
+  .time{font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+  .time.empty{color:var(--ink-4)}
+  .row-actions{display:flex;justify-content:flex-end;gap:8px}
+  .btn{height:34px;padding:0 14px;border-radius:var(--r-sm);font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+  .btn-primary{background:var(--primary);color:#fff}
+  .btn-primary:hover{background:var(--primary-hover)}
+  .btn-outline{background:var(--surface);border:1px solid #d1d5db;color:var(--ink-2)}
+  .btn-sm{height:28px;padding:0 11px;font-size:12px;border-radius:999px}
+  .tgap{margin-left:8px}
+  .btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+  .btn-ghost{color:var(--primary);padding:0 8px}
+  .btn:disabled{background:var(--line-soft);color:var(--ink-4);cursor:not-allowed;box-shadow:none}
+  .btn-lg{height:40px;padding:0 18px}
+  .empty-state{padding:56px 0;text-align:center;color:var(--ink-3)}
+  .empty-state i{display:grid;place-items:center;width:44px;height:44px;margin:0 auto 10px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);font-size:17px;font-style:normal;color:var(--ink-4)}
+
+  /* 二级导航（右侧内容区顶部，进入酒店后展示） */
+  .subnav{position:sticky;top:60px;z-index:15;display:flex;align-items:center;gap:16px;height:52px;padding:0 32px;background:var(--surface);border-bottom:1px solid var(--line)}
+  .sub-back{flex:none;display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-3);height:30px;padding:0 10px;border-radius:var(--r-sm)}
+  .sub-back:hover{background:var(--surface-2);color:var(--primary)}
+  .sub-hotel{flex:none;display:flex;align-items:baseline;gap:8px;padding-right:16px;border-right:1px solid var(--line-soft)}
+  .sub-hotel b{font-size:14px}
+  .sub-hotel small{font-size:12px;color:var(--ink-3)}
+  .subnav nav{display:flex;gap:4px;height:100%}
+  .subnav nav button{display:inline-flex;align-items:center;gap:6px;padding:0 14px;font-size:13px;color:var(--ink-2);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .subnav nav button:hover{color:var(--ink)}
+  .subnav nav button.active{color:var(--primary);font-weight:600;border-color:var(--primary)}
+  .subnav nav em{min-width:17px;height:17px;padding:0 5px;border-radius:999px;background:#f43f5e;color:#fff;font-size:10.5px;font-style:normal;display:grid;place-items:center}
+
+  /* 卡片与统计 */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:20px 22px}
+  .card h3{margin:0 0 6px;font-size:15px}
+  .card>p{margin:0 0 var(--s4);color:var(--ink-3);font-size:13px}
+
+  /* 账号管理 */
+  .narrow{max-width:560px}
+  .profile{display:flex;align-items:center;gap:14px;padding:4px 0 18px;border-bottom:1px solid var(--line-soft)}
+  .profile .avatar{width:48px;height:48px;font-size:17px}
+  .profile b{font-size:15px;display:block}
+  .profile small{display:block;font-size:12.5px;color:var(--ink-3)}
+  .profile .badge{margin-left:auto}
+  .info-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+  .info-row:last-child{border-bottom:0}
+  .info-row small{color:var(--ink-3)}
+  .info-row b{font-size:13.5px;font-weight:600}
+
+  /* 页签 */
+  .tabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin-bottom:var(--s4)}
+  .tabs button{padding:11px 2px;font-size:13.5px;color:var(--ink-3)}
+  .tabs button.active{color:var(--primary);border-bottom:2px solid var(--primary);font-weight:600;margin-bottom:-1px}
+
+  /* 通用表格（任务等） */
+  .tgrid{display:grid;grid-template-columns:2fr 1fr 1fr .8fr .9fr .8fr;align-items:center;gap:12px;padding:0 18px}
+  .thead{height:44px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-3)}
+  .trow{min-height:60px;border-bottom:1px solid var(--line-soft);font-size:13px}
+  .trow:hover{background:#fafbfc}
+  .trow:last-child{border-bottom:0}
+  .tcell-title{display:flex;flex-direction:column}
+  .tcell-title b{font-size:13.5px}
+  .tcell-title small{font-size:12px;color:var(--ink-4);margin-top:2px}
+  .tag{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:6px;font-size:12px;font-style:normal;width:max-content}
+  .tag.red{background:#fef2f2;color:#b91c1c}
+  .tag.gray{background:var(--line-soft);color:var(--ink-2)}
+  .tag.green{background:var(--ok-bg);color:var(--ok)}
+
+  /* 返回 / 详情 */
+  .back{color:var(--ink-3);font-size:13px;margin-bottom:var(--s3);display:inline-flex;align-items:center;gap:6px}
+  .back:hover{color:var(--primary)}
+  .detail-grid{display:grid;grid-template-columns:1fr 300px;gap:var(--s4);align-items:start}
+  .section{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:20px 22px;margin-bottom:var(--s4)}
+  .section h3{margin:0 0 var(--s4);font-size:14.5px}
+  .source{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3);background:var(--surface-2);border-radius:var(--r-md);padding:16px}
+  .source small{font-size:12px;color:var(--ink-3)}
+  .source b{display:block;font-size:13.5px;margin-top:5px}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+  .field{display:flex;flex-direction:column;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+  .field select{height:40px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);padding:0 10px;font-weight:400}
+  .field select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .field input{height:40px;border:1px solid var(--primary-line);border-radius:var(--r-sm);background:var(--primary-soft);padding:0 10px;font-weight:600;color:var(--primary)}
+  .field input:focus{outline:none;border-color:var(--primary);background:var(--surface);color:var(--ink);box-shadow:0 0 0 3px var(--primary-soft)}
+  .field small{font-weight:400;color:var(--ink-4);font-size:11.5px}
+  .action-bar{display:flex;justify-content:flex-end;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:14px 18px}
+  .side-card li{font-size:12.5px;color:var(--ink-2);line-height:2.1}
+
+  /* 找店指引任务详情 */
+  .guide-choose .guide-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .guide-row b{font-size:13.5px}
+  .guide-card{display:flex;align-items:center;gap:12px;width:100%;padding:16px 18px;border:1px solid var(--primary-line);border-radius:var(--r-md);background:linear-gradient(135deg,var(--primary-soft),#fbfcfe);cursor:pointer;text-align:left;margin-bottom:10px;transition:box-shadow .15s}
+  .guide-card:hover{box-shadow:var(--shadow-md)}
+  .guide-card .g-name{font-weight:600;font-size:14.5px}
+  .guide-card .tag{margin-left:auto}
+  .guide-card>b{color:var(--ink-4);font-size:18px;line-height:1}
+  .exlink{color:var(--primary);font-size:12px;cursor:pointer;flex:none}
+  .route-title{margin:2px 0 12px;font-size:14.5px}
+  .route-node{border:1px dashed var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px}
+  .route-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .route-head small{color:var(--ink-4)}
+  .route-tag{background:#1f2937;color:#fff;font-size:12px;font-weight:600;border-radius:4px;padding:2px 8px}
+  .route-body{display:flex;gap:14px;align-items:flex-start}
+  .upload-box{flex:none;width:132px;height:88px;border:1px dashed var(--ink-4);border-radius:var(--r-sm);background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--ink-4);font-size:12px;cursor:pointer}
+  .upload-box i{font-size:20px;font-style:normal}
+  .upload-box.video{width:100%;height:150px}
+  .route-text{flex:1;display:flex;flex-direction:column;gap:4px}
+  .route-text textarea{width:100%;min-height:60px;border:1px solid var(--line);border-radius:var(--r-sm);padding:9px 11px;font-size:13px;resize:vertical;box-sizing:border-box;font-family:inherit}
+  .route-text textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .count{font-size:11px;color:var(--ink-4);text-align:right}
+  .route-tips{font-size:12px;color:var(--ink-3);line-height:1.9;margin:0 0 12px;background:var(--surface-2);border-radius:var(--r-sm);padding:10px 12px}
+  .btn-add-via{border:1px dashed var(--primary);color:var(--primary);background:var(--surface);border-radius:var(--r-sm);padding:8px 16px;font-size:13px;font-weight:600;margin-bottom:12px}
+  /* 中差评逐条回复 */
+  .review-tip{font-size:12px;color:var(--ink-3);margin:0 0 14px;line-height:1.8}
+  .act-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 16px;border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:10px;background:var(--surface)}
+  .act-info{min-width:0}
+  .act-info b{display:block;font-size:13.5px;margin-bottom:3px}
+  .act-info small{color:var(--ink-3);font-size:12px}
+  .act-sel{display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0}
+  .act-sel span{font-size:12px;color:var(--ink-3)}
+  .act-sel select{padding:7px 28px 7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;font-size:13px;color:var(--ink)}
+  .review-item{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:14px;background:var(--surface)}
+  .review-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rv-user{font-weight:700;font-size:13px}
+  .rv-stars{color:#f59e0b;font-size:13px;letter-spacing:2px}
+  .rv-date{color:var(--ink-4);font-size:12px}
+  .review-text{margin:10px 0 12px;font-size:13px;line-height:1.8;color:var(--ink-2);background:var(--surface-2);border-radius:var(--r-sm);padding:10px 12px}
+  .reply-opts{display:flex;flex-direction:column;gap:8px}
+  .reply-opts>small,.reply-edit>small{color:var(--ink-4);font-size:12px}
+  .reply-opt{display:grid;grid-template-columns:22px 100px 1fr;gap:10px;align-items:start;text-align:left;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;background:var(--surface);cursor:pointer;font-size:12.5px;color:var(--ink-2);line-height:1.7}
+  .reply-opt:hover{border-color:var(--primary)}
+  .reply-opt i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--surface-2);color:var(--ink-3);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .reply-opt b{font-size:12px;color:var(--ink);white-space:nowrap}
+  .reply-opt.active{border-color:var(--primary);background:var(--primary-soft)}
+  .reply-opt.active i{background:var(--primary);color:#fff}
+  .reply-edit{margin-top:10px}
+  .reply-edit textarea{width:100%;min-height:76px;margin-top:6px;border:1px solid var(--primary-line);border-radius:var(--r-sm);background:var(--primary-soft);padding:10px 12px;font-size:13px;line-height:1.8;resize:vertical;box-sizing:border-box;font-family:inherit}
+  .reply-edit textarea:focus{outline:none;border-color:var(--primary);background:var(--surface)}
+
+  /* 记录 / 活动 列表 */
+  .list-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);overflow:hidden}
+  .lrow{display:grid;grid-template-columns:44px 1.6fr .6fr .8fr .5fr;align-items:center;gap:12px;min-height:64px;padding:0 18px;border-bottom:1px solid var(--line-soft);font-size:13px}
+  .lrow:hover{background:#fafbfc}
+  .lrow:last-child{border-bottom:0}
+  .lrow strong{width:34px;height:34px;border-radius:var(--r-sm);background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;font-size:13px}
+  .lrow .lt{display:flex;flex-direction:column}
+  .lrow .lt b{font-size:13.5px}
+  .lrow .lt small{font-size:12px;color:var(--ink-3);margin-top:2px}
+
+  /* ===== 步骤化诊断（二级页面） ===== */
+  .diag-hero{border-left:4px solid var(--primary);padding:24px 28px 26px}
+  .diag-hero.idle{background:linear-gradient(100deg,var(--primary-soft),var(--surface) 62%)}
+  .hero-top{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .hero-info h3{margin:0;font-size:16px}
+  .hero-sub{margin:9px 0 0;font-size:13.5px;color:var(--ink-3);line-height:1.6}
+  .hero-cta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn-start{height:46px;padding:0 32px;font-size:15px;font-weight:600;box-shadow:0 8px 20px rgba(79,70,229,.25)}
+  .hero-note{flex:none;max-width:160px;font-size:12px;color:var(--ink-3);line-height:1.5}
+  .hero-progress{display:flex;align-items:center;gap:14px;margin-top:24px}
+  .hero-progress .pbar{flex:1;height:12px}
+  .hero-pct{flex:none;min-width:52px;text-align:right;font-size:15px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+  .hero-stats{display:flex;gap:52px;margin-top:24px;flex-wrap:wrap}
+  .hstat small{display:block;font-size:12.5px;color:var(--ink-3);margin-bottom:5px}
+  .hstat b{font-size:26px;font-variant-numeric:tabular-nums;line-height:1.2}
+  .dlist{position:relative}
+  .drow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 10px;border-radius:var(--r-md)}
+  .drow:hover{background:var(--surface-2)}
+  .drow.focus{background:var(--primary-soft)}
+  .dnode{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:600;background:var(--surface);color:var(--ink-3);border:2px solid var(--line)}
+  .drow.running .dnode{background:var(--primary);border-color:var(--primary);color:#fff;animation:pulse 1.1s ease-in-out infinite}
+  .drow.done .dnode{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok)}
+  .drow .dt{flex:1;min-width:0}
+  .drow .dt b{display:block;font-size:13.5px}
+  .drow .dt small{display:block;font-size:11.5px;color:var(--ink-4);margin-top:2px}
+  .drow .dstat{flex:none;display:flex;align-items:center;gap:8px}
+  .dfoot{margin:0 0 14px;font-size:12px;color:var(--ink-4)}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(79,70,229,.32)}50%{box-shadow:0 0 0 9px rgba(79,70,229,0)}}
+  .ditem{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+  .ditem:last-child{border-bottom:0}
+  .ditem .dn{flex:none;width:130px;font-size:13px;font-weight:600}
+  .ditem .dr{flex:1;font-size:12.5px;color:var(--ink-3)}
+  .ditem .ds{flex:none;width:110px;text-align:right;font-size:12.5px}
+  .ditem .ds small{display:block;font-size:11.5px;color:var(--ink-4);margin-top:2px}
+  .ditem.col{flex-direction:column;align-items:flex-start;gap:3px;padding:10px 0}
+  .ditem.col .dn{width:auto}
+  .ditem.col .dr{font-size:12px;line-height:1.65}
+  .ditem.col .ds{width:auto;text-align:left;margin-top:2px}
+  /* 步骤备注 · 已生成任务区（任务级操作，不挂在检查项上） */
+  .step-tasks{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+  .st-head{font-size:12px;color:var(--ink-3);font-weight:600;margin-bottom:8px}
+  .st-head b{color:var(--primary)}
+  .st-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;background:var(--primary-soft);border:1px solid var(--primary-line);border-radius:var(--r-sm);margin-bottom:6px}
+  .st-row .st-info b{display:block;font-size:12.5px}
+  .st-row .st-info small{color:var(--ink-4);font-size:11px}
+  .ds-fail{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ds-fail small{font-size:11.5px;color:var(--ink-4)}
+  .dgo{margin-left:auto;height:26px;padding:0 13px;border:none;border-radius:999px;background:var(--primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+  .dgo:hover{opacity:.88}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--primary-line);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pbar{height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden}
+  .pbar i{display:block;height:100%;background:var(--primary);border-radius:999px;transition:width .4s}
+
+  /* ===== 执行记录分组 ===== */
+  .rgroup{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);margin-bottom:12px;overflow:hidden}
+  .rg-head{display:flex;align-items:center;gap:10px;padding:14px 18px;width:100%;text-align:left}
+  .rg-head:hover{background:#fafbfc}
+  .rg-path{min-width:0}
+  .rg-path b{font-size:13.5px}
+  .rg-path small{font-size:12px;color:var(--ink-4)}
+  .rg-head .tags{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+  .rg-head .tags>small{color:var(--ink-4);font-size:12px}
+  .rg-body{border-top:1px solid var(--line-soft)}
+  .rline{display:grid;grid-template-columns:72px 150px 86px 120px 1fr;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-soft);font-size:12.5px;color:var(--ink-2)}
+  .rline:last-child{border-bottom:0}
+  .rline .no{font-weight:600;color:var(--ink)}
+  .chev{flex:none;color:var(--ink-4);transition:transform .2s;font-size:12px}
+  .chev.open{transform:rotate(180deg)}
+
+  /* 弹窗 */
+  .modal-mask{position:fixed;inset:0;background:rgba(17,24,39,.45);backdrop-filter:blur(2px);display:grid;place-items:center;z-index:30}
+  .modal{width:480px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow-lg);position:relative;padding:24px}
+  .close{position:absolute;right:16px;top:16px;width:30px;height:30px;border-radius:var(--r-sm);color:var(--ink-4);font-size:15px;display:grid;place-items:center}
+  .close:hover{background:var(--surface-2);color:var(--ink)}
+  .modal h2{margin:0 0 4px;font-size:17px}
+  .modal .sub{font-size:12.5px;color:var(--ink-3)}
+  .steps{display:grid;grid-template-columns:1fr 24px 1fr;align-items:center;gap:4px;margin:20px 0 18px}
+  .steps button{border:1px solid var(--line);border-radius:var(--r-md);padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;background:var(--surface)}
+  .steps button:hover{border-color:var(--primary-line)}
+  .steps button.active{border-color:var(--primary);background:var(--primary-soft)}
+  .steps button b{font-size:13.5px}
+  .steps button.active b{color:var(--primary)}
+  .steps button small{font-size:11.5px;color:var(--ink-3)}
+  .steps>span{color:var(--ink-4);text-align:center}
+  .methods{display:grid;grid-template-columns:1fr 1fr;background:var(--line-soft);padding:3px;border-radius:var(--r-md);margin-bottom:16px}
+  .methods button{height:34px;border-radius:var(--r-sm);color:var(--ink-3)}
+  .methods button.active{background:var(--surface);color:var(--primary);font-weight:600;box-shadow:var(--shadow-sm)}
+  .auth-field{display:flex;flex-direction:column;gap:7px;margin:14px 0;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+  .auth-field input{height:40px;border:1px solid var(--line);border-radius:var(--r-sm);padding:0 12px;font-weight:400}
+  .auth-field input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .code{display:grid;grid-template-columns:1fr 112px;gap:8px}
+  .code button{border:1px solid var(--primary-line);background:var(--primary-soft);color:var(--primary);border-radius:var(--r-sm);height:40px;font-size:12.5px}
+  .success{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:var(--r-md);padding:16px;color:var(--ok)}
+  .success b{font-size:13.5px}
+  .success p{margin:4px 0 0;font-size:12.5px}
+  .modal-foot{margin-top:16px;padding-top:13px;border-top:1px solid var(--line-soft);font-size:12px;color:var(--ink-3);line-height:1.7}
+  .reauth{width:100%;margin-top:12px}
+
+  /* 轻提示 */
+  .toast{position:fixed;right:24px;top:76px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:var(--r-md);box-shadow:var(--shadow-lg);z-index:40;font-size:13px;display:flex;align-items:center;gap:8px}
+  .toast i{width:18px;height:18px;border-radius:50%;background:#10b981;display:grid;place-items:center;font-size:11px;font-style:normal}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark">媒</span><div><b>酒店新媒体营销平台</b><small>酒店智能运营工作台</small></div></div>
+  <nav id="nav" class="nav"></nav>
+</aside>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <div><small>运营工作台</small><b id="pageTitle">酒店管理</b></div>
+    <div class="account"><span class="avatar">禾</span><div class="account-meta"><b>禾薇运营</b><small>代运营管理员</small></div><span>⌄</span></div>
+  </header>
+  <div id="subnav"></div>
+  <main><div id="app"></div></main>
+</div>
+
+<div id="modalRoot"></div><div id="toast" class="toast hidden"></div>
+
+<script>
+  const hotels=[
+    {name:'尚宽酒店',sub:'重庆西站华岩寺店',douyin:'ok',ctrip:'ok',lastDiagnosis:'2026-08-20 15:18',diagHistory:['2026-08-20 15:18']},
+    {name:'全亚酒店',sub:'重庆光环爱琴海店',douyin:'ok',ctrip:'expired',lastDiagnosis:'2026-08-27 18:06',diagHistory:['2026-08-27 18:06']},
+    {name:'云栖酒店',sub:'重庆解放碑洪崖洞店',douyin:'ok',ctrip:'off',lastDiagnosis:null,diagHistory:[]},
+    {name:'山屿酒店',sub:'重庆北站店',douyin:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]}
+  ];
+  const NOW=new Date('2026-08-28T12:00:00'),diagDays=h=>h.lastDiagnosis?Math.floor((NOW-new Date(h.lastDiagnosis.replace(' ','T')))/864e5):null;
+  const DIAG_LIMIT=7*864e5,diagUsed=h=>h.diagHistory.filter(t=>NOW-new Date(t.replace(' ','T'))<DIAG_LIMIT).length,diagLeft=h=>Math.max(0,2-diagUsed(h));
+  let activeHotel=null,view='hotels',authIndex=null,platform='douyin',method='sms',reauth=false,hotelFilter='all',hotelQuery='';
+  const $=s=>document.querySelector(s), both=h=>h.douyin==='ok'&&h.ctrip==='ok', attr=s=>s.replace(/[&"<]/g,c=>({'&':'&amp;','"':'&quot;','<':'&lt;'}[c]));
+
+  /* ===== 诊断步骤（以《抖音来客诊断规则表》的诊断路径为步骤） ===== */
+  const diagSteps=[
+    {name:'基本信息',path:'店铺管理 › 门店管理 › 基本信息',items:[
+      ['门店名称','名称公式：酒店名称（城市＋地标简称1＋地标简称2＋店），当前名称需符合公式','fail','门店名称修改建议任务','信息完善'],
+      ['联系电话','联系电话不为空，且与携程 PC 端联系电话一致','fail','联系电话修正任务','信息完善'],
+      ['房间总数','房间总数不为空，且与携程 PC 端房间总数一致','fail','房间总数修正任务','信息完善'],
+      ['营业状态','营业状态为“正常营业”','fail','营业状态修正任务','信息完善'],
+      ['找店指引','找店指引不为空，含起点、途经点、终点的路线内容与素材','fail','找店指引素材补充','信息完善']]},
+    {name:'酒店政策',path:'店铺管理 › 酒店信息管理 › 酒店政策（联合诊断节点）',items:[
+      ['入离政策','五项政策联合诊断：入离时间已按携程数据配置','fail','酒店政策联合补充任务','信息完善'],
+      ['办理入住年龄','五项政策联合诊断：办理入住年龄不为空','fail','酒店政策联合补充任务','信息完善'],
+      ['加床及儿童','五项政策联合诊断：儿童及加床政策与收费标准需配置完整','fail','酒店政策联合补充任务','信息完善'],
+      ['宠物政策','五项政策联合诊断：宠物政策不为空','fail','酒店政策联合补充任务','信息完善'],
+      ['早餐政策','五项政策联合诊断：早餐信息不为空','fail','酒店政策联合补充任务','信息完善']]},
+    {name:'酒店设施',path:'店铺管理 › 酒店信息管理 › 酒店设施',items:[
+      ['酒店设施审核不通过标签','酒店设施顶部无“审核不通过”标签','fail','酒店设施审核整改任务','信息完善'],
+      ['停车场','对照携程“服务及设施”，停车场信息配置完整','fail','停车场信息补充任务','信息完善'],
+      ['充电车位','对照携程“服务及设施”，充电车位信息配置完整','fail','充电车位信息补充任务','信息完善'],
+      ['餐厅','携程采集到早餐厅，抖音餐厅为“无”，图片与营业时间缺失','fail','餐厅设施详情补充任务','信息完善'],
+      ['接机服务','对照携程用户端“服务及设施”，接机服务配置完整','fail','接机服务补充任务','信息完善'],
+      ['接站服务','对照携程用户端“服务及设施”，接站服务配置完整','fail','接站服务补充任务','信息完善'],
+      ['酒店设施通用规则','以携程用户端为采集边界，按抖音字段逐项核对','fail','酒店设施信息核对任务','信息完善']]},
+    {name:'门店装修',path:'店铺管理 › 店铺装修 › 门店装修',items:[
+      ['装修审核不通过','「门店装修」无审核未通过标识','fail','门店装修审核整改任务','信息完善'],
+      ['外显小图','外显小图与携程「外观」类别图片比对不一致','fail','外显小图替换建议任务','图片替换'],
+      ['头图和相册','门店头图与商家相册均已上传图片','fail','头图相册补充任务','图片替换']]},
+    {name:'房型管理',path:'商品与货架 › 房型管理 › 房型管理',items:[
+      ['房型信息','对照携程房型数据，逐字段核对房型名称、描述与设施','fail','房型信息核对任务','信息完善']]},
+    {name:'日历房',path:'商品与货架 › 商品管理 › 日历房',items:[
+      ['日历房房型与早餐份数','日历房覆盖全部房型，早餐份数与携程一致','fail','日历房早餐份数修正任务','信息完善']]},
+    {name:'房价房态管理',path:'商品与货架 › 房价房态管理 › 房价房态管理',items:[
+      ['近7天房型价格','近 7 天逐日价格不高于携程实时价格','fail','悦享双床房近 7 天价格偏高','价格调整']]},
+    {name:'预售房型',path:'商品与货架 › 预售房型 › 预售房型',items:[
+      ['引流预售房型','最低两个价格档位均已配置预售房型','fail','预售房型补充任务','商品配置']]},
+    {name:'团购',path:'商品与货架 › 商品管理 › 团购',items:[
+      ['团购商品覆盖、价格与名称','AI 逐个点击团购商品“查看”，核对商品搭配、实际售价、名称、间夜数与规则；节假日与日常商品覆盖完整','fail','团购商品核对任务','商品配置']]},
+    {name:'装修',path:'经营成长 › 商家经营分 › 装修',items:[
+      ['装修评分','商家经营分“装修”下各评分节点满分则通过','fail','装修评分提升建议任务','经营建议']]},
+    {name:'商品',path:'经营成长 › 商家经营分 › 商品',items:[
+      ['商品评分','商家经营分“商品”下各评分节点满分则通过','fail','商品评分提升建议任务','经营建议']]},
+    {name:'评价',path:'经营成长 › 商家经营分 › 评价',items:[
+      ['评价评分','评价评分满分则通过；未满分形成线下经营建议任务','fail','评价评分提升建议任务','经营建议']]},
+    {name:'评价回复',path:'经营成长 › 评价管理 › 评价回复',items:[
+      ['待回复中差评','无待回复中差评则通过；存在时按评价逐条生成回复建议任务','fail','中差评回复建议任务','评价回复']]},
+    {name:'活动管理',path:'带货与推广 › 活动广场 › 活动管理',items:[
+      ['活动参与与配置','采集活动广场全部活动；对“在线＋管理员打开＋立即报名”的活动生成报名建议任务','fail','活动报名','活动报名']]}
+  ];
+  let diagRun=null,diagT=[];
+  /* 联合诊断节点：任务名 → 代表检查项（多项不通过合并为一个任务，路径与“去处理”挂在代表项上） */
+  const JOINT_TASK_NODE={'酒店政策联合补充任务':'加床及儿童'};
+  function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
+  function initRediag(){diagT.forEach(clearTimeout);diagT=[];const old=diagRun;diagRun={phase:'idle',focus:0,added:[],failCount:0,hotel:old&&old.hotel,steps:diagSteps.map((s,si)=>({state:'pending',prev:old?old.steps[si].state:null,items:s.items.map((it,ii)=>({state:'pending',prev:old?old.steps[si].items[ii].state:null}))}))}}
+  const stepFails=si=>diagRun.steps[si].items.filter(it=>it.state==='fail').length;
+  function startDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('7天内只能诊断两次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));runStep(0)}
+  function resetDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('7天内只能诊断两次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));initRediag();toast('已开始重新诊断');runStep(0)}
+  function scrollStep(){const el=document.querySelector('.drow.running')||(document.querySelectorAll('.drow')||[])[diagRun.focus];if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'})}
+  function runStep(si){diagRun.phase='running';diagRun.focus=si;diagRun.steps[si].state='running';runItem(si,0);render();scrollStep()}
+  function runItem(si,ii){
+    if(!activeHotel)return;
+    const run=diagRun.steps[si];run.items[ii].state='running';diagRun.focus=si;render();scrollStep();
+    diagT.push(setTimeout(()=>{
+      run.items[ii].state=diagSteps[si].items[ii][2]==='pass'?'pass':'fail';
+      if(ii+1<run.items.length){runItem(si,ii+1)}
+      else{
+        run.state='done';
+        const fails=diagSteps[si].items.filter(x=>x[2]!=='pass');
+        /* 联合诊断节点：多项不通过合并为一个任务，路径取联合代表节点 */
+        let added=0;
+        fails.forEach(f=>{diagRun.failCount++;
+          if(taskData.some(t=>t.status==='待处理'&&t.name===f[3]))return;   // 同名待处理任务不重复生成
+          const row={name:f[3],path:diagSteps[si].name+' · '+(JOINT_TASK_NODE[f[3]]||f[0]),rule:f[1],type:f[4],diagTime:'2026-08-28 12:0'+(si<6?0:1)+':'+String(8+si*3).padStart(2,'0'),status:'待处理',submitTime:null,exec:null};
+          diagRun.added.push(row);taskData.unshift(row);added++});
+        if(added)toast(`${diagSteps[si].name}诊断完成：${fails.length} 项不通过，已生成 ${added} 个任务`);
+        if(si+1<diagSteps.length)diagT.push(setTimeout(()=>runStep(si+1),500));
+        else{diagRun.phase='done';activeHotel.lastDiagnosis='2026-08-28 12:06';activeHotel.diagHistory.push('2026-08-28 12:06');toast(`诊断完成：不通过 ${diagRun.failCount} 项，已生成 ${diagRun.added.length} 个任务`)}
+        render();
+      }
+    },240));
+  }
+  function focusStep(i){diagRun.focus=i;render();scrollStep()}
+
+  function toast(msg){const el=$('#toast');el.innerHTML=`<i>✓</i>${msg}`;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2300)}
+
+  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',records:'执行记录',activities:'活动配置',account:'账号管理'};
+  function nav(){
+    $('#nav').innerHTML=`<button class="${view!=='account'?'active':''}" onclick="go('hotels')"><i>▦</i>酒店管理</button>`
+      +`<p>系统管理</p><button class="${view==='account'?'active':''}" onclick="go('account')"><i>⚙</i>账号管理</button>`;
+    $('#pageTitle').textContent=pageTitles[view];
+    const hotelViews=['diag','tasks','detail','records','activities'];
+    const tabs=[['diag','诊断工作台'],['tasks','诊断任务'],['records','执行记录'],['activities','活动配置']];
+    $('#subnav').innerHTML=activeHotel&&hotelViews.includes(view)?`<div class="subnav">
+      <button class="sub-back" onclick="go('hotels')">‹ 返回酒店管理</button>
+      <div class="sub-hotel"><b>${activeHotel.name}</b><small>${activeHotel.sub}</small></div>
+      <nav>${tabs.map(x=>`<button class="${(view===x[0]||(view==='detail'&&x[0]==='tasks'))?'active':''}" onclick="go('${x[0]}')">${x[1]}${x[0]==='tasks'&&todoTasks().length?`<em>${todoTasks().length}</em>`:''}</button>`).join('')}</nav>
+    </div>`:'';
+  }
+  function go(v){view=v;if(v==='hotels')activeHotel=null;render()}
+  function diagnose(i){if(!both(hotels[i]))return;activeHotel=hotels[i];if(!diagRun||diagRun.hotel!==hotels[i])initDiag();diagRun.hotel=hotels[i];view='diag';render()}
+  function setHotelFilter(next){hotelFilter=next;render()}
+  function setHotelQuery(next){hotelQuery=next;render();const input=$('#hotelSearch');input.focus();input.setSelectionRange(next.length,next.length)}
+  function authState(v){return `<span class="badge ${v}"><i></i>${v==='ok'?'已授权':v==='expired'?'已失效':'未授权'}</span>`}
+
+  /* ===== 酒店管理 ===== */
+  function hotelsPage(){
+    const opts=[['all','全部酒店',h=>true],
+      ['diag7','近 7 天已诊断',h=>{const d=diagDays(h);return d!==null&&d<=7}],
+      ['undiag7','近 7 天未诊断',h=>{const d=diagDays(h);return d===null||d>7}]];
+    const match=opts.find(o=>o[0]===hotelFilter)[2];
+    const visible=hotels.map((h,i)=>({h,i})).filter(({h})=>match(h)&&h.name.includes(hotelQuery.trim()));
+    return `<div class="page">
+      <div class="page-head"><div><h1>酒店管理</h1></div></div>
+      <div class="notice"><span class="notice-icon">ⓘ</span><div><b>抖音来客和携程官网都授权之后才可进行诊断</b></div></div>
+      <div class="panel">
+        <div class="panel-toolbar">
+          <label class="search">⌕<input id="hotelSearch" value="${attr(hotelQuery)}" placeholder="搜索酒店名称" oninput="setHotelQuery(this.value)"></label>
+          <div class="seg">${opts.map(o=>`<button class="${hotelFilter===o[0]?'active':''}" onclick="setHotelFilter('${o[0]}')">${o[1]}<i>${hotels.filter(o[2]).length}</i></button>`).join('')}</div>
+        </div>
+        <div class="grid-row table-head"><span>酒店名称</span><span>抖音来客授权</span><span>携程官网授权</span><span>最近一次诊断完成时间</span><span style="text-align:right">操作</span></div>
+        ${visible.length?visible.map(({h,i})=>`<div class="grid-row hotel-row">
+          <span class="hotel-name">${h.name}</span>
+          ${authState(h.douyin)}${authState(h.ctrip)}
+          <span class="time ${h.lastDiagnosis?'':'empty'}">${h.lastDiagnosis||'暂无诊断记录'}</span>
+          <span class="row-actions"><button class="btn btn-outline" onclick="openAuth(${i})">${both(h)?'更新授权':'去授权'}</button><button class="btn btn-primary" onclick="diagnose(${i})" ${both(h)?'':'disabled'}>诊断</button></span>
+        </div>`).join(''):`<div class="empty-state"><i>⌕</i>未找到匹配的酒店，请调整搜索内容或筛选条件</div>`}
+      </div>
+    </div>`}
+
+  /* ===== 诊断工作台（二级页面） ===== */
+  function diagPage(){
+    if(!diagRun)initDiag();
+    const total=diagSteps.reduce((n,s)=>n+s.items.length,0);
+    const allItems=diagRun.steps.flatMap(s=>s.items);
+    const resolved=allItems.filter(it=>it.state==='pass'||it.state==='fail').length;
+    const passed=allItems.filter(it=>it.state==='pass').length;
+    const failed=allItems.filter(it=>it.state==='fail').length;
+    const runningIdx=diagRun.steps.findIndex(s=>s.state==='running');
+    const curIdx=runningIdx<0?diagRun.focus:runningIdx;
+    const left=activeHotel?diagLeft(activeHotel):2,limited=left<1;
+    const note='<small class="hero-note">7天内只能诊断两次，请合理使用</small>';
+    const heroSub=diagRun.phase==='idle'?(limited?'近 7 天内已诊断 2 次，达到诊断上限'
+      :`共 ${diagSteps.length} 个步骤、${total} 项检查，点击“开始诊断”逐项执行 · 近 7 天还可诊断 ${left} 次`)
+      :diagRun.phase==='running'?`诊断中 · 第 ${curIdx+1}/${diagSteps.length} 步 ${diagSteps[curIdx].name}`
+      :`诊断完成：不通过 ${failed} 项，已生成 ${diagRun.added.length} 个任务`;
+    const f=diagRun.focus,step=diagSteps[f],rs=diagRun.steps[f];
+    const stepState=rs.state==='running'?'<i class="tag" style="background:var(--primary-soft);color:var(--primary)">诊断中</i>':rs.state==='done'?'<i class="tag green">诊断完成</i>':rs.prev==='done'?'<i class="tag gray">上次已诊断</i>':'<i class="tag gray">未诊断</i>';
+    const pct=total?Math.round(resolved/total*100):0;
+    return `<div class="page">
+    <div class="panel diag-hero ${diagRun.phase}" style="margin-bottom:16px">
+      <div class="hero-top">
+        <div class="hero-info">
+          <h3>本次诊断进度</h3>
+          <p class="hero-sub">${heroSub}</p>
+        </div>
+        <div class="hero-cta">
+          ${diagRun.phase==='idle'?(limited?`<button class="btn btn-primary btn-start" disabled>▶　开始诊断</button>${note}`
+          :'<button class="btn btn-primary btn-start" onclick="startDiag()">▶　开始诊断</button>')
+          :diagRun.phase==='running'?'<button class="btn btn-primary btn-start" disabled><span class="spinner" style="margin:0"></span>　诊断中，请稍候</button>'
+          :`<button class="btn btn-primary btn-start" onclick="go('tasks')">查看任务（${diagRun.added.length}）</button><button class="btn btn-outline" style="height:46px;padding:0 24px" onclick="resetDiag()" ${limited?'disabled':''}>重新诊断</button>${note}`}
+        </div>
+      </div>
+      <div class="hero-progress"><div class="pbar"><i style="width:${pct}%"></i></div><b class="hero-pct">${pct}%</b></div>
+      <div class="hero-stats">
+        <div class="hstat"><small>检查项</small><b>${total}</b></div>
+        <div class="hstat"><small>已完成</small><b>${resolved}</b></div>
+        <div class="hstat"><small>通过</small><b style="color:var(--ok)">${passed}</b></div>
+        <div class="hstat"><small>不通过</small><b style="color:#b91c1c">${failed}</b></div>
+        <div class="hstat"><small>已生成任务</small><b style="color:#b91c1c">${diagRun.added.length}</b></div>
+      </div>
+    </div>
+
+    <div class="detail-grid" style="grid-template-columns:1fr 360px">
+      <main>
+        <div class="section" style="margin-bottom:0">
+          <h3 style="margin:0 0 6px">诊断步骤</h3>
+          <p class="dfoot">步骤按检查路径顺序执行，当前步骤完成后自动进入下一步；点击步骤可在右侧查看检查项备注</p>
+          <div class="dlist">
+            ${diagSteps.map((s,i)=>{const st=diagRun.steps[i],n=s.items.length,fl=stepFails(i),pfl=st.items.filter(x=>x.prev==='fail').length,add=diagRun.added.filter(t=>t.path.startsWith(s.name+' ·')).length;
+              const tag=st.state==='running'?'<i class="tag" style="background:var(--primary-soft);color:var(--primary)">诊断中</i>'
+                :st.state==='done'?(fl?`<i class="tag red">不通过 ${fl}</i>`:'<i class="tag green">全部通过</i>')
+                :st.prev==='done'?(pfl?`<i class="tag red">上次不通过 ${pfl}</i>`:'<i class="tag green">上次通过</i>')
+                :'<i class="tag gray">未诊断</i>';
+              const cnt=st.state==='running'?`已检 ${st.items.filter(x=>x.state==='pass'||x.state==='fail').length}/${n} 项`
+                :st.state==='done'?(fl?`通过 ${n-fl} · 不通过 ${fl} · 生成任务 ${add}`:`通过 ${n} 项`)
+                :st.prev==='done'?(pfl?`上次：通过 ${n-pfl} · 不通过 ${pfl}`:`上次：通过 ${n} 项`)
+                :`检查 ${n} 项`;
+              const doneCls=st.state==='done'||st.state==='pending'&&st.prev==='done';
+              return `<button class="drow ${st.state}${doneCls?' done':''}${diagRun.focus===i?' focus':''}" onclick="focusStep(${i})">
+                <span class="dnode">${doneCls&&st.state!=='running'?'✓':i+1}</span>
+                <span class="dt"><b>${s.name}</b><small>${cnt}</small></span>
+                <span class="dstat">${tag}</span>
+              </button>`}).join('')}
+          </div>
+        </div>
+      </main>
+      <aside>
+        <div class="section" style="margin-bottom:0;position:sticky;top:126px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0">步骤备注 · 第 ${f+1} 步</h3>${stepState}</div>
+          <p style="margin:8px 0 2px;font-size:12.5px;color:var(--ink-3)">${step.name} · 检查路径：${step.path} · 共 ${step.items.length} 项</p>
+          ${step.items.map((it,ii)=>{const st=rs.items[ii].state,pv=rs.items[ii].prev;
+            const right=st==='pass'?'<span style="color:var(--ok);font-weight:600">✓ 通过</span>'
+              :st==='fail'?'<span style="color:#b91c1c;font-weight:600">✕ 不通过</span>'
+              :st==='running'?'<span class="spinner"></span><span style="color:var(--primary)">诊断中</span>'
+              :pv==='pass'?'<span style="color:var(--ok)">✓ 上次通过</span>'
+              :pv==='fail'?'<span style="color:#b91c1c">✕ 上次不通过</span>'
+              :'<span style="color:var(--ink-4)">未诊断</span>';
+            return `<div class="ditem col"><span class="dn">${it[0]}</span><span class="dr">${it[1]}</span><span class="ds">${right}</span></div>`}).join('')}
+          ${(()=>{const stasks=taskData.filter(t=>t.status==='待处理'&&t.path.startsWith(step.name+' · '));
+            return stasks.length?`<div class="step-tasks"><div class="st-head">本步骤已生成任务 <b>${stasks.length}</b></div>
+            ${stasks.map(t=>`<div class="st-row"><div class="st-info"><b>${t.name}</b><small>${t.path.split(' · ')[1]||''}</small></div><button class="dgo" onclick="openTask(${todoTasks().indexOf(t)})">去处理</button></div>`).join('')}</div>`:''})()}
+        </div>
+      </aside>
+    </div>
+  </div>`}
+
+  /* ===== 诊断任务 ===== */
+  let taskData=[];
+  let taskTab='todo',taskIdx=0,taskQuery='',taskExec='全部';
+  const todoTasks=()=>taskData.filter(t=>t.status==='待处理'),doneTasks=()=>taskData.filter(t=>t.status==='已处理');
+  const doneShown=()=>doneTasks().filter(t=>(taskExec==='全部'||t.exec===taskExec)&&t.name.includes(taskQuery.trim()));
+  const execTag=e=>e==='执行完成'?'green':e==='执行失败'?'red':(e==='已忽略'||e==='已忽略（此次）')?'gray':'';
+  const TS_FULL=/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+  function setTaskTab(t){taskTab=t;render()}
+  function setTaskExec(v){taskExec=v;render()}
+  function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};go('tasks')}
+  /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
+  let confirmAsk=null;
+  function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
+    const c=type==='skip'
+      ?{title:'确认此次忽略？',body:`忽略后本次任务关闭，下次诊断仍会检查「${t.path}」节点。`,btn:'确认忽略'}
+      :{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，直至主动恢复。`,btn:'确认不再提醒'};
+    $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeConfirm(event)"><div class="modal" onclick="event.stopPropagation()" style="width:400px">
+      <h2>${c.title}</h2><p class="sub">${c.body}</p>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
+    </div></div>`}
+  function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};go('tasks')}
+  function tasks(){
+    const todo=todoTasks(),done=doneTasks(),shown=doneShown();
+    const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
+    return `<div class="page">
+    <div class="page-head"><div><h1>诊断任务</h1><p>本次诊断生成的任务，逐项确认后 AI 才会进入抖音来客执行修改</p></div></div>
+    <div class="tabs">
+      <button class="${taskTab==='todo'?'active':''}" onclick="setTaskTab('todo')">待处理 ${todo.length}</button>
+      <button class="${taskTab==='done'?'active':''}" onclick="setTaskTab('done')">已处理 ${done.length}</button>
+    </div>
+    <div class="panel">
+      ${taskTab==='todo'
+        ?`<div class="tgrid thead" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr"><span>任务名称</span><span>任务路径</span><span>任务诊断时间</span><span style="text-align:right">操作</span></div>
+        ${todo.length?todo.map((x,i)=>{const di=taskData.indexOf(x);return `<div class="tgrid trow" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr">
+          <div class="tcell-title"><b>${x.name}</b><small>已完成数据比对，等待人工确认</small></div>
+          <span>${x.path}</span><span>${x.diagTime}</span>
+          <span style="text-align:right;white-space:nowrap"><button class="btn btn-primary btn-sm" onclick="openTask(${i})">去处理</button><button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'skip')">此次忽略</button><button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'mute')">以后不再提醒</button></span>
+        </div>`}).join(''):'<div class="empty-state"><i>✓</i>暂无待处理任务</div>'}`
+        :`<div class="panel-toolbar">
+          <label class="search">⌕<input id="taskSearch" value="${attr(taskQuery)}" placeholder="搜索任务名称" oninput="setTaskQuery(this.value)"></label>
+          <div class="seg">${execOpts.map(s=>`<button class="${taskExec===s?'active':''}" onclick="setTaskExec('${s}')">${s}<i>${done.filter(t=>s==='全部'||t.exec===s).length}</i></button>`).join('')}</div>
+        </div>
+        <div class="tgrid thead" style="grid-template-columns:2fr 1.2fr .9fr .9fr"><span>任务名称</span><span>任务路径</span><span>任务提交时间</span><span>任务状态</span></div>
+        ${shown.length?shown.map(x=>`<div class="tgrid trow" style="grid-template-columns:2fr 1.2fr .9fr .9fr">
+          <div class="tcell-title"><b>${x.name}</b><small>已提交处理</small></div>
+          <span>${x.path}</span><span>${x.submitTime}</span>
+          <span><i class="tag ${execTag(x.exec)}" ${x.exec==='执行中'?'style="background:var(--primary-soft);color:var(--primary)"':''}>${x.exec}</i></span>
+        </div>`).join(''):(done.length===0?'<div class="empty-state"><i>✓</i>暂无已处理任务，提交或忽略的任务会展示在这里</div>':'<div class="empty-state"><i>⌕</i>未找到匹配的任务，请调整搜索内容或筛选条件</div>')}`}
+    </div>
+  </div>`}
+
+  /* ===== 任务详情（内容与任务一致） ===== */
+  let guideMode=null,guideVia=1;
+  function setGuideMode(m){guideMode=m;render()}
+  function addVia(){guideVia++;render()}
+  function routeNode(tag,hint,ph){return `<div class="route-node">
+    <div class="route-head"><span class="route-tag">${tag}</span><small>${hint}</small><a class="exlink" onclick="toast('已打开示例参考')">示例</a></div>
+    <div class="route-body">
+      <div class="upload-box" onclick="toast('演示原型：请在抖音来客上传对应素材')"><i>📷</i><span>上传文件</span></div>
+      <div class="route-text"><textarea maxlength="50" placeholder="${ph}" oninput="this.nextElementSibling.textContent=this.value.length+' / 50'"></textarea><small class="count">0 / 50</small></div>
+    </div>
+  </div>`}
+  const taskDetailCfg={
+    '悦享双床房近 7 天价格偏高':{advice:'携程用户端悦享双床房近 7 天均价 ¥428，抖音来客当前卖价 ¥519，价差 21%，价格竞争力不足。建议按携程近 7 天均价同步调整。',src:[['房型','悦享双床房'],['携程近 7 天均价','¥428'],['抖音来客当前卖价','¥519']],fields:[{label:'建议写入价格',input:'¥428',note:'已按携程近 7 天均价预填，可修改'}],ignore:'此次忽略'},
+    '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式（酒店名称＝城市＋地标简称1＋地标简称2＋店），缺少地标简称。',src:[['当前名称','尚宽酒店'],['名称公式','城市＋地标简称1＋地标简称2＋店'],['建议名称','重庆西站华岩寺尚宽酒店店']],fields:[{label:'城市',options:['重庆']},{label:'地标简称1',options:['西站','华岩寺']}],ignore:'此次忽略'},
+    '酒店政策联合补充任务':{advice:'当前仅配置 2 项儿童与加床政策，需补齐全部五项后一次写入。',src:[['已配置','儿童入住政策、加床政策'],['待补充','儿童早餐、儿童用品、加床收费标准']],fields:[{label:'儿童早餐',options:['免费','半价','全价']},{label:'加床收费标准',options:['¥100/床/晚','¥150/床/晚']}],ignore:'此次忽略'},
+    '餐厅设施详情补充任务':{advice:'携程用户端已展示早餐厅信息，抖音来客餐厅当前为“无”。建议开启餐厅并完善以下信息。',src:[['设施名称','早餐厅 · 免费'],['所处位置','酒店 1 层'],['营业时间','07:00-10:00']],fields:[{label:'餐厅名称',options:['早餐厅','自助餐厅']},{label:'菜系',options:['中式','西式','中西式']}],ignore:'暂无此设施'},
+    '外显小图替换建议任务':{advice:'外显小图与携程「外观」类别首图比对不一致，建议替换为携程用户端外观首图，提高进店转化。',src:[['携程外观首图','酒店正面夜景 · 1920×1080'],['抖音当前小图','大堂内景 · 与外观不符']],fields:[{label:'替换图片来源',options:['携程外观首图','手动上传']}],ignore:'此次忽略'},
+    '中差评回复建议任务':{advice:'近 30 天存在 3 条待回复中差评。请逐条确认回复内容后一并提交，提交后逐条写入抖音来客。',src:[['待回复中差评','3 条'],['涉及节点','卫生、服务']],ignore:'此次忽略',
+      reviews:[
+        {user:'途**风',stars:1,date:'2026-08-24 21:36',node:'卫生',text:'隔音太差了，凌晨还能听见走廊说话声，枕头有异味，跟前台反映了也没人来处理。',replies:[
+          '非常抱歉影响您休息。我们已对涉事楼层进行隔音排查并更换全部枕芯，同时加强了夜间巡楼提醒。给您带来的不便深表歉意，欢迎您再次入住检验改进。',
+          '诚恳道歉！关于隔音和枕品问题我们已连夜整改。为表歉意，您的下次入住可享房型免费升级一份，到店联系前台说明即可，期待有机会弥补您的体验。',
+          '感谢您的反馈。经核查：当夜前台交接漏掉了您的报修，我们已重新明确 10 分钟内响应的处理时限，并完成枕品更换与楼层隔音处理。再次向您致歉。']},
+        {user:'momo酱',stars:2,date:'2026-08-22 13:02',node:'卫生',text:'房间卫生没打扫干净，床单上有头发，浴室排水口堵住，住得不太舒服。',replies:[
+          '非常抱歉给您带来不好的入住体验。您反馈的床品和浴室排水问题，客房部已完成该房间深度清洁并全面更换床品，排水已疏通，后续将严格执行退房即查制度。',
+          '深表歉意！针对此次卫生问题我们已同步整改，并为您的下次入住准备了一份双早补偿券，报手机尾号即可使用，期待能有机会弥补这次的体验。',
+          '感谢您的反馈。我们已对涉事房间停房消杀、更换全部床品并疏通排水，同时增加每日两次巡房检查，整改结果将于 3 日内复核。给您带来不便再次致歉。']},
+        {user:'张**先生',stars:2,date:'2026-08-18 09:47',node:'服务',text:'到店后说预订的房型没有了，等了四十多分钟才安排好，也没有任何补偿，体验很差。',replies:[
+          '非常抱歉让您久等。当日满房导致原房型紧张，我们已优化排房流程：提前一天锁定房型、备好替代方案，确保客人到店即住。给您带来的不便深表歉意。',
+          '诚恳致歉！让您到店等待四十分钟是我们的失误，我们已为您的账户发放一张无门槛住宿券作为补偿，下次入住可直接抵扣，期待您再来体验。',
+          '感谢您的耐心反馈。我们已复盘当日排房流程，明确超售时须第一时间致歉并提供补偿方案，前台应急培训已完成，欢迎您再次选择我们。']}
+      ]},
+    '活动报名':{advice:'当前有 3 个可报名的活动本酒店尚未参加，参加后可获得平台流量扶持。请逐个确认报名意向后提交。',src:[['可报名活动','3 个'],['本酒店已参加','0 个']],ignore:'此次忽略',
+      acts:[
+        {name:'暑期酒店爆款冲刺',desc:'平台流量扶持 · 酒店住宿',time:'2026-09-01 至 2026-09-30'},
+        {name:'金秋出游季',desc:'平台流量扶持 · 酒店住宿',time:'2026-09-15 至 2026-10-15'},
+        {name:'中秋团圆住房季',desc:'节日主题 · 限量补贴',time:'2026-09-25 至 2026-10-08'}
+      ]}
+  };
+  const replyStyles=['致歉＋整改说明','致歉＋补偿方案','情况说明＋整改时限'];
+  /* 中差评逐条回复状态：replySel 每条评价选中的答复语序号，replyText 每条评价编辑框内容 */
+  let replySel={},replyText={};
+  function pickReply(i,j){replySel[i]=j;const c=taskDetailCfg[taskData[taskIdx].name];replyText[i]=c.reviews[i].replies[j];render()}
+  function setReplyText(i,v){replyText[i]=v}
+  /* 活动报名意向状态：actSel 每个活动选择（参加/不参加），未选择默认参加 */
+  let actSel={};
+  function setActSel(i,v){actSel[i]=v}
+  const fieldHtml=f=>f.input!==undefined
+    ?`<label class="field"><span>${f.label}</span><input type="text" value="${f.input}"><small>${f.note||'已预填建议值，可修改'}</small></label>`
+    :`<label class="field"><span>${f.label}</span><select>${f.options.map(o=>`<option>${o}</option>`).join('')}</select><small>${f.note||'来自携程用户端，可修改'}</small></label>`;
+  function detail(){const t=taskData[taskIdx]||taskData[0];
+    let main='',actions='';
+    if(t.kind==='route'||t.name==='找店指引素材补充'){
+      main=`<div class="notice"><span class="notice-icon">✦</span><div><b>AI 诊断建议</b><span>抖音来客当前未设置找店指引（图文指引、视频指引均为“暂未设置”）。建议选择一种指引方式，按起点 → 途经点 → 终点的路线补充素材，帮助顾客快速找到门店。</span></div></div>
+      <div class="section"><h3>设置找店指引</h3>
+        ${guideMode==null?`<div class="guide-choose">
+          <div class="guide-row"><b>选择指引方式</b><a class="exlink" onclick="toast('已打开优秀案例参考')">优秀案例</a></div>
+          <button class="guide-card" onclick="setGuideMode('pic')"><span class="g-name">图文指引</span><i class="tag gray">暂未设置</i><b>›</b></button>
+          <button class="guide-card" onclick="setGuideMode('video')"><span class="g-name">视频指引</span><i class="tag gray">暂未设置</i><b>›</b></button>
+        </div>`
+        :guideMode==='pic'?`<h4 class="route-title">请用图文描述路线</h4>
+          ${routeNode('起点','选公交站/大楼/沿街店铺等易辨认地标作起点','附近地标拍全景照，如“面对万达广场1号门，往右边走100米”')}
+          ${Array.from({length:guideVia},()=>routeNode('途经点','选路口/楼梯等关键标志物作途经点','告诉顾客怎么走，如“左转后沿着零食店直走100米”')).join('')}
+          <button class="btn-add-via" onclick="addVia()">＋ 添加途经点</button>
+          ${routeNode('终点','上传清晰完整的门头照','用和门店一致的门头图，如“直走左手边第2间店，看到招牌就到店啦”')}`
+        :`<h4 class="route-title">请用视频描述路线</h4>
+          <p class="route-tips">视频时长建议控制在 90 秒以内；分辨率需清晰呈现关键信息（避免画面模糊）；画面建议减少晃动、保持稳定；内容禁止包含营销推广信息；拍摄过程中不得出现未成年人肖像。</p>
+          <div class="upload-box video" onclick="toast('演示原型：请在抖音来客上传指引视频')"><i>📷</i><span>上传指引视频</span></div>`}
+      </div>`;
+      actions=`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
+        <button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>
+        ${guideMode!=null?'<button class="btn btn-outline" onclick="setGuideMode(null)">上一步</button>':''}
+        <button class="btn btn-primary" onclick="finishTask('执行中','找店指引已提交，AI 正在同步至抖音来客')" ${guideMode==null?'disabled':''}>提交</button>`;
+    }else{
+      const c=taskDetailCfg[t.name]||{advice:`「${t.path}」检查不通过，已生成处理建议。请确认以下建议内容，提交后写入抖音来客。`,src:[['检查项',t.path],...(t.type?[['任务类型',t.type]]:[]),['诊断时间',t.diagTime]],fields:[]};
+      main=`<div class="notice"><span class="notice-icon">✦</span><div><b>AI 诊断建议</b><span>${c.advice}</span></div></div>
+      <div class="section"><h3>1　来源数据与差异</h3>
+        <div class="source">${c.src.map(x=>`<div><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}</div>
+      </div>
+      ${c.reviews?`<div class="section"><h3>2　逐条回复（共 ${c.reviews.length} 条）</h3>
+        <p class="review-tip">每条评价提供三套答复语供选择，选中内容同步展示在下方编辑框中，可修改后一并提交。</p>
+        ${c.reviews.map((r,i)=>{const sel=replySel[i]||0;const txt=replyText[i]!==undefined?replyText[i]:r.replies[sel];
+          return `<div class="review-item">
+          <div class="review-head"><span class="rv-user">${r.user}</span><span class="rv-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span><small class="rv-date">${r.date}</small><i class="tag gray">${r.node}</i><i class="tag red">待回复</i></div>
+          <p class="review-text">${r.text}</p>
+          <div class="reply-opts"><small>第 ${i+1} / ${c.reviews.length} 条 · 选择一套答复语</small>
+            ${r.replies.map((rp,j)=>`<button type="button" class="reply-opt${sel===j?' active':''}" onclick="pickReply(${i},${j})"><i>${j+1}</i><b>${replyStyles[j]}</b><span>${rp}</span></button>`).join('')}
+          </div>
+          <div class="reply-edit"><small>回复内容（可修改后提交）</small><textarea oninput="setReplyText(${i},this.value)">${txt}</textarea></div>
+        </div>`}).join('')}
+      </div>`
+      :c.acts?`<div class="section"><h3>2　确认报名意向（共 ${c.acts.length} 个活动）</h3>
+        <p class="review-tip">以下为可报名且本酒店尚未参加的活动，默认选择“参加”，可改为“不参加”，确认后提交。</p>
+        ${c.acts.map((a,i)=>`<div class="act-row">
+          <div class="act-info"><b>${a.name}</b><small>${a.desc} · 活动时间 ${a.time}</small></div>
+          <label class="act-sel"><span>报名意向</span><select onchange="setActSel(${i},this.value)"><option${(actSel[i]||'参加')==='参加'?' selected':''}>参加</option><option${actSel[i]==='不参加'?' selected':''}>不参加</option></select></label>
+        </div>`).join('')}
+      </div>`
+      :c.fields.length?`<div class="section"><h3>2　建议写入抖音来客</h3>
+        <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
+      </div>`:''}`;
+      actions=`${c.ignore==='暂无此设施'?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
+        <button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
+        <button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>
+        <button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`;
+    }
+    return `<div class="page">
+    <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
+    <div class="page-head"><div><h1>${t.name}</h1><p>${t.path} · 当前酒店：${activeHotel.name}</p></div><i class="tag red">待处理</i></div>
+    <main>
+      ${main}
+      <div class="action-bar">${actions}</div>
+    </main>
+  </div>`}
+
+  /* ===== 执行记录（按检查路径分组，按诊断次数展示） ===== */
+  const recordGroups=[
+    {path:['店铺管理','门店管理','基本信息','门店名称'],rounds:[
+      ['2026-08-28 10:32','fail',1,'门店名称不符合名称公式，已生成修改建议任务'],
+      ['2026-08-15 09:18','fail',1,'整改后仍缺少地标简称，再次生成任务'],
+      ['2026-08-08 16:40','pass',0,'全部规则通过']]},
+    {path:['店铺管理','门店管理','基本信息','找店指引'],rounds:[
+      ['2026-08-27 18:06','fail',1,'起点与途经点素材缺失，已生成补充任务'],
+      ['2026-08-20 11:24','pass',0,'全部规则通过']]},
+    {path:['店铺管理','酒店信息管理','酒店政策','加床及儿童'],rounds:[
+      ['2026-08-27 18:06','fail',1,'联合诊断节点未全部配置，已生成联合补充任务'],
+      ['2026-08-13 14:02','pass',0,'五项政策全部通过']]},
+    {path:['店铺管理','酒店信息管理','酒店设施','餐厅'],rounds:[
+      ['2026-08-27 18:06','fail',1,'抖音餐厅为“无”，已生成详情补充任务']]},
+    {path:['店铺管理','店铺装修','门店装修','外显小图'],rounds:[
+      ['2026-08-27 18:06','fail',1,'与携程「外观」图片不一致，已生成替换建议任务']]}
+  ];
+  let recOpen={0:true};
+  function toggleRec(i){recOpen[i]=!recOpen[i];render()}
+  function records(){return `<div class="page">
+    <div class="page-head"><div><h1>执行记录</h1><p>按检查路径归类，展开查看每一次诊断的结果与生成任务数</p></div></div>
+    ${recordGroups.map((g,i)=>{const latest=g.rounds[0];
+      return `<div class="rgroup">
+        <button class="rg-head" onclick="toggleRec(${i})">
+          <span class="rg-path"><b>${g.path[3]}</b><small>　${g.path.slice(0,3).join(' › ')}</small></span>
+          <span class="tags">
+            <i class="tag gray">已诊断 ${g.rounds.length} 次</i>
+            <i class="tag ${latest[1]==='pass'?'green':'red'}">${latest[1]==='pass'?'最近通过':'最近不通过'}</i>
+            <small>${latest[0]}</small>
+            <span class="chev ${recOpen[i]?'open':''}">⌄</span>
+          </span>
+        </button>
+        ${recOpen[i]?`<div class="rg-body">${g.rounds.map((r,ri)=>`<div class="rline">
+          <span class="no">第 ${g.rounds.length-ri} 次</span><span>${r[0]}</span>
+          <i class="tag ${r[1]==='pass'?'green':'red'}">${r[1]==='pass'?'通过':'不通过'}</i>
+          <span>${r[2]?`<b style="color:#b91c1c">生成任务 ${r[2]} 个</b>`:'<span style="color:var(--ink-4)">未生成任务</span>'}</span>
+          <span>${r[3]}</span>
+        </div>`).join('')}</div>`:''}
+      </div>`}).join('')}
+  </div>`}
+
+  /* ===== 活动配置 ===== */
+  function activities(){return `<div class="page">
+    <div class="page-head"><div><h1>活动配置</h1><p>管理员配置允许进入诊断范围的抖音活动</p></div><button class="btn btn-outline" onclick="toast('活动列表已同步')">↻ 同步活动</button></div>
+    <div class="list-card">${[['暑期酒店爆款冲刺','立即报名','平台流量扶持 · 酒店住宿','允许诊断','已开启'],['金秋出游季','立即报名','平台流量扶持 · 酒店住宿','允许诊断','已开启'],['中秋团圆住房季','立即报名','节日主题 · 限量补贴','允许诊断','已开启'],['夏日清凉住宿节','已下线','平台流量扶持 · 酒店住宿','不参与诊断','开启']].map((x,i)=>`<div class="lrow"><strong>${['暑','秋','中','夏'][i]}</strong><div class="lt"><b>${x[0]}</b><small>${x[2]}</small></div><i class="tag ${i===3?'gray':'green'}">${x[1]}</i><span>${x[3]}</span><span style="text-align:right"><button class="btn btn-outline">${x[4]}</button></span></div>`).join('')}</div>
+  </div>`}
+
+  /* ===== 账号管理 ===== */
+  function accountPage(){return `<div class="page">
+    <div class="page-head"><div><h1>账号管理</h1><p>管理当前登录账号的基础信息与安全设置</p></div></div>
+    <div class="card narrow">
+      <h3>账号信息</h3>
+      <div class="profile"><span class="avatar">禾</span><div><b>禾薇运营</b><small>代运营管理员</small></div><span class="badge ok"><i></i>正常</span></div>
+      <div class="info-row"><small>登录手机号</small><b>138 8888 6620</b></div>
+      <div class="info-row"><small>账号角色</small><b>代运营管理员</b></div>
+      <div class="info-row"><small>所属组织</small><b>禾薇代运营</b></div>
+    </div>
+    <div class="card narrow" style="margin-top:16px">
+      <h3>安全设置</h3>
+      <p>修改登录密码或退出当前账号</p>
+      <div style="display:flex;gap:10px"><button class="btn btn-outline" onclick="toast('修改密码功能预留')">修改登录密码</button><button class="btn btn-outline" style="color:#dc2626;border-color:#fecaca" onclick="toast('已退出登录（演示）')">退出登录</button></div>
+    </div>
+  </div>`}
+
+  /* ===== 授权弹窗 ===== */
+  function openAuth(i){authIndex=i;platform=hotels[i].douyin!=='ok'?'douyin':hotels[i].ctrip!=='ok'?'ctrip':'douyin';method='sms';reauth=false;modal()}
+  function modal(){const h=hotels[authIndex];const st=v=>v==='ok'?'已授权 · 保活中':v==='expired'?'已失效 · 需重新授权':'待授权';const ok=h[platform]==='ok'&&!reauth;$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeModal(event)"><div class="modal" onclick="event.stopPropagation()">
+    <button class="close" onclick="closeModal()">×</button>
+    <h2>${both(h)?'更新酒店平台授权':'授权酒店平台账号'}</h2>
+    <div class="sub">${h.name} · ${h.sub}</div>
+    <div class="steps">
+      <button class="${platform==='douyin'?'active':''}" onclick="platform='douyin';reauth=false;modal()"><b>抖音来客</b><small>${st(h.douyin)}</small></button>
+      <span>›</span>
+      <button class="${platform==='ctrip'?'active':''}" onclick="platform='ctrip';reauth=false;modal()"><b>携程官网</b><small>${st(h.ctrip)}</small></button>
+    </div>
+    ${ok?`<div class="success"><b>✓　${platform==='douyin'?'抖音来客':'携程官网'}授权有效</b><p>会话保活中，系统将在诊断前自动校验。</p><button class="btn btn-outline reauth" onclick="reauth=true;modal()">重新授权当前平台</button></div>`
+    :`<div class="methods"><button class="${method==='sms'?'active':''}" onclick="method='sms';modal()">验证码登录</button><button class="${method==='password'?'active':''}" onclick="method='password';modal()">账密登录</button></div>
+      <label class="auth-field"><span>${method==='sms'?'手机号':'账号'}</span><input value="138 8888 6620"></label>
+      ${method==='sms'?`<label class="auth-field"><span>验证码</span><div class="code"><input placeholder="请输入 6 位验证码"><button onclick="this.textContent='已发送 59s'">获取验证码</button></div></label>`:`<label class="auth-field"><span>密码</span><input type="password" placeholder="请输入密码"></label>`}
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="authorize()">确认授权</button>`}
+    <div class="modal-foot">授权成功后将自动保活一段时间，具体时长以平台实际会话为准。</div>
+  </div></div>`}
+  function authorize(){hotels[authIndex][platform]='ok';reauth=false;toast(`${platform==='douyin'?'抖音来客':'携程官网'}授权成功`);modal();render()}
+  function closeModal(e){if(e&&e.target!==e.currentTarget)return;$('#modalRoot').innerHTML='';authIndex=null}
+
+  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,records,activities,account:accountPage};$('#app').innerHTML=pages[view]()}
+  render();
+</script>
+</body>
+</html>
