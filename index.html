@@ -249,6 +249,16 @@
   .gb-roomsel b{flex:1;min-width:0;font-size:12.5px}
   .gb-roomsel small{display:block;color:var(--ink-4);font-size:11.5px;font-weight:400;margin-top:2px}
   .gb-qtyrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  /* 房型信息核对：逐字段「由 → 修改为」差异表 */
+  .rt-grid{display:grid;grid-template-columns:76px 1.15fr .95fr 1.3fr;gap:10px;align-items:start}
+  .rt-hd{font-size:11.5px;color:var(--ink-4);font-weight:600;padding-bottom:7px;border-bottom:1px solid var(--line)}
+  .rt-ln{padding:9px 0;border-bottom:1px dashed var(--line-soft);font-size:12.5px}
+  .rt-ln:last-of-type{border-bottom:0}
+  .rt-ln>b{font-weight:600;color:var(--ink-2);line-height:1.6}
+  .rt-ln>span{color:var(--ink-2);line-height:1.6}
+  .rt-fix{display:flex;flex-direction:column;gap:4px}
+  .gb-ta{width:100%;min-height:56px;border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 10px;font-size:12.5px;resize:vertical;box-sizing:border-box;font-family:inherit}
+  .gb-ta:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
   .review-item{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:14px;background:var(--surface)}
   .review-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .rv-user{font-weight:700;font-size:13px}
@@ -425,18 +435,15 @@
       ['早餐政策','五项政策联合诊断：早餐信息不为空','fail','酒店政策联合补充任务','信息完善']]},
     {name:'酒店设施',path:'店铺管理 › 酒店信息管理 › 酒店设施',items:[
       ['酒店设施审核不通过标签','酒店设施顶部无“审核不通过”标签','fail','酒店设施审核整改任务','信息完善'],
-      ['停车场','对照携程“服务及设施”，停车场信息配置完整','fail','停车场信息补充任务','信息完善'],
-      ['充电车位','对照携程“服务及设施”，充电车位信息配置完整','fail','充电车位信息补充任务','信息完善'],
-      ['餐厅','携程采集到早餐厅，抖音餐厅为“无”，图片与营业时间缺失','fail','餐厅设施详情补充任务','信息完善'],
-      ['接机服务','对照携程用户端“服务及设施”，接机服务配置完整','fail','接机服务补充任务','信息完善'],
-      ['接站服务','对照携程用户端“服务及设施”，接站服务配置完整','fail','接站服务补充任务','信息完善'],
-      ['酒店设施通用规则','以携程用户端为采集边界，按抖音字段逐项核对','fail','酒店设施信息核对任务','信息完善']]},
+      ['酒店设施通用规则','以携程用户端“服务及设施”为采集边界逐设施核对，合并为一条核对任务：携程有、抖音无→建议改为“有”并补充详情；已为“有”→逐字段校验，不一致按携程修正；携程未查到→不推测，维持当前值。本次不通过 5 个设施：充电车位、接机服务、接站服务缺失，停车场、餐厅字段不一致','fail','酒店设施信息核对任务','信息完善']]},
     {name:'门店装修',path:'店铺管理 › 店铺装修 › 门店装修',items:[
-      ['装修审核不通过','「门店装修 › 门店主页 › 头图和相册」存在审核不通过标识，AI 点击“去设置”读取失败原因与被驳回图片','fail','门店装修审核整改任务','信息完善'],
+      ['装修审核不通过','「门店装修 › 头图和相册」有审核不通过标识，被驳回图片合并为一条整改任务，用户重新上传或删除后提交','fail','门店装修审核整改任务','信息完善'],
       ['外显小图','外显小图与携程「外观」类别图片比对不一致','fail','外显小图替换建议任务','图片替换'],
       ['头图和相册','门店头图与商家相册均已上传图片','fail','头图相册补充任务','图片替换']]},
     {name:'房型管理',path:'商品与货架 › 房型管理 › 房型管理',items:[
-      ['房型信息','对照携程房型数据，逐字段核对房型名称、描述与设施','fail','房型信息核对任务','信息完善']]},
+      ['钟点房','名称一致自动对应；楼层、网络服务、房型设施 3 项与携程不一致，该房型单独形成 1 条核对任务','fail','房型信息核对·钟点房','信息完善'],
+      ['亲子家庭房','名称不一致，建议对应「亲子家庭房-赠送小孩早餐·免费携带宠物」，需确认；床型、最大可住人数 2 项不一致','fail','房型信息核对·亲子家庭房','信息完善'],
+      ['电竞大床房','携程在售、抖音未创建，按缺失房型单独形成 1 条新增任务','fail','房型新增·电竞大床房','信息完善']]},
     {name:'日历房',path:'商品与货架 › 商品管理 › 日历房',items:[
       ['日历房房型集合','日历房已上架 10 个，覆盖“房型管理”全部 6 个房型，集合一致后逐房型比较早餐份数','pass','',''],
       ['景观棋牌娱乐房','早餐份数与携程一致：抖音 2 份＝携程 2 份','pass','',''],
@@ -635,8 +642,8 @@
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auditPick=0;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auditPick=0;go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
   function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
@@ -648,7 +655,7 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auditPick=0;go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -705,18 +712,100 @@
     ['修改入口与生效范围','在「编辑日历房型」修改早餐份数是否要求重新维护价量态（近 3 个月内 30 天房价/房量）、修改对已生成未入住订单的影响，待确认。'],
     ['携程份数取值口径','携程早餐展示为“无早/单早/双早/三早”，按 0/1/2/3 份映射；携程仅展示“含早”未标明份数时的取值口径待确认。']];
   const calTask=(advice,room)=>({advice,src:[['酒店','尚宽酒店（重庆西站华岩寺店）· 抖音来客'],['数据范围','日历房已上架 10 个 · 覆盖房型 6/6'],['早餐份数不一致','2 个房型 · 本任务仅处理当前房型']],ignore:'此次忽略',cal:{room},pends:CAL_PENDS});
-  /* 门店装修审核整改：规则待确认口径（与《抖音来客诊断规则表A》「装修审核不通过」一致） */
-  const AUDIT_PENDS=[
-    ['失败原因解读深度','平台仅返回简短驳回文案（如“图片不符合规范”）时，AI 是否需归类解读原因并逐条给出整改建议，待确认；当前任务页按抖音返回的原始原因展示。'],
-    ['多节点同时驳回的任务粒度','头图和相册、外显小图等多个装修节点同时审核不通过时，是合并为一条装修审核处理任务还是按节点拆分（Excel 未明确；日历房等节点已有“不合并”口径），待确认。当前按单一节点生成。'],
-    ['被驳回图片的定位粒度','抖音若仅返回节点级驳回结果、不指明具体被驳回图片时，如何定位单张图片（逐张读取审核状态或由用户指认），待确认。'],
-    ['删除后的空缺联动','被驳回图片删除后，若该相册类别张数不足、或被驳回的是门店头图导致头图为空，是否联动生成缺图补充任务，待确认。'],
-    ['审核结果跟踪口径','Excel 按“写入/提交校验成功后标记已完成”执行；重新提交后再次被驳回时是否重新生成任务、审核通过前是否需要跟踪，待确认。']];
+  /* 房型信息核对：逐字段差异与规则待确认口径（与《抖音来客诊断规则表A》「房型信息」一致） */
+  const RT_PENDS=[
+    ['房型名称修改边界','规则将「房型名称」列入逐字段比对，但未明确已关联日历房、团购商品的抖音房型是否允许改名、改名后商品关联是否受影响，待确认。本任务对名称差异仅提示对应关系，不直接改名。'],
+    ['同名房型误匹配','规则按「名称一致」自动对应，未覆盖名称相同但床型、面积明显不同的同名房型是否需人工复核，待确认。'],
+    ['区间字段的写入口径','携程楼层、面积展示为区间（如 3~6 层、25-35㎡），抖音支持「固定值 / 区间」两种模式；默认按区间写入还是取中间值写固定值，待确认。本任务默认按区间写入。'],
+    ['网络服务映射粒度','携程网络仅区分无线 / 有线，抖音为「可上网＋WiFi（收费 / 免费）＋有线网络（收费 / 免费）」结构；差异修改删除已勾选的有线网络是否影响前台外显，待确认。'],
+    ['房型图片覆盖策略','携程房型图片为多张，抖音「编辑房型」房型图片最多 10 张且区分头图；存在差异时是全量覆盖抖音已有图片还是仅补缺、头图是否保持不变，待确认。'],
+    ['抖音有而携程未采集的字段','规则仅规定「携程有、抖音无对应字段不展示」；反向场景（如吸烟政策、英文名称，携程未采集）是保持抖音当前值还是提示用户补充，待确认。本任务默认保持抖音当前值、新增时不预填。']];
+  const rtPends=()=>`<div class="section"><h3>4　本规则待确认事项（${RT_PENDS.length} 项）</h3>
+    <p class="review-tip">以下为《抖音来客诊断规则表A》「房型信息」规则尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
+    ${RT_PENDS.map((p,i)=>`<div class="gb-kv"><small>待确认 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
+  </div>`;
+  const rtTask=(advice,src,match,diffs,ok)=>({advice,src,ignore:'此次忽略',rt:{match,diffs,ok},pends:RT_PENDS});
+  const rtCnt=['房型数量','携程 8 个 · 抖音来客已上架 11 个','不能仅因数量相等或抖音≥携程就判定通过，须逐房型完成字段校验'];
+  const rtExtra=['多出房型','抖音多出的 4 个房型（列表折叠未展开）','按规则不删除、不形成任务'];
+  /* 缺失房型新增：总间数由用户填写，未填写时提交置灰 */
+  function rtQtySync(v){const b=document.getElementById('rtSubmit');if(b)b.disabled=!v.trim()}
+  /* 酒店设施信息核对：规则待确认口径（与《抖音来客诊断规则表》「酒店设施通用规则」及各设施节点一致） */
+  const FAC_PENDS=[
+    ['任务粒度','Excel「酒店设施通用规则」为全设施统一口径，但各设施节点又写明“仅处理该设施、独立任务”；本任务按设施合并为一条核对任务，逐设施独立确认、独立写入、互不影响，该粒度口径需确认。'],
+    ['携程无数据设施的任务量','抖音来客带“必检”标的设施达 40+（泳池、水上乐园、儿童泳池等），携程均未采集到时按通用规则仍需逐个创建确认任务；本任务并入批量清单展示（保持“无”无需操作，可主动改“有”），是否认可需确认。'],
+    ['同一设施多条携程数据','携程“服务及设施”同一设施存在多条并列数据（如多个泳池、多个餐厅）时取哪条（取首条/逐条生成/用户选择），Excel 未明确。'],
+    ['携程值无对应抖音选项','携程采集值在抖音选项中无对应项（如携程泳池“半露天”，抖音无此选项）时，Excel 仅要求不推测；该字段留空待用户选择还是保留抖音当前值，需确认。'],
+    ['“有”改回“无”的回退','用户提交改为“有”并写入成功后发现实际无此设施：是否支持再次改回“无”、是否生成新任务，Excel 未覆盖。'],
+    ['执行时携程数据时效','诊断采集与 AI 执行之间存在时间差，携程“服务及设施”可能已更新；执行以诊断时采集值还是执行时重新采集值为准，需确认。'],
+    ['免费标签与金额并存','携程同时展示“免费”标签与“每车 100 元”金额文案时，收费信息以哪个为准；本任务按金额优先（收费＋价格 100 元/车），需确认。']];
   const taskDetailCfg={
     '悦享双床房近 7 天价格偏高':{advice:'携程用户端悦享双床房近 7 天均价 ¥428，抖音来客当前卖价 ¥519，价差 21%，价格竞争力不足。建议按携程近 7 天均价同步调整。',src:[['房型','悦享双床房'],['携程近 7 天均价','¥428'],['抖音来客当前卖价','¥519']],fields:[{label:'建议写入价格',input:'¥428',note:'已按携程近 7 天均价预填，可修改'}],ignore:'此次忽略'},
     '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式（酒店名称＝城市＋地标简称1＋地标简称2＋店），缺少地标简称。',src:[['当前名称','尚宽酒店'],['名称公式','城市＋地标简称1＋地标简称2＋店'],['建议名称','重庆西站华岩寺尚宽酒店店']],fields:[{label:'城市',options:['重庆']},{label:'地标简称1',options:['西站','华岩寺']}],ignore:'此次忽略'},
     '酒店政策联合补充任务':{advice:'当前仅配置 2 项儿童与加床政策，需补齐全部五项后一次写入。',src:[['已配置','儿童入住政策、加床政策'],['待补充','儿童早餐、儿童用品、加床收费标准']],fields:[{label:'儿童早餐',options:['免费','半价','全价']},{label:'加床收费标准',options:['¥100/床/晚','¥150/床/晚']}],ignore:'此次忽略'},
-    '餐厅设施详情补充任务':{advice:'携程用户端已展示早餐厅信息，抖音来客餐厅当前为“无”。建议开启餐厅并完善以下信息。',src:[['设施名称','早餐厅 · 免费'],['所处位置','酒店 1 层'],['营业时间','07:00-10:00']],fields:[{label:'餐厅名称',options:['早餐厅','自助餐厅']},{label:'菜系',options:['中式','西式','中西式']}],ignore:'暂无此设施'},
+    /* 酒店设施信息核对：停车场/充电车位/餐厅/接机服务/接站服务等设施合并为一条核对任务，逐设施独立确认（与「酒店设施通用规则」一致） */
+    '酒店设施信息核对任务':{advice:'对照携程用户端“服务及设施”逐设施核对抖音来客「酒店信息管理 › 酒店设施」：检出 5 个设施不通过——充电车位、接机服务、接站服务为“携程有、抖音无”，建议改为“有”并补充详情；停车场、餐厅已为“有”但部分字段与携程不一致，按携程修正。其余设施携程未查到对应数据，AI 不推测、维持抖音当前值。以下修改内容已按携程映射预填，全部可修改，逐设施确认后 AI 按确认结果写入抖音来客。',src:[['采集来源','携程用户端“服务及设施”'],['抖音当前值','抖音来客 · 酒店信息管理 › 酒店设施'],['诊断不通过','5 个设施：缺失补充 3 · 字段修正 2'],['携程未查到数据','其余设施 · 维持“无”']],ignore:'此次忽略',pends:FAC_PENDS,
+      fac:{list:[
+        {name:'停车场',tag:'字段修正',
+         lack:'抖音停车场已为「有」，「类型」与携程不一致；位置、预定方式、收费信息逐字段校验通过',
+         ctrip:'公共停车场 · 免费 · 所处位置：酒店内停车场 · 预约信息：不需要提前预约',
+         change:'停车场类型：私人停车场 → 公共停车场；其余字段与携程一致，校验通过',
+         rows:[
+           {t:'sel',label:'位置',opts:['酒店内','酒店附近'],v:'酒店内',note:'与携程一致，可修改'},
+           {t:'sel',label:'类型',opts:['公共停车场','私人停车场'],v:'公共停车场',note:'携程“公共停车场”→公共停车场，已预填可修改',hl:true},
+           {t:'sel',label:'预定方式',opts:['无需预定','需预约','无法提前预定'],v:'无需预定',note:'携程“不需要提前预约”→无需预定，与当前一致'},
+           {t:'sel',label:'收费信息',opts:['免费','收费','部分住宿可免费使用'],v:'免费',note:'与携程一致，可修改'}]},
+        {name:'充电车位',tag:'缺失补充',
+         lack:'抖音充电车位为「无」；携程“服务及设施”已采集到充电车位',
+         ctrip:'所处位置：酒店内 · 快充 · 一般充电桩 · 收费 · 充电车位数量：4',
+         change:'充电车位 无 → 有；位置＝酒店内；充电方式＝快充；充电桩类型＝一般充电桩；收费信息＝收费充电；数量＝4',
+         rows:[
+           {t:'sel',label:'位置',opts:['酒店内','酒店附近'],v:'酒店内',note:'携程酒店内→酒店内，已预填可修改'},
+           {t:'chk',label:'充电方式',opts:['快充','慢充'],v:['快充'],note:'携程快充→勾选快充；携程快慢充均有→两项均勾选'},
+           {t:'chk',label:'充电桩类型',opts:['一般充电桩','特斯拉目的地充电桩','特斯拉超级充电桩'],v:['一般充电桩'],note:'按携程采集类型勾选，可多选'},
+           {t:'sel',label:'收费信息',opts:['免费充电','收费充电'],v:'收费充电',note:'携程收费标签→收费充电',hl:true},
+           {t:'in',label:'充电车位数量',v:'4',note:'个 · 携程采集数字预填，可修改；未采集则保持为空'}]},
+        {name:'接机服务',tag:'缺失补充',
+         lack:'抖音接机服务为「无」；携程用户端已展示专车接机服务（携程“适用机场”为非抖音字段，不采集、不展示）',
+         ctrip:'专车接机 · 收费信息：每车 100 元 · [周一–周日] 00:00–23:59 · 需要提前预约 · 车型：别克',
+         change:'接机服务 无 → 有；接送方式＝专车；收费信息＝收费、价格 100 元/车；开放时间＝每日开放 00:00–23:59；是否需要预约＝是；车型品牌＝别克',
+         rows:[
+           {t:'sel',label:'接送方式',opts:['专车','拼车'],v:'专车',note:'携程“专车接机”→专车'},
+           {t:'fee',label:'收费信息',fee:'收费',price:'100',note:'携程“每车 100 元”→收费＋价格 100 元，已预填可修改',hl:true},
+           {t:'radio',label:'是否需要预约',opts:['是','否'],v:'是',note:'携程“需要提前预约”→是'},
+           {t:'time',label:'开放时间',t1:'00:00',t2:'23:59',note:'携程 [周一–周日] → 每日开放'},
+           {t:'sel',label:'车型品牌',opts:['请选择','别克','丰田','传祺'],v:'别克',note:'携程未展示的品牌不由 AI 推测，由用户选择'}]},
+        {name:'接站服务',tag:'缺失补充',
+         lack:'抖音接站服务为「无」；携程用户端已展示班车接站服务',
+         ctrip:'班车接站 · 免费 · [周一–周日] 08:30–22:30 · 不需要预约 · 每 3 小时 3 班',
+         change:'接站服务 无 → 有；接送方式＝拼车；收费信息＝免费；开放时间＝每日开放 08:30–22:30；是否需要预约＝否；服务频次＝每 3 小时 3 次',
+         rows:[
+           {t:'sel',label:'接送方式',opts:['专车','拼车'],v:'拼车',note:'携程“班车接站”→拼车'},
+           {t:'fee',label:'收费信息',fee:'免费',price:'',note:'携程免费标签→免费'},
+           {t:'radio',label:'是否需要预约',opts:['是','否'],v:'否',note:'携程“不需要预约”→否'},
+           {t:'time',label:'开放时间',t1:'08:30',t2:'22:30',note:'携程 [周一–周日] → 每日开放'},
+           {t:'sel',label:'车型品牌',opts:['请选择','别克','丰田','传祺'],v:'请选择',note:'携程未展示，不推测，由用户选择'},
+           {t:'freq',label:'服务频次',h:'3',c:'3',note:'携程“每3小时3次”预填，可修改'}]},
+        {name:'餐厅',tag:'字段修正',
+         lack:'抖音餐厅已为「有」，「供应」「开放时间」与携程不一致；菜单类型、菜系、氛围/风格校验通过；图片 1 张已审核通过',
+         ctrip:'早餐厅 · 自助 · 供应：早餐 · 营业时间 07:30–10:00',
+         change:'供应：午餐 → 早餐；开放时间：08:00–10:00 → 07:30–10:00（餐厅名称、支持特殊饮食为携程未采集字段，可自行选填）',
+         rows:[
+           {t:'chk',label:'菜单类型',opts:['单点','自助'],v:['自助'],note:'携程“自助”→自助，与当前一致'},
+           {t:'sel',label:'菜系',opts:['中餐','西餐','中西餐'],v:'中餐',note:'与携程一致，可修改'},
+           {t:'sel',label:'供应',opts:['早餐','午餐','晚餐'],v:'早餐',note:'携程可识别供应“早餐”→早餐，已预填可修改',hl:true},
+           {t:'time',label:'开放时间',t1:'07:30',t2:'10:00',note:'已按携程营业时间预填，可修改',hl:true},
+           {t:'sel',label:'氛围/风格',opts:['现代','简约','商务'],v:'现代',note:'与携程一致，可修改'},
+           {t:'img',label:'餐厅图片',note:'1 张已审核通过，无需重传；携程无图时必须由用户上传后才可提交'}]}
+      ],
+      keep:[
+        {cat:'游乐设施',items:['泳池','水上乐园','水上滑梯','池边酒吧','游泳池具','儿童泳池','专属海滩区','沙滩酒吧','海滩','钓鱼','射击','种植采摘','亲近动物','骑马','KTV','滑雪项目','水上运动','冒险运动','游戏室']},
+        {cat:'儿童乐趣',items:['儿童乐园','儿童俱乐部','儿童玩具']},
+        {cat:'运动健身',items:['健身室','健身课程','私人教练','瑜伽课程']},
+        {cat:'个人护理',items:['spa服务','美容美体服务','按摩室','理发美容中心']},
+        {cat:'交通服务',items:['代客泊车','送机服务','送站服务','班车服务','穿梭机场班车']},
+        {cat:'商务会议',items:['会议厅','商务中心','传真/复印']},
+        {cat:'公共设施',items:['商场','鲜花店','礼品廊','共用厨房','吸烟区','公共区域禁烟','阳台']}
+      ]}},
     '外显小图替换建议任务':{advice:'外显小图与携程「外观」类别首图比对不一致，建议替换为携程用户端外观首图，提高进店转化。',src:[['携程外观首图','酒店正面夜景 · 1920×1080'],['抖音当前小图','大堂内景 · 与外观不符']],fields:[{label:'替换图片来源',options:['携程外观首图','手动上传']}],ignore:'此次忽略'},
     '中差评回复':{advice:'近 30 天存在 3 条待回复中差评。请逐条确认回复内容后一并提交，提交后逐条写入抖音来客。',src:[['待回复中差评','3 条'],['涉及节点','卫生、服务']],ignore:'此次忽略',
       reviews:[
@@ -772,12 +861,35 @@
       {roomName:'巨幕投影大床房-重庆西站免费接送站2选1',roomId:'7659677410023846218',spec:'20-25㎡ · 1张1.8m大床 · 有窗 · 可住2人',calName:'巨幕投影大床房-重庆西站免费接送站2选1-0份早餐-限时免费退',calId:'18700426338190247',cur:'0',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
     '早餐份数修正·景观双床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，检出 2 个房型与携程不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「景观双床房」：早餐份数 1 份 → 携程当前 2 份。',
       {roomName:'景观双床房-观龙门公园景观·免费早餐',roomId:'7659677622001534882',spec:'25-30㎡ · 2张1.35m单人床 · 有窗 · 可住2人',calName:'景观双床房-观龙门公园景观·免费早餐-1份早餐-阶梯退',calId:'18700427100226851',cur:'1',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
-    '门店装修审核整改任务':{advice:'抖音来客「门店装修 › 门店主页 › 头图和相册」存在审核不通过标识，其余装修模块（外显小图、直播导流、商家动态、官方公告、设施及服务）未见审核标识。AI 已点击“去设置”读取失败原因与被驳回图片：商家相册「房间」类别 1 张图片含促销文字与水印。请替换为合规图片或授权删除，确认后 AI 写入抖音来客并重新提交审核。',src:[['审核不通过节点','头图和相册 · 商家相册「房间」'],['失败原因','图片含促销文字与水印，不符合规范'],['被驳回图片','1 张 · 相册「房间」第 3 张'],['替换素材','携程「客房」类别图片']],ignore:'此次忽略',pends:AUDIT_PENDS,
+    '房型信息核对·钟点房':rtTask('携程与抖音「钟点房」名称一致，已自动对应。逐字段核对检出 3 项不一致（楼层、网络服务、房型设施），已按「携程值 → 建议修改值」生成修改内容：楼层 5~10 层 → 3~6 层、网络服务去除有线网络、房型设施补充电热水壶。全部内容可修改，确认后 AI 仅修改本房型中用户确认的字段并写入抖音来客。',
+      [['房型对应','钟点房 → 钟点房 · 名称一致自动对应'],['房型数量','携程 8 个 · 抖音来客已上架 11 个'],['本房型差异','3 项 · 楼层、网络服务、房型设施']],
+      {mode:'auto',ctrip:'钟点房',douyin:'钟点房',cnt:rtCnt,extra:rtExtra},
+      [{field:'楼层',cur:'区间 5 ~ 10 层',ctrip:'区间 3 ~ 6 层',to:'3 ~ 6 层'},
+       {field:'网络服务',cur:'可上网 · WiFi 免费＋有线网络免费',ctrip:'仅无线 WiFi（免费）',to:'可上网 · WiFi 免费'},
+       {field:'房型设施',cur:'一次性洗漱用品 6 项、毛巾、浴巾、24 小时热水、淋浴、卫生间、电视机、空调、书桌、衣柜、瓶装水、唤醒服务',ctrip:'另含「电热水壶」，抖音未勾选',to:'电热水壶',ctl:'check'}],
+      '面积 25~35㎡ · 床型 大床 1.8m × 1张 · 窗户 落地窗 · 最大可住 2 人 · 房型图片'),
+    '房型信息核对·亲子家庭房':rtTask('携程「亲子家庭房」与抖音「亲子家庭房-赠送小孩早餐·免费携带宠物」名称不一致，已给出建议对应关系，需用户确认后才会执行修改；确认后同一任务内展示该房型全部 2 项字段差异（床型、最大可住人数）。全部内容可修改，确认后 AI 仅修改本房型中用户确认的字段。选择「没有对应房型」时本任务转为新增任务。',
+      [['房型对应','亲子家庭房 → 亲子家庭房-赠送小孩早餐·免费携带宠物（待确认）'],['本房型差异','2 项 · 床型、最大可住人数'],['对应关系确认','仅保存匹配关系，不修改抖音']],
+      {mode:'confirm',ctrip:'亲子家庭房',douyin:'亲子家庭房-赠送小孩早餐·免费携带宠物',cands:['亲子家庭房-赠送小孩早餐·免费携带宠物（建议）','三床家庭房-暑假不加价·免费停车免费早餐','景观双床房-观龙门公园景观·免费早餐','没有对应房型（转为新增任务）'],cnt:rtCnt,extra:rtExtra},
+      [{field:'床型',cur:'单人床 1.35m × 1张＋大床 1.8m × 1张',ctrip:'单人床 1.35m × 2张＋大床 1.8m × 1张',to:'单人床 1.35m × 2张＋大床 1.8m × 1张'},
+       {field:'最大可住人数',cur:'3 人',ctrip:'4 人',to:'4 人'}],
+      '楼层 8~10 层 · 面积 28~30㎡ · 窗户 有窗 · 网络服务 WiFi 免费 · 房型图片'),
+    '房型新增·电竞大床房':{advice:'携程用户端在售房型「电竞大床房」（¥159 / 晚）在抖音来客「房型管理」中无对应房型，按缺失房型单独形成 1 条新增任务。以下已按抖音「创建房型」表单预填携程可映射字段，全部可修改；携程未采集的字段（吸烟政策、有线网络）不预填、由用户选择；「总间数」携程不提供，须由用户填写后才能提交。提交后 AI 进入抖音来客「房型管理 → 创建房型 → 手动创建」，仅创建当前房型。',src:[['缺失房型','电竞大床房 · 携程在售 ¥159 / 晚'],['抖音房型管理','无对应房型 · 走「手动创建」'],['总间数','携程不提供 · 须由用户填写']],ignore:'此次忽略',pends:RT_PENDS,
+      rtNew:{
+        name:'电竞大床房',price:'¥159 / 晚',
+        remark:'携程房间详情：配备高配电脑与电竞桌椅，适合游戏爱好者入住。',
+        facs:['牙刷','牙膏','洗发水','毛巾','浴巾','24 小时热水','淋浴','电视机','空调','书桌','瓶装水','WiFi','电竞椅','机械键盘','电竞鼠标','电竞耳机','电竞显示器']
+      }},
+    '门店装修审核整改任务':{advice:'抖音来客「门店装修 › 门店主页 › 头图和相册」存在审核不通过标识（2026-08-06 14:52 提交的装修信息审核失败）。AI 无需分析原因，直接进入「头图和相册」查看审核不通过的图片；全部被驳回图片合并为一条整改任务，由用户逐张重新上传或删除后提交。',src:[['审核失败提交时间','2026-08-06 14:52'],['审核不通过节点','头图和相册 · 商家相册'],['被驳回图片','4 张（外观 1 · 房间 3）'],['处理方式','逐张重新上传或删除']],ignore:'此次忽略',
       audit:{
-        node:'头图和相册 · 商家相册「房间」',
-        reason:'图片含促销文字与水印，不符合平台图片规范（禁止水印、边框、二维码、大量文字）',
-        rejected:'房间 · 第 3 张',
-        cands:['大床房','双床房','卫生间']
+        failTime:'2026-08-06 14:52',
+        cats:[['全部',43],['外观',2],['公共区域',5],['房间',27],['餐厅',4],['休闲',0],['商务',0],['儿童玩乐',0],['周边',4],['其他',1]],
+        rejected:[
+          {cat:'外观',name:'大门口'},
+          {cat:'房间',name:'房间 · 大床窗景'},
+          {cat:'房间',name:'房间 · 书桌区'},
+          {cat:'房间',name:'房间 · 浴室'}
+        ]
       }}
   };
   const replyStyles=['致歉＋整改说明','致歉＋补偿方案','情况说明＋整改时限'];
@@ -792,9 +904,9 @@
   let gbSel={},gbPriv={};
   function setGbSel(k,v){gbSel[k]=v}
   function gbPrivToggle(i){gbPriv[i]=!gbPriv[i];render()}
-  /* 装修审核整改：auditPick 当前选中的携程替换图片序号 */
-  let auditPick=0;
-  function setAuditPick(i){auditPick=i;render()}
+  /* 装修审核整改：auAct 每张被驳回图片的处理方式（replace=重新上传替换，delete=删除） */
+  let auAct={};
+  function setAuAct(i,v){auAct[i]=v;render()}
   /* 团购核对表单：与抖音来客「创建商品」表单一致，选择项为选择项、输入项为输入框，全部可修改 */
   const GROOMS=['商务大床房','悦享双床房','豪华景观双床房'];
   const GHOLIDAYS=[['中秋节','2026-09-25 至 09-27'],['国庆节','2026-10-01 至 10-07'],['元旦','2027-01-01 至 01-03'],['春节','2027-02-06 至 02-12'],['清明节','2027-04-03 至 04-05'],['劳动节','2027-05-01 至 05-05'],['端午节','2027-06-09 至 06-11']];
@@ -803,6 +915,19 @@
   const fieldHtml=f=>f.input!==undefined
     ?`<label class="field"><span>${f.label}</span><input type="text" value="${f.input}"><small>${f.note||'已预填建议值，可修改'}</small></label>`
     :`<label class="field"><span>${f.label}</span><select>${f.options.map(o=>`<option>${o}</option>`).join('')}</select><small>${f.note||'来自携程用户端，可修改'}</small></label>`;
+  /* 酒店设施核对表单行：与抖音来客「酒店设施」字段控件一致，已按携程映射预填，全部可修改 */
+  const facRow=(r,fi)=>{
+    const nm=`fac-${fi}-${r.label}`;let ctl='';
+    if(r.t==='sel')ctl=`<select class="gb-sl">${gbOpts(r.opts,r.v)}</select>`;
+    else if(r.t==='in')ctl=`<input class="gb-in gb-num" type="text" value="${r.v}">`;
+    else if(r.t==='chk')ctl=r.opts.map(o=>`<label class="gb-radio"><input type="checkbox"${r.v.includes(o)?' checked':''}>${o}</label>`).join('');
+    else if(r.t==='radio')ctl=r.opts.map(o=>`<label class="gb-radio"><input type="radio" name="${nm}"${r.v===o?' checked':''}>${o}</label>`).join('');
+    else if(r.t==='fee')ctl=`<label class="gb-radio"><input type="radio" name="${nm}"${r.fee==='免费'?' checked':''}>免费</label><label class="gb-radio"><input type="radio" name="${nm}"${r.fee==='收费'?' checked':''}>收费</label>${r.fee==='收费'?`<input class="gb-in gb-num" type="text" value="${r.price}"><span class="gb-unit">元 / 车</span>`:''}`;
+    else if(r.t==='time')ctl=`<label class="gb-radio"><input type="radio" name="${nm}" checked>每日开放</label><label class="gb-radio"><input type="radio" name="${nm}">指定时间</label><input class="gb-in gb-time" type="text" value="${r.t1}"><span class="gb-unit">至</span><input class="gb-in gb-time" type="text" value="${r.t2}">`;
+    else if(r.t==='freq')ctl=`<span class="gb-unit">每</span><input class="gb-in gb-num" type="text" value="${r.h}"><span class="gb-unit">小时</span><input class="gb-in gb-num" type="text" value="${r.c}"><span class="gb-unit">次</span>`;
+    else if(r.t==='img')ctl=`<span class="gb-thumb">设施实拍</span><a class="exlink" onclick="toast('演示原型：可替换设施图片，重新提交审核')">替换</a>`;
+    return gbRow(r.label,ctl+(r.note?`<span class="gb-unit">${r.note}</span>`:''),r.hl);
+  };
   function detail(){const t=taskData[taskIdx]||taskData[0];
     let main='',actions='';
     if(t.kind==='route'||t.name==='找店指引素材补充'){
@@ -924,24 +1049,87 @@
           ${gbRow('已选图片',ct.imgs.map(im=>`<span class="gb-thumb">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开携程${ct.cat}类别图片列表更换')">更换图片</a>`)}
         </div>`).join('')}
       </div>`
-      :c.audit?`<div class="section"><h3>2　审核不通过详情（读取自抖音来客「去设置」）</h3>
-        <p class="review-tip">缺少合规图片：审核不通过节点为「${c.audit.node}」，需替换或删除被驳回图片后重新提交审核；其余装修模块（外显小图、直播导流、商家动态、官方公告、设施及服务）未见审核不通过标识。</p>
+      :c.audit?`<div class="section"><h3>2　审核失败概览（读取自抖音来客「头图和相册」详情）</h3>
+        <p class="review-tip">AI 无需分析失败原因：直接进入「头图和相册」查看哪些图片审核不通过，全部被驳回图片合并为一条整改任务。门店头图与相册其余图片均未受影响。</p>
         <div class="gb-card">
-          <div class="gb-head"><b>商家相册「房间」<small>门店装修 › 门店主页 › 头图和相册</small></b><i class="tag red">审核不通过</i></div>
-          ${gbRow('失败原因',`<b>${c.audit.reason}</b>`)}
-          ${gbRow('被驳回图片',`<span class="gb-thumb">${c.audit.rejected}</span><i class="tag red">审核不通过</i><span class="gb-unit">删除该图片不影响相册内其余 2 张已通过图片</span>`)}
+          <div class="gb-head"><b><i class="tag red">⨯</i>　${c.audit.failTime} 提交的装修信息审核失败<small>门店装修 › 门店主页 › 头图和相册</small></b></div>
+          ${gbRow('门店头图',`<span class="gb-thumb">封面</span><span class="gb-unit">视频封面 · 未被驳回，无需处理</span>`)}
+          ${gbRow('商家相册分类',c.audit.cats.map(ct=>`<span class="gb-unit" style="margin-right:12px">${ct[0]} ${ct[1]}</span>`).join(''))}
+          ${gbRow('从「全部」上传',`<span class="gb-unit">上传的图片通过审核后，平台将运用算法能力帮你分类</span>`)}
         </div>
       </div>
-      <div class="section"><h3>3　修改内容（可修改后提交）</h3>
-        <p class="review-tip">支持两种处理方式：替换为合规图片（可选携程素材或本地上传，可随时更换），或授权直接删除；确认后 AI 写入抖音来客对应节点并重新提交审核。</p>
+      <div class="section"><h3>3　被驳回图片（共 ${c.audit.rejected.length} 张，逐张重新上传或删除，可修改）</h3>
+        <p class="review-tip">与抖音来客「头图和相册」详情一致，被驳回图片带“审核不通过”标识。为每张选择重新上传替换或删除；删除造成空缺（门店头图为空或相册类别无图）时，将自动生成缺图补充任务。</p>
+        ${c.audit.rejected.map((r,i)=>`<div class="gb-card">
+          <div class="gb-head"><b>被驳回图片 ${i+1} · ${r.cat}<small>${r.name}</small></b><i class="tag red">审核不通过</i></div>
+          ${gbRow('当前图片',`<span class="gb-thumb">${r.name}</span><span class="gb-unit">商家相册「${r.cat}」类别 · 审核不通过</span>`)}
+          ${gbRow('处理方式',`<label class="gb-radio"><input type="radio" name="au-way${i}" ${(auAct[i]||'replace')==='replace'?'checked':''} onchange="setAuAct(${i},'replace')">重新上传替换</label><label class="gb-radio"><input type="radio" name="au-way${i}" ${auAct[i]==='delete'?'checked':''} onchange="setAuAct(${i},'delete')">删除图片</label>`)}
+          ${(auAct[i]||'replace')==='replace'?gbRow('重新上传',`<span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片直接上传')">＋ 上传替换图</span><span class="gb-unit">建议比例 4:3，PNG / JPG / JPEG / GIF，不超过 20M；图片清晰，禁止水印、边框、二维码、图片拼接及大量文字</span>`,true):''}
+        </div>`).join('')}
+      </div>
+      <div class="section"><h3>4　修改与提交规则</h3>
+        <div class="gb-kv"><small>提交后</small><div class="gb-ctl"><b>AI 将替换 / 删除结果写入抖音来客并重新提交审核</b><span class="gb-unit">提交成功即本轮诊断成功并结束；即使再次被驳回，也不重新生成任务</span></div></div>
+        <div class="gb-kv"><small>删除联动</small><div class="gb-ctl"><b>删除造成空缺时自动生成补充任务</b><span class="gb-unit">门店头图为空或相册类别缺图时，生成「头图相册补充任务」</span></div></div>
+      </div>`
+      :c.rt?`<div class="section"><h3>2　房型对应关系与数量口径</h3>
+        <p class="review-tip">${c.rt.match.mode==='confirm'?'携程与抖音房型名称不一致：系统给出建议对应关系，需用户确认后才会执行修改；确认仅保存匹配关系并继续诊断，尚未触发修改时不加入执行中。选择「没有对应房型」时本任务转为新增任务。':'携程与抖音房型名称一致，已自动对应；逐房型完成字段校验后才判定通过。'}</p>
         <div class="gb-card">
-          ${gbRow('处理方式',`<label class="gb-radio"><input type="radio" name="au-way" checked>替换图片</label><label class="gb-radio"><input type="radio" name="au-way">删除图片</label><span class="gb-unit">选择“删除图片”时无需选图，直接点击下方「确认删除」</span>`)}
-          ${gbRow('修改内容',`<b>商家相册「房间」第 3 张：含水印图片 → 携程「客房」类别「${c.audit.cands[auditPick]}」图</b>`,true)}
-          ${gbRow('替换图片',c.audit.cands.map((im,j)=>`<span class="gb-thumb${auditPick===j?' on':''}" onclick="setAuditPick(${j})">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开本地文件选择图片直接上传')">＋ 本地上传</a><span class="gb-unit">已选携程「客房」类别图片，可点选更换或本地上传；规范：比例 4:3，无水印、无促销文字</span>`,true)}
+          ${gbRow('携程房型',`<b>${c.rt.match.ctrip}</b>`)}
+          ${gbRow('抖音对应房型',`<b>${c.rt.match.douyin}</b><i class="tag ${c.rt.match.mode==='auto'?'green':'red'}">${c.rt.match.mode==='auto'?'名称一致 · 自动对应':'名称不一致 · 待确认'}</i>`)}
+          ${c.rt.match.mode==='confirm'?gbRow('确认对应关系',`<select class="gb-sl">${c.rt.match.cands.map(o=>`<option>${o}</option>`).join('')}</select>`):''}
+          ${gbRow(c.rt.match.cnt[0],`<b>${c.rt.match.cnt[1]}</b><span class="gb-unit">${c.rt.match.cnt[2]}</span>`)}
+          ${gbRow(c.rt.match.extra[0],`<b>${c.rt.match.extra[1]}</b><span class="gb-unit">${c.rt.match.extra[2]}</span>`)}
         </div>
+      </div>
+      <div class="section"><h3>3　字段差异与修改内容（共 ${c.rt.diffs.length} 项，可修改）</h3>
+        <p class="review-tip">每行为一项差异：「抖音当前值」是修改前（由什么），「携程值」是比对依据，「修改内容」是建议修改值（修改为什么）。输入框已按携程值预填，可修改后提交；提交后 AI 仅写入本房型中用户确认的字段，写入并校验成功后任务完成。</p>
+        <div class="gb-card">
+          <div class="rt-grid rt-hd"><span>检查字段</span><span>抖音当前值（由）</span><span>携程值</span><span>修改内容（修改为 · 可编辑）</span></div>
+          ${c.rt.diffs.map(d=>`<div class="rt-grid rt-ln">
+            <b>${d.field}</b><span>${d.cur}</span><span>${d.ctrip}</span>
+            <span class="rt-fix">${d.ctl==='check'?`<label class="gb-radio"><input type="checkbox" checked>${d.to}</label><small class="count">勾选后写入，可取消</small>`:`<input class="gb-in" type="text" value="${d.to}"><small class="count">已按携程值预填 · 可修改</small>`}</span>
+          </div>`).join('')}
+          <div class="gb-kv" style="border-top:1px dashed var(--line);margin-top:2px;padding-top:11px"><small>一致字段</small><div class="gb-ctl"><b>${c.rt.ok}</b><span class="gb-unit">与携程一致，已通过，不生成修改项</span></div></div>
+        </div>
+      </div>
+      ${rtPends()}`
+      :c.rtNew?`<div class="section"><h3>2　缺失房型 · 新增方案（与抖音来客「创建房型」表单一致）</h3>
+        <p class="review-tip">携程在售、抖音「房型管理」无对应房型。以下已预填携程可映射字段，全部可修改；携程未采集的字段（吸烟政策、有线网络）不预填、由用户选择；「总间数」为必填，携程不提供，须由用户填写后才能提交。提交后 AI 进入抖音来客「房型管理 → 创建房型 → 手动创建」，仅创建当前房型，写入并校验成功后任务完成。</p>
+        <div class="gb-card">
+          <div class="gb-head"><b>${c.rtNew.name} · 新增房型<small>携程用户端在售 · ${c.rtNew.price}（诊断时采集）</small></b></div>
+          ${gbRow('中文名称',`<input class="gb-in" type="text" value="${c.rtNew.name}"><span class="gb-unit">已按携程房型名称预填，可修改</span>`)}
+          ${gbRow('英文名称',`<input class="gb-in" type="text" placeholder="选填"><span class="gb-unit">携程未采集，AI 不推测，可留空</span>`)}
+          ${gbRow('房型图片',`<span class="gb-thumb">携程房型图 1</span><span class="gb-thumb">携程房型图 2</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a><span class="gb-unit">已按携程房型图预填 2 张（最多 10 张，第 1 张为头图），可修改</span>`)}
+          ${gbRow('总间数',`<input id="rtQty" class="gb-in gb-num" type="text" placeholder="请填写" oninput="rtQtySync(this.value)"><span class="gb-unit gb-req">间 · 携程不提供总间数，须由用户填写后才能提交</span>`,true)}
+          ${gbRow('楼层',`<label class="gb-radio"><input type="radio" name="rt-fl">固定值</label><label class="gb-radio"><input type="radio" name="rt-fl" checked>区间</label><input class="gb-in gb-num" type="text" value="6"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="8"><span class="gb-unit">层 · 已按携程预填，可修改</span>`)}
+          ${gbRow('面积（㎡）',`<label class="gb-radio"><input type="radio" name="rt-ar">固定值</label><label class="gb-radio"><input type="radio" name="rt-ar" checked>区间</label><input class="gb-in gb-num" type="text" value="20.00"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="25.00"><span class="gb-unit">已按携程预填，可修改</span>`)}
+          ${gbRow('窗户',`<select class="gb-sl">${gbOpts(['有窗','部分房间有窗','无窗'],'有窗')}</select><span class="gb-unit">窗型</span><select class="gb-sl">${gbOpts(['正常窗户','天窗','封闭窗','飘窗','落地窗','装饰性窗面','窗户较小'],'落地窗')}</select>`)}
+          ${gbRow('床型',`<label class="gb-radio"><input type="radio" name="rt-bd" checked>1张床</label><label class="gb-radio"><input type="radio" name="rt-bd">2张床</label><label class="gb-radio"><input type="radio" name="rt-bd">多张床</label><span class="gb-unit">床型设置</span><select class="gb-sl">${gbOpts(['大床','双人床','单人床','上下铺'],'大床')}</select><input class="gb-in gb-num" type="text" value="2.00"><span class="gb-unit">米 × 1张</span>`)}
+          ${gbRow('最大可住人数',`<input class="gb-in gb-num" type="text" value="2"><span class="gb-unit">人 · 已按携程预填，可修改</span>`)}
+          ${gbRow('吸烟政策',`<select class="gb-sl">${['请选择','可吸烟','不可吸烟','部分房间可吸烟'].map(o=>`<option>${o}</option>`).join('')}</select><span class="gb-unit">携程未采集吸烟信息，AI 不推测，由用户选择</span>`)}
+          ${gbRow('网络',`<label class="gb-radio"><input type="radio" name="rt-net" checked>可上网</label><label class="gb-radio"><input type="radio" name="rt-net">部分房间可上网</label><label class="gb-radio"><input type="radio" name="rt-net">不可上网</label><label class="gb-radio"><input type="checkbox" checked>WiFi 免费</label><label class="gb-radio"><input type="checkbox">有线网络</label><span class="gb-unit">携程仅采集到无线 WiFi，有线网络未预填</span>`)}
+          ${gbRow('房型特殊说明',`<textarea class="gb-ta" maxlength="300" oninput="this.nextElementSibling.textContent=this.value.length+' / 300'">${c.rtNew.remark}</textarea><small class="count">${c.rtNew.remark.length} / 300</small>`)}
+          ${gbRow('房型设施',`<div class="gb-hol"><b>已按携程房间设施预填可映射项（可增删）</b>${c.rtNew.facs.map(f=>`<label class="gb-hol-it"><input type="checkbox" checked>${f}</label>`).join('')}</div><span class="gb-unit">携程「高配电脑主机」在抖音无对应字段，不展示、不填写</span>`)}
+        </div>
+      </div>
+      ${rtPends()}`
+      :c.fac?`<div class="section"><h3>2　诊断不通过设施与修改内容（${c.fac.list.length} 个 · 全部可修改）</h3>
+        <p class="review-tip">逐设施独立确认，互不合并：「缺少什么」为抖音当前缺口，「携程采集值」为比对依据，「修改内容」为建议修改值（修改为什么）；下方表单与抖音来客「酒店设施」字段一致并已按携程映射预填，可逐字段修改。选择「暂无此设施」时 AI 将该设施保持或改为「无」。确认后提交，AI 逐设施写入抖音来客，写入并校验成功后任务完成。</p>
+        ${c.fac.list.map((f,fi)=>`<div class="gb-card">
+          <div class="gb-head"><b>${f.name}<small>店铺管理 › 酒店信息管理 › 酒店设施 › ${f.name}</small></b><i class="tag ${f.tag==='缺失补充'?'red':'gray'}">${f.tag}</i>
+            <label class="act-sel"><span>处理意向</span><select onchange="setGbSel('f${fi}',this.value)"><option${(gbSel['f'+fi]||'确认修改')==='确认修改'?' selected':''}>确认修改</option><option${gbSel['f'+fi]==='暂无此设施'?' selected':''}>暂无此设施</option></select></label></div>
+          ${gbRow('缺少什么',`<b>${f.lack}</b>`)}
+          ${gbRow('携程采集值',`<b>${f.ctrip}</b>`)}
+          ${gbRow('修改内容',`<b>${f.change}</b>`,true)}
+          ${f.rows.map(r=>facRow(r,fi)).join('')}
+        </div>`).join('')}
+      </div>
+      <div class="section"><h3>3　携程未查到、维持“无”的设施（${c.fac.keep.reduce((n,k)=>n+k.items.length,0)} 个）</h3>
+        <p class="review-tip">按《抖音来客诊断规则表》「酒店设施通用规则」：携程未查到对应数据时 AI 不推测、不预填“有”，维持抖音当前值，保持“无”无需操作；如酒店实际提供，可在抖音来客逐项改为“有”并补充，或在下次诊断时主动勾选后由 AI 写入。</p>
+        ${c.fac.keep.map(k=>`<div class="gb-kv"><small>${k.cat}</small><div class="gb-ctl">${k.items.map(n=>`<i class="tag gray">${n}</i>`).join('')}</div></div>`).join('')}
       </div>
       <div class="section"><h3>4　本规则待确认事项（${c.pends.length} 项）</h3>
-        <p class="review-tip">以下为《抖音来客诊断规则表A》「装修审核不通过」规则尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
+        <p class="review-tip">以下为《抖音来客诊断规则表》「酒店设施通用规则」及各设施节点尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
         ${c.pends.map((p,i)=>`<div class="gb-kv"><small>待确认 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
       </div>`
       :c.cal?`<div class="section"><h3>2　逐房型早餐份数比对结果</h3>
@@ -969,8 +1157,9 @@
       actions=`${c.ignore==='暂无此设施'?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
         ${c.audit?'<button class="btn btn-outline" onclick="finishTask(\'执行中\',\'已确认删除，AI 正在删除审核不通过图片\')">确认删除</button>':''}
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
-        <button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>
-        ${c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.audit?'替换图片已提交，AI 正在写入抖音来客并重新提交审核':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
+        ${c.rtNew?'':`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`}
+        ${c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
+          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.audit?'替换图片已提交，AI 正在写入抖音来客并重新提交审核':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在逐设施写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
@@ -993,8 +1182,9 @@
     {path:['店铺管理','酒店信息管理','酒店政策','加床及儿童'],rounds:[
       ['2026-08-27 18:06','fail',1,'联合诊断节点未全部配置，已生成联合补充任务'],
       ['2026-08-13 14:02','pass',0,'五项政策全部通过']]},
-    {path:['店铺管理','酒店信息管理','酒店设施','餐厅'],rounds:[
-      ['2026-08-27 18:06','fail',1,'抖音餐厅为“无”，已生成详情补充任务']]},
+    {path:['店铺管理','酒店信息管理','酒店设施','酒店设施通用规则'],rounds:[
+      ['2026-08-27 18:06','fail',1,'逐设施核对不通过：缺失 3 个、字段不一致 2 个，已生成酒店设施信息核对任务'],
+      ['2026-08-13 14:02','fail',1,'逐设施核对不通过：缺失 2 个，已生成酒店设施信息核对任务']]},
     {path:['店铺管理','店铺装修','门店装修','外显小图'],rounds:[
       ['2026-08-27 18:06','fail',1,'与携程「外观」图片不一致，已生成替换建议任务']]}
   ];
