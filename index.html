@@ -234,7 +234,6 @@
   .gb-radio{display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--ink-2);white-space:nowrap}
   .gb-radio input{accent-color:var(--primary);margin:0}
   .gb-thumb{width:60px;height:60px;border-radius:var(--r-sm);background:linear-gradient(135deg,#c7d2fe,#e0e7ff);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--primary);flex-shrink:0}
-  .gb-thumb.on{outline:2px solid var(--primary);outline-offset:1px;font-weight:700}
   .gb-upload{width:60px;height:60px;border:1px dashed var(--ink-4);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:11px;cursor:pointer;flex-shrink:0;background:var(--surface)}
   .gb-req{color:#b91c1c}
   .gb-hol{width:100%;background:var(--surface-2);border-radius:var(--r-sm);padding:9px 12px;display:flex;flex-wrap:wrap;gap:6px 16px}
@@ -642,8 +641,8 @@
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};xspPick=0;go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};xspPick=0;go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
   function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
@@ -655,7 +654,7 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};xspPick=0;go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -738,6 +737,13 @@
     ['“有”改回“无”的回退','用户提交改为“有”并写入成功后发现实际无此设施：是否支持再次改回“无”、是否生成新任务，Excel 未覆盖。'],
     ['执行时携程数据时效','诊断采集与 AI 执行之间存在时间差，携程“服务及设施”可能已更新；执行以诊断时采集值还是执行时重新采集值为准，需确认。'],
     ['免费标签与金额并存','携程同时展示“免费”标签与“每车 100 元”金额文案时，收费信息以哪个为准；本任务按金额优先（收费＋价格 100 元/车），需确认。']];
+  /* 外显小图替换建议：规则待确认口径（与《抖音来客诊断规则表A》「外显小图」一致） */
+  const XSP_PENDS=[
+    ['一致性判定口径','「与携程「外观」类别逐图一致性比对」未明确判定方式（原图链接 / 文件哈希 / 感知相似度 / 人工确认）；本任务按原图链接一致判定，需确认。'],
+    ['比对覆盖的小图位置','抖音来客外显小图分「单列外显小图」（门店头像，比例 1:1）与「双列外显小图」（多张候选，比例 4:3）；Excel 仅写「外显小图」未明确比对位置，本任务按单列外显小图比对替换，双列候选图未纳入，需确认。'],
+    ['双列候选图是否补充','双列外显小图支持多张候选、平台按质量筛选优质图展示；是否从携程「外观」类别为其补充候选图并纳入本任务，需确认。'],
+    ['携程外观图缺失时的处理','携程「外观」类别无图或张数不足时，任务是否转为引导用户本地上传、该节点是否仍算不通过，需确认。'],
+    ['替换后的审核跟踪','外显小图提交后进入平台审核；审核被驳回时是否重新生成任务、审核通过前旧图是否继续展示，Excel 未明确，需确认。']];
   const taskDetailCfg={
     '悦享双床房近 7 天价格偏高':{advice:'携程用户端悦享双床房近 7 天均价 ¥428，抖音来客当前卖价 ¥519，价差 21%，价格竞争力不足。建议按携程近 7 天均价同步调整。',src:[['房型','悦享双床房'],['携程近 7 天均价','¥428'],['抖音来客当前卖价','¥519']],fields:[{label:'建议写入价格',input:'¥428',note:'已按携程近 7 天均价预填，可修改'}],ignore:'此次忽略'},
     '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式（酒店名称＝城市＋地标简称1＋地标简称2＋店），缺少地标简称。',src:[['当前名称','尚宽酒店'],['名称公式','城市＋地标简称1＋地标简称2＋店'],['建议名称','重庆西站华岩寺尚宽酒店店']],fields:[{label:'城市',options:['重庆']},{label:'地标简称1',options:['西站','华岩寺']}],ignore:'此次忽略'},
@@ -806,7 +812,7 @@
         {cat:'商务会议',items:['会议厅','商务中心','传真/复印']},
         {cat:'公共设施',items:['商场','鲜花店','礼品廊','共用厨房','吸烟区','公共区域禁烟','阳台']}
       ]}},
-    '外显小图替换建议任务':{advice:'外显小图与携程「外观」类别首图比对不一致，建议替换为携程用户端外观首图，提高进店转化。',src:[['携程外观首图','酒店正面夜景 · 1920×1080'],['抖音当前小图','大堂内景 · 与外观不符']],fields:[{label:'替换图片来源',options:['携程外观首图','手动上传']}],ignore:'此次忽略'},
+    '外显小图替换建议任务':{advice:'抖音来客「门店装修 › 门店入口 › 外显小图」当前为大堂内景图，与携程素材池「外观」类别 12 张图片逐一比对，未发现相同图片。建议按下方方案替换：替换前后对比见详情，替换图可点选更换或本地上传，确认后 AI 替换抖音来客外显小图并重新读取校验。',src:[['抖音当前外显小图','已设置 · 大堂内景图'],['携程「外观」类别','12 张 · 逐一一致性比对'],['比对结果','未发现相同图片 · 不通过']],ignore:'此次忽略',xsp:{cur:{name:'大堂内景',where:'展示于店铺列表、地点列表等页面，作为门店头像'},cands:['正面夜景','正面日景','外立面','大门口'],dual:['候选图 1','候选图 2','候选图 3']},pends:XSP_PENDS},
     '中差评回复':{advice:'近 30 天存在 3 条待回复中差评。请逐条确认回复内容后一并提交，提交后逐条写入抖音来客。',src:[['待回复中差评','3 条'],['涉及节点','卫生、服务']],ignore:'此次忽略',
       reviews:[
         {user:'途**风',stars:1,date:'2026-08-24 21:36',node:'卫生',text:'隔音太差了，凌晨还能听见走廊说话声，枕头有异味，跟前台反映了也没人来处理。',replies:[
@@ -902,6 +908,9 @@
   function setActSel(i,v){actSel[i]=v}
   /* 团购商品核对状态：gbSel 每个不通过项的确认意向（新增方案/价格/名称），未选择默认确认；gbPriv 礼遇添加表单展开态 */
   let gbSel={},gbPriv={};
+  /* 外显小图替换：xspPick 当前选中的携程「外观」替换图片序号 */
+  let xspPick=0;
+  function setXspPick(i){xspPick=i;render()}
   function setGbSel(k,v){gbSel[k]=v}
   function gbPrivToggle(i){gbPriv[i]=!gbPriv[i];render()}
   /* 装修审核整改：auAct 每张被驳回图片的处理方式（replace=重新上传替换，delete=删除） */
@@ -1049,6 +1058,27 @@
           ${gbRow('已选图片',ct.imgs.map(im=>`<span class="gb-thumb">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开携程${ct.cat}类别图片列表更换')">更换图片</a>`)}
         </div>`).join('')}
       </div>`
+      :c.xsp?`<div class="section"><h3>2　外显小图替换（替换前 → 替换后）</h3>
+        <p class="review-tip">已将抖音当前外显小图与携程「外观」类别图片逐一比对，未发现相同图片。下方为替换前后对比；替换后图片默认选中携程外观首图，可点选更换或本地上传，确认后 AI 替换并重新读取校验。</p>
+        <div class="gb-card">
+          <div class="gb-head"><b>单列外显小图<small>门店装修 › 门店入口 › 外显小图</small></b><i class="tag red">与携程外观不一致</i></div>
+          ${gbRow('替换前（当前图片）',`<span class="gb-thumb">${c.xsp.cur.name}</span><span class="gb-unit">${c.xsp.cur.where}</span>`)}
+          ${gbRow('替换后（修改为）',c.xsp.cands.map((im,j)=>`<span class="gb-thumb${xspPick===j?' on':''}" onclick="setXspPick(${j})">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开本地文件选择图片直接上传')">＋ 本地上传</a><span class="gb-unit">已选携程「外观」类别首图，可点选更换</span>`,true)}
+          ${gbRow('修改内容',`<b>${c.xsp.cur.name} → 携程「外观」类别「${c.xsp.cands[xspPick]}」图</b>`,true)}
+          <div class="gb-kv"><small>上传规范</small><b>比例 1:1，支持 PNG / JPG / JPEG / GIF / WEBP 格式，文件大小不超过 20M；建议上传最能代表门店的图片，如品牌 logo、环境、招牌商品等</b></div>
+        </div>
+      </div>
+      <div class="section"><h3>3　双列外显小图（搜索页候选图）</h3>
+        <p class="review-tip">双列外显小图展示在搜索列表，支持上传多张候选图片，平台按图片质量筛选优质图展示；该位置本次未纳入一致性比对，是否纳入需确认（见下方待确认事项）。</p>
+        <div class="gb-card">
+          ${gbRow('当前候选图',c.xsp.dual.map(im=>`<span class="gb-thumb">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开携程「外观」类别图片列表更换')">更换图片</a>`)}
+          <div class="gb-kv"><small>上传规范</small><b>可上传多张候选图片，比例 4:3，支持 PNG / JPG / JPEG / GIF / WEBP 格式，文件大小不超过 20M；搜索页面会根据图片质量筛选最优质图片进行展示</b></div>
+        </div>
+      </div>
+      <div class="section"><h3>4　本规则待确认事项（${c.pends.length} 项）</h3>
+        <p class="review-tip">以下为「外显小图」节点规则尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
+        ${c.pends.map((p,i)=>`<div class="gb-kv"><small>待确认 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
+      </div>`
       :c.audit?`<div class="section"><h3>2　审核失败概览（读取自抖音来客「头图和相册」详情）</h3>
         <p class="review-tip">AI 无需分析失败原因：直接进入「头图和相册」查看哪些图片审核不通过，全部被驳回图片合并为一条整改任务。门店头图与相册其余图片均未受影响。</p>
         <div class="gb-card">
@@ -1155,11 +1185,11 @@
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
       actions=`${c.ignore==='暂无此设施'?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
-        ${c.audit?'<button class="btn btn-outline" onclick="finishTask(\'执行中\',\'已确认删除，AI 正在删除审核不通过图片\')">确认删除</button>':''}
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
         ${c.rtNew?'':`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`}
         ${c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
-          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.audit?'替换图片已提交，AI 正在写入抖音来客并重新提交审核':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在逐设施写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
+          :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
+          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图并校验':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在逐设施写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
