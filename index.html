@@ -236,6 +236,14 @@
   .gb-thumb{width:60px;height:60px;border-radius:var(--r-sm);background:linear-gradient(135deg,#c7d2fe,#e0e7ff);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--primary);flex-shrink:0}
   .gb-upload{width:60px;height:60px;border:1px dashed var(--ink-4);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:11px;cursor:pointer;flex-shrink:0;background:var(--surface)}
   .gb-req{color:#b91c1c}
+  .gb-hol{width:100%;background:var(--surface-2);border-radius:var(--r-sm);padding:9px 12px;display:flex;flex-wrap:wrap;gap:6px 16px}
+  .gb-hol b{width:100%;font-size:12px;color:var(--ink-3);font-weight:600}
+  .gb-hol-it{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--ink-2);white-space:nowrap}
+  .gb-hol-it input{accent-color:var(--primary);margin:0}
+  .gb-hol-it span{color:var(--ink-4)}
+  .gb-privbox{width:100%;border:1px dashed var(--line);border-radius:var(--r-sm);padding:10px 12px;background:var(--surface-2);display:flex;flex-direction:column;gap:8px}
+  .gb-prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .gb-prow .count{text-align:left}
   .review-item{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:14px;background:var(--surface)}
   .review-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .rv-user{font-weight:700;font-size:13px}
@@ -616,8 +624,8 @@
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
   function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
@@ -629,7 +637,7 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -702,8 +710,8 @@
     '团购商品核对任务':{advice:'团购商品共 3 类 4 项不通过：预售房型「商务大床房」的日常与最近节假日团购商品均缺失；商品「【三天两晚】悦享双床房＋双人早餐」当前售价高于携程对比总价；商品「来重庆西站别踩雷！2天1晚｜周末不加价」名称需修改。请逐项核对以下内容，全部内容均可修改，提交后 AI 按确认结果写入抖音来客。',src:[['需核对问题','3 类 4 项'],['涉及预售房型','商务大床房、悦享双床房'],['最近节假日','中秋节 09-25 至 09-27']],ignore:'此次忽略',
       gbuy:{
         plans:[
-          {room:'商务大床房',tag:'日常团购商品',cat:'住宿/酒店宾馆/舒适型酒店',ptype:'预售券',slot:'全日房',name:'商务大床房1晚＋双人早餐＋华岩寺',mealQty:'2',priv:'无',nights:'1',list:'399',price:'323',img:true,holiday:'节假日不可用（全年节假日均不可入住）',book:'需要提前预约 · 提前 1 天',tin:'14:00',tout:'12:00'},
-          {room:'商务大床房',tag:'中秋节团购商品',cat:'住宿/酒店宾馆/舒适型酒店',ptype:'预售券',slot:'全日房',name:'【中秋节】商务大床房1晚＋双人早餐＋华岩寺',mealQty:'2',priv:'无',nights:'1',list:'439',price:'375',img:false,holiday:'不限',book:'需要提前预约 · 提前 1 天',tin:'14:00',tout:'12:00'}
+          {room:'商务大床房',tag:'日常团购商品',cat:'住宿/酒店宾馆/舒适型酒店',ptype:'预售券',slot:'全日房',name:'商务大床房1晚＋双人早餐＋华岩寺',mealQty:'2',nights:'1',list:'399',price:'323',img:true,holiday:'节假日不可用（全年节假日均不可入住）',book:'需要提前预约 · 提前 1 天',tin:'14:00',tout:'12:00'},
+          {room:'商务大床房',tag:'中秋节团购商品',cat:'住宿/酒店宾馆/舒适型酒店',ptype:'预售券',slot:'全日房',name:'【中秋节】商务大床房1晚＋双人早餐＋华岩寺',mealQty:'2',nights:'1',list:'439',price:'375',img:false,holiday:'不限',book:'需要提前预约 · 提前 1 天',tin:'14:00',tout:'12:00'}
         ],
         prices:[
           {prod:'【三天两晚】悦享双床房＋双人早餐',sub:'售卖中 · 已售 23',rows:[
@@ -722,11 +730,13 @@
   /* 活动报名意向状态：actSel 每个活动选择（参加/不参加），未选择默认参加 */
   let actSel={};
   function setActSel(i,v){actSel[i]=v}
-  /* 团购商品核对状态：gbSel 每个不通过项的确认意向（新增方案/价格/名称），未选择默认确认 */
-  let gbSel={};
+  /* 团购商品核对状态：gbSel 每个不通过项的确认意向（新增方案/价格/名称），未选择默认确认；gbPriv 礼遇添加表单展开态 */
+  let gbSel={},gbPriv={};
   function setGbSel(k,v){gbSel[k]=v}
+  function gbPrivToggle(i){gbPriv[i]=!gbPriv[i];render()}
   /* 团购核对表单：与抖音来客「创建商品」表单一致，选择项为选择项、输入项为输入框，全部可修改 */
   const GROOMS=['商务大床房','悦享双床房','豪华景观双床房'];
+  const GHOLIDAYS=[['中秋节','2026-09-25 至 09-27'],['国庆节','2026-10-01 至 10-07'],['元旦','2027-01-01 至 01-03'],['春节','2027-02-06 至 02-12'],['清明节','2027-04-03 至 04-05'],['劳动节','2027-05-01 至 05-05'],['端午节','2027-06-09 至 06-11']];
   const gbOpts=(opts,cur)=>opts.map(o=>`<option${o===cur?' selected':''}>${o}</option>`).join('');
   const gbRow=(label,ctl,hl)=>`<div class="gb-kv${hl?' hl':''}"><small>${label}</small><div class="gb-ctl">${ctl}</div></div>`;
   const fieldHtml=f=>f.input!==undefined
@@ -791,12 +801,18 @@
           ${gbRow('商品名称',`<input class="gb-in" type="text" value="${p.name}">`)}
           ${gbRow('商品搭配 · 住宿',`<select class="gb-sl">${gbOpts(GROOMS,p.room)}</select><span class="gb-unit">从已配置的预售房型中选择，一个商品搭配一个房型</span>`)}
           ${gbRow('商品搭配 · 餐食',`<label class="gb-radio"><input type="radio" name="meal${i}" checked>早餐</label><label class="gb-radio"><input type="radio" name="meal${i}">其它</label><span class="gb-unit">数量</span><input class="gb-in gb-num" type="text" value="${p.mealQty}"><span class="gb-unit">份</span>`)}
-          ${gbRow('商品搭配 · 礼遇',`<select class="gb-sl">${gbOpts(['无','免费停车','延迟退房','接送站服务'],p.priv)}</select>`)}
+          ${gbRow('商品搭配 · 礼遇',`${gbPriv[i]?`<div class="gb-privbox">
+            <div class="gb-prow"><span class="gb-unit">项目名称</span><input class="gb-in" type="text" maxlength="12" placeholder="如酒店往返接驳巴士" oninput="this.nextElementSibling.textContent=this.value.length+' / 12'"><small class="count">0 / 12</small></div>
+            <div class="gb-prow"><span class="gb-unit">数量</span><input class="gb-in gb-num" type="text" value="1"><span class="gb-unit">份</span><span class="gb-unit">划线价</span><input class="gb-in gb-num" type="text" placeholder="选填"><span class="gb-unit">元 · 选填</span></div>
+            <div class="gb-prow"><span class="gb-unit">图片说明</span><span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片')">＋ 上传</span><span class="gb-unit">0 / 1 · 建议清晰优质图，比例 4:3</span></div>
+            <div class="gb-prow"><a class="exlink" onclick="gbPrivToggle(${i})">取消</a><a class="exlink" onclick="toast('已添加礼遇项目（演示）');gbPrivToggle(${i})">确定</a></div>
+            <span class="gb-unit">仅填写酒店自身提供、所有权归属酒店的权益（娱乐项目、出行服务、礼宾服务等）；餐食与房型请填入对应模块</span>
+          </div>`:`<span class="gb-unit">未添加</span><button class="btn-add-via" style="margin-bottom:0" onclick="gbPrivToggle(${i})">＋ 添加项目</button>`}`)}
           ${gbRow('包含数量',`<input class="gb-in gb-num" type="text" value="${p.nights}"><span class="gb-unit">间 / 夜</span>`)}
           ${gbRow('划线价',`<input class="gb-in gb-num" type="text" value="${p.list}"><span class="gb-unit">元</span>`)}
           ${gbRow('售价',`<input class="gb-in gb-num" type="text" value="${p.price}"><span class="gb-unit">元 · 已按携程对比结果预填，可修改</span>`,true)}
-          ${gbRow('套餐图',p.img?`<span class="gb-thumb">房型图</span><span class="gb-unit">已按携程房型图预填</span><a class="exlink" onclick="toast('演示原型：请在抖音来客上传替换套餐图')">替换图片</a>`:`<span class="gb-upload" onclick="toast('演示原型：请上传套餐图')">＋ 上传</span><span class="gb-unit gb-req">携程暂无套餐图，必须由用户上传</span>`)}
-          ${gbRow('不可入住日期',`<select class="gb-sl">${gbOpts(['节假日不可用（全年节假日均不可入住）','每周不可用（自选星期）','指定日期不可用','不限'],p.holiday)}</select>`)}
+          ${gbRow('套餐图',p.img?`<span class="gb-thumb">房型图</span><span class="gb-unit">已按携程房型图预填</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a>`:`<span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片，直接上传')">＋ 上传</span><span class="gb-unit gb-req">携程暂无套餐图，必须由用户上传</span>`)}
+          ${gbRow('不可入住日期',`<select class="gb-sl">${gbOpts(['节假日不可用（全年节假日均不可入住）','每周不可用（自选星期）','指定日期不可用','不限'],p.holiday)}</select>${p.holiday.indexOf('节假日不可用')===0?`<div class="gb-hol"><b>全量节假日区间（默认全部勾选，可调整）</b>${GHOLIDAYS.map(h=>`<label class="gb-hol-it"><input type="checkbox" checked>${h[0]}<span>${h[1]}</span></label>`).join('')}</div>`:''}`)}
           ${gbRow('预约规则',`<select class="gb-sl">${gbOpts(['需要提前预约 · 提前 1 天','需要提前预约 · 提前 2 天','不需要提前预约'],p.book)}</select>`)}
           ${gbRow('消费规则（入离时间）',`<span class="gb-unit">最早入住</span><input class="gb-in gb-time" type="text" value="${p.tin}"><span class="gb-unit">最晚退房</span><input class="gb-in gb-time" type="text" value="${p.tout}">`)}
         </div>`).join('')}
