@@ -244,6 +244,10 @@
   .gb-privbox{width:100%;border:1px dashed var(--line);border-radius:var(--r-sm);padding:10px 12px;background:var(--surface-2);display:flex;flex-direction:column;gap:8px}
   .gb-prow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .gb-prow .count{text-align:left}
+  .gb-roomsel{width:100%;display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:var(--r-sm);padding:8px 12px}
+  .gb-roomsel b{flex:1;min-width:0;font-size:12.5px}
+  .gb-roomsel small{display:block;color:var(--ink-4);font-size:11.5px;font-weight:400;margin-top:2px}
+  .gb-qtyrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .review-item{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:14px;background:var(--surface)}
   .review-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .rv-user{font-weight:700;font-size:13px}
@@ -720,6 +724,12 @@
         names:[
           {prod:'来重庆西站别踩雷！2天1晚｜周末不加价',sub:'售卖中 · 已售 73',cur:'来重庆西站别踩雷！2天1晚｜周末不加价',sug:'悦享双床房1晚＋双人早餐＋华岩寺'}
         ]
+      }},
+    '预售房型补充任务':{advice:'检测到价格最低的「景观大床房·重庆西站接站·送站2选1」未在预售房型中，已按抖音来客「创建预售房型」表单生成补充方案。请核对以下内容，全部内容均可修改，提交后 AI 按确认结果写入抖音来客。',src:[['档位要求','最低 2 个价格档位均已配置预售房型'],['第 1 档','景观棋牌娱乐房 · 已配置'],['第 2 档','景观大床房 · ¥319 · 未配置']],ignore:'此次忽略',
+      presale:{
+        slot:'全日房',namePre:'景观大床房·重庆西站接站·送站2选1',name:'引流特惠',
+        room:{name:'景观大床房·重庆西站接站·送站2选1',id:'7659659835655997461',spec:'22-25㎡ 可住2人'},
+        span:'2026-09-01 ~ 2027-02-27',days:'180天',qty:'5'
       }}
   };
   const replyStyles=['致歉＋整改说明','致歉＋补偿方案','情况说明＋整改时限'];
@@ -835,6 +845,18 @@
           ${gbRow('建议名称',`<input class="gb-in" type="text" value="${n.sug}">`,true)}
         </div>`).join('')}
       </div>`:''}`
+      :c.presale?`<div class="section"><h3>2　需新增的预售房型（第 2 价格档位）</h3>
+        <p class="review-tip">以下方案已按抖音来客「创建预售房型」表单预填，全部内容可修改。需至少维护近 3 个月内 30 天的房价 / 房量，且房态设置为"有房"后才可发布。</p>
+        <div class="gb-card">
+          <div class="gb-head"><b>景观大床房 · 引流预售房型补充<small>适用房型 ID：${c.presale.room.id}</small></b></div>
+          ${gbRow('商品售卖时段',`<label class="gb-radio"><input type="radio" name="ps-slot" checked>全日房</label><label class="gb-radio"><input type="radio" name="ps-slot">钟点房</label>`)}
+          ${gbRow('预售房型名称',`<span class="gb-unit">${c.presale.namePre}（系统生成）·</span><input class="gb-in" type="text" maxlength="40" value="${c.presale.name}" oninput="this.nextElementSibling.textContent=this.value.length+' / 40'"><small class="count">${c.presale.name.length} / 40</small><span class="gb-unit">名称会对用户展示，格式如：高级大床房-五一节预售</span>`)}
+          ${gbRow('适用房型',`<div class="gb-roomsel"><b>${c.presale.room.name}<small>ID：${c.presale.room.id} · ${c.presale.room.spec}</small></b><a class="exlink" onclick="toast('演示原型：可移除后重新选择物理房型')">移除</a></div><a class="exlink" onclick="toast('演示原型：打开物理房型列表选择')">＋ 选择物理房型</a>`)}
+          ${gbRow('时段',`<input class="gb-in" type="text" value="${c.presale.span}"><a class="exlink" onclick="toast('演示原型：可添加多个售卖时段')">＋ 添加时段</a>`)}
+          ${gbRow('适用星期',`<label class="gb-radio"><input type="checkbox" checked>全选</label>${['周一','周二','周三','周四','周五','周六','周日'].map(w=>`<label class="gb-radio"><input type="checkbox" checked>${w}</label>`).join('')}<span class="gb-unit">实际选中 ${c.presale.days}</span>`)}
+          ${gbRow('房量房态',`<div class="gb-qtyrow"><span class="gb-unit">基础房量</span><label class="gb-radio"><input type="radio" name="ps-qty">无限制</label><label class="gb-radio"><input type="radio" name="ps-qty" checked>限制数量</label><input class="gb-in gb-num" type="text" value="${c.presale.qty}"><span class="gb-unit">间（取自房价房态管理当前房量，可修改）</span><label class="gb-radio"><input type="radio" name="ps-state" checked>有房</label><label class="gb-radio"><input type="radio" name="ps-state">无房</label></div>`)}
+        </div>
+      </div>`
       :(c.fields||[]).length?`<div class="section"><h3>2　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
