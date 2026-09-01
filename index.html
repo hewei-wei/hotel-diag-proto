@@ -290,8 +290,6 @@
   .st-row .st-info small{color:var(--ink-4);font-size:11px}
   .ds-fail{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ds-fail small{font-size:11.5px;color:var(--ink-4)}
-  .dgo{margin-left:auto;height:26px;padding:0 13px;border:none;border-radius:999px;background:var(--primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
-  .dgo:hover{opacity:.88}
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--primary-line);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
   .pbar{height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden}
@@ -413,19 +411,15 @@
       ['引流预售房型','最低两个价格档位均已配置预售房型','fail','预售房型补充任务','商品配置']]},
     {name:'团购',path:'商品与货架 › 商品管理 › 团购',items:[
       ['团购商品覆盖、价格与名称','AI 逐个点击团购商品“查看”，核对商品搭配、实际售价、名称、间夜数与规则；节假日与日常商品覆盖完整','fail','团购商品核对任务','商品配置']]},
-    {name:'装修',path:'经营成长 › 商家经营分 › 装修',items:[
-      ['装修评分','商家经营分“装修”下各评分节点满分则通过','fail','装修评分提升建议任务','经营建议']]},
-    {name:'商品',path:'经营成长 › 商家经营分 › 商品',items:[
-      ['商品评分','商家经营分“商品”下各评分节点满分则通过','fail','商品评分提升建议任务','经营建议']]},
     {name:'评价',path:'经营成长 › 商家经营分 › 评价',items:[
-      ['评价评分','评价评分满分则通过；未满分形成线下经营建议任务','fail','评价评分提升建议任务','经营建议']]},
+      ['评价评分','评价评分满分则通过；未满分形成线下经营建议任务','fail','商家经营分-评价分提升','经营建议']]},
     {name:'评价回复',path:'经营成长 › 评价管理 › 评价回复',items:[
       ['待回复中差评','无待回复中差评则通过；存在时按评价逐条生成回复建议任务','fail','中差评回复','评价回复']]},
     {name:'活动管理',path:'带货与推广 › 活动广场 › 活动管理',items:[
       ['活动参与与配置','采集活动广场全部活动；对“在线＋管理员打开＋立即报名”的活动生成报名建议任务','fail','活动报名','活动报名']]}
   ];
   let diagRun=null,diagT=[];
-  /* 联合诊断节点：任务名 → 代表检查项（多项不通过合并为一个任务，路径与“去处理”挂在代表项上） */
+  /* 联合诊断节点：任务名 → 代表检查项（多项不通过合并为一个任务，任务行挂在代表项上） */
   const JOINT_TASK_NODE={'酒店政策联合补充任务':'加床及儿童'};
   function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
   function initRediag(){diagT.forEach(clearTimeout);diagT=[];const old=diagRun;diagRun={phase:'idle',focus:0,added:[],failCount:0,hotel:old&&old.hotel,steps:diagSteps.map((s,si)=>({state:'pending',prev:old?old.steps[si].state:null,items:s.items.map((it,ii)=>({state:'pending',prev:old?old.steps[si].items[ii].state:null}))}))}}
@@ -585,7 +579,7 @@
             return `<div class="ditem col"><span class="dn">${it[0]}</span><span class="dr">${it[1]}</span><span class="ds">${right}</span></div>`}).join('')}
           ${(()=>{const stasks=taskData.filter(t=>t.status==='待处理'&&t.path.startsWith(step.name+' · '));
             return stasks.length?`<div class="step-tasks"><div class="st-head">本步骤已生成任务 <b>${stasks.length}</b></div>
-            ${stasks.map(t=>`<div class="st-row"><div class="st-info"><b>${t.name}</b><small>${t.path.split(' · ')[1]||''}</small></div><button class="dgo" onclick="openTask(${todoTasks().indexOf(t)})">去处理</button></div>`).join('')}</div>`:''})()}
+            ${stasks.map(t=>`<div class="st-row"><div class="st-info"><b>${t.name}</b><small>${t.path.split(' · ')[1]||''}</small></div></div>`).join('')}</div>`:''})()}
         </div>
       </aside>
     </div>
@@ -683,7 +677,7 @@
         {name:'金秋出游季',desc:'平台流量扶持 · 酒店住宿',time:'2026-09-15 至 2026-10-15'},
         {name:'中秋团圆住房季',desc:'节日主题 · 限量补贴',time:'2026-09-25 至 2026-10-08'}
       ]},
-    '评价评分提升建议任务':{advice:'本酒店好评率较低，每日至少达到 3 条以上抖音店铺好评，请提醒酒店线下完成此任务。',src:[['好评情况','好评率较低'],['目标要求','每日 3 条以上抖音店铺好评'],['完成方式','酒店线下完成后确认']],offline:true}
+    '商家经营分-评价分提升':{advice:'本酒店好评率较低，每日至少达到 3 条以上抖音店铺好评，请提醒酒店线下完成此任务。',src:[['好评情况','好评率较低'],['目标要求','每日 3 条以上抖音店铺好评'],['完成方式','酒店线下完成后确认']],offline:true}
   };
   const replyStyles=['致歉＋整改说明','致歉＋补偿方案','情况说明＋整改时限'];
   /* 中差评逐条回复状态：replySel 每条评价选中的答复语序号，replyText 每条评价编辑框内容 */
