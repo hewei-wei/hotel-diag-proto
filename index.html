@@ -682,7 +682,8 @@
         {name:'暑期酒店爆款冲刺',desc:'平台流量扶持 · 酒店住宿',time:'2026-09-01 至 2026-09-30'},
         {name:'金秋出游季',desc:'平台流量扶持 · 酒店住宿',time:'2026-09-15 至 2026-10-15'},
         {name:'中秋团圆住房季',desc:'节日主题 · 限量补贴',time:'2026-09-25 至 2026-10-08'}
-      ]}
+      ]},
+    '评价评分提升建议任务':{advice:'本酒店好评率较低，每日至少达到 3 条以上抖音店铺好评，请提醒酒店线下完成此任务。',src:[['好评情况','好评率较低'],['目标要求','每日 3 条以上抖音店铺好评'],['完成方式','酒店线下完成后确认']],offline:true}
   };
   const replyStyles=['致歉＋整改说明','致歉＋补偿方案','情况说明＋整改时限'];
   /* 中差评逐条回复状态：replySel 每条评价选中的答复语序号，replyText 每条评价编辑框内容 */
@@ -743,13 +744,13 @@
           <label class="act-sel"><span>报名意向</span><select onchange="setActSel(${i},this.value)"><option${(actSel[i]||'参加')==='参加'?' selected':''}>参加</option><option${actSel[i]==='不参加'?' selected':''}>不参加</option></select></label>
         </div>`).join('')}
       </div>`
-      :c.fields.length?`<div class="section"><h3>2　建议写入抖音来客</h3>
+      :(c.fields||[]).length?`<div class="section"><h3>2　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
       actions=`${c.ignore==='暂无此设施'?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>
-        <button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`;
+        ${c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
