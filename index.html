@@ -223,7 +223,19 @@
   .gb-kv{display:flex;gap:12px;padding:7px 2px;border-top:1px dashed var(--line);font-size:12.5px}
   .gb-kv small{width:96px;flex-shrink:0;color:var(--ink-4)}
   .gb-kv b{color:var(--ink-2);font-weight:600;line-height:1.7}
-  .gb-kv.hl b{color:var(--primary)}
+  .gb-kv.hl small{color:var(--primary);font-weight:700}
+  .gb-ctl{flex:1;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .gb-in{padding:7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);font-size:12.5px;background:#fff;color:var(--ink);box-sizing:border-box}
+  .gb-in:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .gb-num{width:76px;text-align:center}
+  .gb-time{width:72px;text-align:center}
+  .gb-sl{padding:7px 28px 7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;font-size:12.5px;color:var(--ink)}
+  .gb-unit{color:var(--ink-4);font-size:12px}
+  .gb-radio{display:flex;align-items:center;gap:4px;font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+  .gb-radio input{accent-color:var(--primary);margin:0}
+  .gb-thumb{width:60px;height:60px;border-radius:var(--r-sm);background:linear-gradient(135deg,#c7d2fe,#e0e7ff);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--primary);flex-shrink:0}
+  .gb-upload{width:60px;height:60px;border:1px dashed var(--ink-4);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:11px;cursor:pointer;flex-shrink:0;background:var(--surface)}
+  .gb-req{color:#b91c1c}
   .review-item{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:14px;background:var(--surface)}
   .review-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .rv-user{font-weight:700;font-size:13px}
@@ -687,27 +699,18 @@
         {name:'中秋团圆住房季',desc:'节日主题 · 限量补贴',time:'2026-09-25 至 2026-10-08'}
       ]},
     '商家经营分-评价分提升':{advice:'本酒店好评率较低，每日至少达到 3 条以上抖音店铺好评，请提醒酒店线下完成此任务。',src:[['好评情况','好评率较低'],['目标要求','每日 3 条以上抖音店铺好评'],['完成方式','酒店线下完成后确认']],offline:true},
-    '团购商品核对任务':{advice:'团购商品共 3 类 4 项不通过：预售房型「商务大床房」的日常与中秋节团购商品均缺失；商品「【三天两晚】悦享双床房＋双人早餐」售价高于携程对比总价；商品「来重庆西站别踩雷！2天1晚｜周末不加价」名称不符合名称公式。请逐项核对以下内容并确认，提交后 AI 写入抖音来客。',src:[['需核对问题','3 类 4 项'],['涉及预售房型','商务大床房、悦享双床房'],['最近节假日','中秋节 09-25 至 09-27']],ignore:'此次忽略',
+    '团购商品核对任务':{advice:'团购商品共 3 类 4 项不通过：预售房型「商务大床房」的日常与最近节假日团购商品均缺失；商品「【三天两晚】悦享双床房＋双人早餐」当前售价高于携程对比总价；商品「来重庆西站别踩雷！2天1晚｜周末不加价」名称需修改。请逐项核对以下内容，全部内容均可修改，提交后 AI 按确认结果写入抖音来客。',src:[['需核对问题','3 类 4 项'],['涉及预售房型','商务大床房、悦享双床房'],['最近节假日','中秋节 09-25 至 09-27']],ignore:'此次忽略',
       gbuy:{
         plans:[
-          {room:'商务大床房',tag:'日常团购商品',name:'商务大床房1晚＋双人早餐＋华岩寺',rows:[
-            ['商品品类','住宿/酒店宾馆/舒适型酒店'],['商品类型','预售券 · 全日房'],['商品搭配','住｜商务大床房 ×1 间 · 餐｜早餐 2 份'],
-            ['包含数量','1 间 / 夜'],['划线价','¥399'],['售价','¥323'],['套餐图','已预填商务大床房房型图'],
-            ['不可入住日期','节假日不可用（中秋节 09-25 至 09-27）'],['预约规则','需提前 1 天预约 · 14:00 入住 · 12:00 退房']]},
-          {room:'商务大床房',tag:'中秋节团购商品',name:'【中秋节】商务大床房1晚＋双人早餐＋华岩寺',rows:[
-            ['商品品类','住宿/酒店宾馆/舒适型酒店'],['商品类型','预售券 · 全日房'],['商品搭配','住｜商务大床房 ×1 间 · 餐｜早餐 2 份'],
-            ['包含数量','1 间 / 夜'],['划线价','¥439'],['售价','¥375'],['套餐图','已预填商务大床房房型图'],
-            ['不可入住日期','不限（中秋节可入住）'],['预约规则','需提前 1 天预约 · 14:00 入住 · 12:00 退房']]}
+          {room:'商务大床房',tag:'日常团购商品',cat:'住宿/酒店宾馆/舒适型酒店',ptype:'预售券',slot:'全日房',name:'商务大床房1晚＋双人早餐＋华岩寺',mealQty:'2',priv:'无',nights:'1',list:'399',price:'323',img:true,holiday:'节假日不可用（全年节假日均不可入住）',book:'需要提前预约 · 提前 1 天',tin:'14:00',tout:'12:00'},
+          {room:'商务大床房',tag:'中秋节团购商品',cat:'住宿/酒店宾馆/舒适型酒店',ptype:'预售券',slot:'全日房',name:'【中秋节】商务大床房1晚＋双人早餐＋华岩寺',mealQty:'2',priv:'无',nights:'1',list:'439',price:'375',img:false,holiday:'不限',book:'需要提前预约 · 提前 1 天',tin:'14:00',tout:'12:00'}
         ],
         prices:[
           {prod:'【三天两晚】悦享双床房＋双人早餐',sub:'售卖中 · 已售 23',rows:[
-            ['关联预售房型','悦享双床房'],['间夜数','2 晚'],['携程基准价','¥428 / 晚'],['对比总价','¥856（428 × 2）'],
-            ['抖音实际售价','¥899（商促价）'],['建议售价','¥813（428 × 2 × 95%）']]}
+            ['关联预售房型','悦享双床房'],['间夜数','2 晚'],['携程基准价','¥428 / 晚'],['携程对比总价','¥856'],['抖音当前售价','¥899（商促价）']],suggest:'813'}
         ],
         names:[
-          {prod:'来重庆西站别踩雷！2天1晚｜周末不加价',sub:'售卖中 · 已售 73',rows:[
-            ['名称公式','房型＋间夜数＋酒店免费特色＋景区名称'],['组成依据','悦享双床房 ＋ 1 晚 ＋ 双人早餐 ＋ 华岩寺'],
-            ['当前问题','未体现房型与酒店免费特色'],['建议名称','悦享双床房1晚＋双人早餐＋华岩寺']]}
+          {prod:'来重庆西站别踩雷！2天1晚｜周末不加价',sub:'售卖中 · 已售 73',cur:'来重庆西站别踩雷！2天1晚｜周末不加价',sug:'悦享双床房1晚＋双人早餐＋华岩寺'}
         ]
       }}
   };
@@ -722,6 +725,10 @@
   /* 团购商品核对状态：gbSel 每个不通过项的确认意向（新增方案/价格/名称），未选择默认确认 */
   let gbSel={};
   function setGbSel(k,v){gbSel[k]=v}
+  /* 团购核对表单：与抖音来客「创建商品」表单一致，选择项为选择项、输入项为输入框，全部可修改 */
+  const GROOMS=['商务大床房','悦享双床房','豪华景观双床房'];
+  const gbOpts=(opts,cur)=>opts.map(o=>`<option${o===cur?' selected':''}>${o}</option>`).join('');
+  const gbRow=(label,ctl,hl)=>`<div class="gb-kv${hl?' hl':''}"><small>${label}</small><div class="gb-ctl">${ctl}</div></div>`;
   const fieldHtml=f=>f.input!==undefined
     ?`<label class="field"><span>${f.label}</span><input type="text" value="${f.input}"><small>${f.note||'已预填建议值，可修改'}</small></label>`
     :`<label class="field"><span>${f.label}</span><select>${f.options.map(o=>`<option>${o}</option>`).join('')}</select><small>${f.note||'来自携程用户端，可修改'}</small></label>`;
@@ -774,27 +781,42 @@
         </div>`).join('')}
       </div>`
       :c.gbuy?`${c.gbuy.plans.length?`<div class="section"><h3>2　需新增的团购商品（${c.gbuy.plans[0].room}，共 ${c.gbuy.plans.length} 个方案）</h3>
-        <p class="review-tip">该预售房型的日常与最近节假日（中秋节）团购商品均缺失，以下两个新增方案可独立确认，默认均为确认新增。</p>
+        <p class="review-tip">该预售房型的日常与最近节假日团购商品均缺失。以下新增方案已按抖音来客「创建商品」表单预填全部字段，均可修改；两个方案可独立确认，默认均为确认新增。</p>
         ${c.gbuy.plans.map((p,i)=>`<div class="gb-card">
-          <div class="gb-head"><b>${p.room} · ${p.tag} · ${p.name}</b>
+          <div class="gb-head"><b>${p.room} · ${p.tag}<small>${p.name}</small></b>
             <label class="act-sel"><span>新增意向</span><select onchange="setGbSel('m${i}',this.value)"><option${(gbSel['m'+i]||'确认新增')==='确认新增'?' selected':''}>确认新增</option><option${gbSel['m'+i]==='暂不新增'?' selected':''}>暂不新增</option></select></label></div>
-          ${p.rows.map(r=>`<div class="gb-kv${r[0]==='售价'?' hl':''}"><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}
+          ${gbRow('商品品类',`<input class="gb-in" type="text" value="${p.cat}">`)}
+          ${gbRow('商品类型',`<select class="gb-sl">${gbOpts(['预售券','团购券'],p.ptype)}</select>`)}
+          ${gbRow('商品售卖时段',`<select class="gb-sl">${gbOpts(['全日房','钟点房'],p.slot)}</select>`)}
+          ${gbRow('商品名称',`<input class="gb-in" type="text" value="${p.name}">`)}
+          ${gbRow('商品搭配 · 住宿',`<select class="gb-sl">${gbOpts(GROOMS,p.room)}</select><span class="gb-unit">从已配置的预售房型中选择，一个商品搭配一个房型</span>`)}
+          ${gbRow('商品搭配 · 餐食',`<label class="gb-radio"><input type="radio" name="meal${i}" checked>早餐</label><label class="gb-radio"><input type="radio" name="meal${i}">其它</label><span class="gb-unit">数量</span><input class="gb-in gb-num" type="text" value="${p.mealQty}"><span class="gb-unit">份</span>`)}
+          ${gbRow('商品搭配 · 礼遇',`<select class="gb-sl">${gbOpts(['无','免费停车','延迟退房','接送站服务'],p.priv)}</select>`)}
+          ${gbRow('包含数量',`<input class="gb-in gb-num" type="text" value="${p.nights}"><span class="gb-unit">间 / 夜</span>`)}
+          ${gbRow('划线价',`<input class="gb-in gb-num" type="text" value="${p.list}"><span class="gb-unit">元</span>`)}
+          ${gbRow('售价',`<input class="gb-in gb-num" type="text" value="${p.price}"><span class="gb-unit">元 · 已按携程对比结果预填，可修改</span>`,true)}
+          ${gbRow('套餐图',p.img?`<span class="gb-thumb">房型图</span><span class="gb-unit">已按携程房型图预填</span><a class="exlink" onclick="toast('演示原型：请在抖音来客上传替换套餐图')">替换图片</a>`:`<span class="gb-upload" onclick="toast('演示原型：请上传套餐图')">＋ 上传</span><span class="gb-unit gb-req">携程暂无套餐图，必须由用户上传</span>`)}
+          ${gbRow('不可入住日期',`<select class="gb-sl">${gbOpts(['节假日不可用（全年节假日均不可入住）','每周不可用（自选星期）','指定日期不可用','不限'],p.holiday)}</select>`)}
+          ${gbRow('预约规则',`<select class="gb-sl">${gbOpts(['需要提前预约 · 提前 1 天','需要提前预约 · 提前 2 天','不需要提前预约'],p.book)}</select>`)}
+          ${gbRow('消费规则（入离时间）',`<span class="gb-unit">最早入住</span><input class="gb-in gb-time" type="text" value="${p.tin}"><span class="gb-unit">最晚退房</span><input class="gb-in gb-time" type="text" value="${p.tout}">`)}
         </div>`).join('')}
       </div>`:''}
       ${c.gbuy.prices.length?`<div class="section"><h3>3　价格需修改的商品（共 ${c.gbuy.prices.length} 个）</h3>
-        <p class="review-tip">以下商品抖音实际售价高于携程对比总价，确认后 AI 将售价修改为建议售价。</p>
+        <p class="review-tip">以下商品当前售价高于携程对比总价，建议售价已预填、可修改，确认后 AI 按修改后的价格写入抖音来客。</p>
         ${c.gbuy.prices.map((p,i)=>`<div class="gb-card">
-          <div class="gb-head"><b>${p.prod}</b><small>${p.sub}</small>
+          <div class="gb-head"><b>${p.prod}<small>${p.sub}</small></b>
             <label class="act-sel"><span>修改意向</span><select onchange="setGbSel('p${i}',this.value)"><option${(gbSel['p'+i]||'确认修改')==='确认修改'?' selected':''}>确认修改</option><option${gbSel['p'+i]==='本次不改'?' selected':''}>本次不改</option></select></label></div>
-          ${p.rows.map(r=>`<div class="gb-kv${r[0].indexOf('建议')===0?' hl':''}"><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}
+          ${p.rows.map(r=>`<div class="gb-kv"><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}
+          ${gbRow('建议售价',`<input class="gb-in gb-num" type="text" value="${p.suggest}"><span class="gb-unit">元 · 已按携程对比结果预填，可修改</span>`,true)}
         </div>`).join('')}
       </div>`:''}
       ${c.gbuy.names.length?`<div class="section"><h3>4　名称需修改的商品（共 ${c.gbuy.names.length} 个）</h3>
-        <p class="review-tip">以下商品名称不符合名称公式，确认后 AI 将名称修改为建议名称。</p>
+        <p class="review-tip">以下商品名称需修改，建议名称已预填、可修改，确认后 AI 按修改后的名称写入抖音来客。</p>
         ${c.gbuy.names.map((n,i)=>`<div class="gb-card">
-          <div class="gb-head"><b>${n.prod}</b><small>${n.sub}</small>
+          <div class="gb-head"><b>${n.prod}<small>${n.sub}</small></b>
             <label class="act-sel"><span>修改意向</span><select onchange="setGbSel('n${i}',this.value)"><option${(gbSel['n'+i]||'确认修改')==='确认修改'?' selected':''}>确认修改</option><option${gbSel['n'+i]==='本次不改'?' selected':''}>本次不改</option></select></label></div>
-          ${n.rows.map(r=>`<div class="gb-kv${r[0].indexOf('建议')===0?' hl':''}"><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}
+          <div class="gb-kv"><small>当前名称</small><b>${n.cur}</b></div>
+          ${gbRow('建议名称',`<input class="gb-in" type="text" value="${n.sug}">`,true)}
         </div>`).join('')}
       </div>`:''}`
       :(c.fields||[]).length?`<div class="section"><h3>2　建议写入抖音来客</h3>
