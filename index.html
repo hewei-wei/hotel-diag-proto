@@ -215,6 +215,15 @@
   .act-sel{display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0}
   .act-sel span{font-size:12px;color:var(--ink-3)}
   .act-sel select{padding:7px 28px 7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;font-size:13px;color:var(--ink)}
+  /* 团购商品核对 */
+  .gb-card{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px;background:var(--surface)}
+  .gb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .gb-head b{font-size:13.5px;line-height:1.6}
+  .gb-head small{display:block;color:var(--ink-4);font-size:12px;margin-top:2px;font-weight:400}
+  .gb-kv{display:flex;gap:12px;padding:7px 2px;border-top:1px dashed var(--line);font-size:12.5px}
+  .gb-kv small{width:96px;flex-shrink:0;color:var(--ink-4)}
+  .gb-kv b{color:var(--ink-2);font-weight:600;line-height:1.7}
+  .gb-kv.hl b{color:var(--primary)}
   .review-item{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:14px;background:var(--surface)}
   .review-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .rv-user{font-weight:700;font-size:13px}
@@ -595,8 +604,8 @@
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
   function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
@@ -608,7 +617,7 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -677,7 +686,30 @@
         {name:'金秋出游季',desc:'平台流量扶持 · 酒店住宿',time:'2026-09-15 至 2026-10-15'},
         {name:'中秋团圆住房季',desc:'节日主题 · 限量补贴',time:'2026-09-25 至 2026-10-08'}
       ]},
-    '商家经营分-评价分提升':{advice:'本酒店好评率较低，每日至少达到 3 条以上抖音店铺好评，请提醒酒店线下完成此任务。',src:[['好评情况','好评率较低'],['目标要求','每日 3 条以上抖音店铺好评'],['完成方式','酒店线下完成后确认']],offline:true}
+    '商家经营分-评价分提升':{advice:'本酒店好评率较低，每日至少达到 3 条以上抖音店铺好评，请提醒酒店线下完成此任务。',src:[['好评情况','好评率较低'],['目标要求','每日 3 条以上抖音店铺好评'],['完成方式','酒店线下完成后确认']],offline:true},
+    '团购商品核对任务':{advice:'团购商品共 3 类 4 项不通过：预售房型「商务大床房」的日常与中秋节团购商品均缺失；商品「【三天两晚】悦享双床房＋双人早餐」售价高于携程对比总价；商品「来重庆西站别踩雷！2天1晚｜周末不加价」名称不符合名称公式。请逐项核对以下内容并确认，提交后 AI 写入抖音来客。',src:[['需核对问题','3 类 4 项'],['涉及预售房型','商务大床房、悦享双床房'],['最近节假日','中秋节 09-25 至 09-27']],ignore:'此次忽略',
+      gbuy:{
+        plans:[
+          {room:'商务大床房',tag:'日常团购商品',name:'商务大床房1晚＋双人早餐＋华岩寺',rows:[
+            ['商品品类','住宿/酒店宾馆/舒适型酒店'],['商品类型','预售券 · 全日房'],['商品搭配','住｜商务大床房 ×1 间 · 餐｜早餐 2 份'],
+            ['包含数量','1 间 / 夜'],['划线价','¥399'],['售价','¥323'],['套餐图','已预填商务大床房房型图'],
+            ['不可入住日期','节假日不可用（中秋节 09-25 至 09-27）'],['预约规则','需提前 1 天预约 · 14:00 入住 · 12:00 退房']]},
+          {room:'商务大床房',tag:'中秋节团购商品',name:'【中秋节】商务大床房1晚＋双人早餐＋华岩寺',rows:[
+            ['商品品类','住宿/酒店宾馆/舒适型酒店'],['商品类型','预售券 · 全日房'],['商品搭配','住｜商务大床房 ×1 间 · 餐｜早餐 2 份'],
+            ['包含数量','1 间 / 夜'],['划线价','¥439'],['售价','¥375'],['套餐图','已预填商务大床房房型图'],
+            ['不可入住日期','不限（中秋节可入住）'],['预约规则','需提前 1 天预约 · 14:00 入住 · 12:00 退房']]}
+        ],
+        prices:[
+          {prod:'【三天两晚】悦享双床房＋双人早餐',sub:'售卖中 · 已售 23',rows:[
+            ['关联预售房型','悦享双床房'],['间夜数','2 晚'],['携程基准价','¥428 / 晚'],['对比总价','¥856（428 × 2）'],
+            ['抖音实际售价','¥899（商促价）'],['建议售价','¥813（428 × 2 × 95%）']]}
+        ],
+        names:[
+          {prod:'来重庆西站别踩雷！2天1晚｜周末不加价',sub:'售卖中 · 已售 73',rows:[
+            ['名称公式','房型＋间夜数＋酒店免费特色＋景区名称'],['组成依据','悦享双床房 ＋ 1 晚 ＋ 双人早餐 ＋ 华岩寺'],
+            ['当前问题','未体现房型与酒店免费特色'],['建议名称','悦享双床房1晚＋双人早餐＋华岩寺']]}
+        ]
+      }}
   };
   const replyStyles=['致歉＋整改说明','致歉＋补偿方案','情况说明＋整改时限'];
   /* 中差评逐条回复状态：replySel 每条评价选中的答复语序号，replyText 每条评价编辑框内容 */
@@ -687,6 +719,9 @@
   /* 活动报名意向状态：actSel 每个活动选择（参加/不参加），未选择默认参加 */
   let actSel={};
   function setActSel(i,v){actSel[i]=v}
+  /* 团购商品核对状态：gbSel 每个不通过项的确认意向（新增方案/价格/名称），未选择默认确认 */
+  let gbSel={};
+  function setGbSel(k,v){gbSel[k]=v}
   const fieldHtml=f=>f.input!==undefined
     ?`<label class="field"><span>${f.label}</span><input type="text" value="${f.input}"><small>${f.note||'已预填建议值，可修改'}</small></label>`
     :`<label class="field"><span>${f.label}</span><select>${f.options.map(o=>`<option>${o}</option>`).join('')}</select><small>${f.note||'来自携程用户端，可修改'}</small></label>`;
@@ -738,13 +773,37 @@
           <label class="act-sel"><span>报名意向</span><select onchange="setActSel(${i},this.value)"><option${(actSel[i]||'参加')==='参加'?' selected':''}>参加</option><option${actSel[i]==='不参加'?' selected':''}>不参加</option></select></label>
         </div>`).join('')}
       </div>`
+      :c.gbuy?`${c.gbuy.plans.length?`<div class="section"><h3>2　需新增的团购商品（${c.gbuy.plans[0].room}，共 ${c.gbuy.plans.length} 个方案）</h3>
+        <p class="review-tip">该预售房型的日常与最近节假日（中秋节）团购商品均缺失，以下两个新增方案可独立确认，默认均为确认新增。</p>
+        ${c.gbuy.plans.map((p,i)=>`<div class="gb-card">
+          <div class="gb-head"><b>${p.room} · ${p.tag} · ${p.name}</b>
+            <label class="act-sel"><span>新增意向</span><select onchange="setGbSel('m${i}',this.value)"><option${(gbSel['m'+i]||'确认新增')==='确认新增'?' selected':''}>确认新增</option><option${gbSel['m'+i]==='暂不新增'?' selected':''}>暂不新增</option></select></label></div>
+          ${p.rows.map(r=>`<div class="gb-kv${r[0]==='售价'?' hl':''}"><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}
+        </div>`).join('')}
+      </div>`:''}
+      ${c.gbuy.prices.length?`<div class="section"><h3>3　价格需修改的商品（共 ${c.gbuy.prices.length} 个）</h3>
+        <p class="review-tip">以下商品抖音实际售价高于携程对比总价，确认后 AI 将售价修改为建议售价。</p>
+        ${c.gbuy.prices.map((p,i)=>`<div class="gb-card">
+          <div class="gb-head"><b>${p.prod}</b><small>${p.sub}</small>
+            <label class="act-sel"><span>修改意向</span><select onchange="setGbSel('p${i}',this.value)"><option${(gbSel['p'+i]||'确认修改')==='确认修改'?' selected':''}>确认修改</option><option${gbSel['p'+i]==='本次不改'?' selected':''}>本次不改</option></select></label></div>
+          ${p.rows.map(r=>`<div class="gb-kv${r[0].indexOf('建议')===0?' hl':''}"><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}
+        </div>`).join('')}
+      </div>`:''}
+      ${c.gbuy.names.length?`<div class="section"><h3>4　名称需修改的商品（共 ${c.gbuy.names.length} 个）</h3>
+        <p class="review-tip">以下商品名称不符合名称公式，确认后 AI 将名称修改为建议名称。</p>
+        ${c.gbuy.names.map((n,i)=>`<div class="gb-card">
+          <div class="gb-head"><b>${n.prod}</b><small>${n.sub}</small>
+            <label class="act-sel"><span>修改意向</span><select onchange="setGbSel('n${i}',this.value)"><option${(gbSel['n'+i]||'确认修改')==='确认修改'?' selected':''}>确认修改</option><option${gbSel['n'+i]==='本次不改'?' selected':''}>本次不改</option></select></label></div>
+          ${n.rows.map(r=>`<div class="gb-kv${r[0].indexOf('建议')===0?' hl':''}"><small>${r[0]}</small><b>${r[1]}</b></div>`).join('')}
+        </div>`).join('')}
+      </div>`:''}`
       :(c.fields||[]).length?`<div class="section"><h3>2　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
       actions=`${c.ignore==='暂无此设施'?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>
-        ${c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
+        ${c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
