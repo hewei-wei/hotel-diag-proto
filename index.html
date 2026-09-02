@@ -338,7 +338,7 @@
   .pbar{height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden}
   .pbar i{display:block;height:100%;background:var(--primary);border-radius:999px;transition:width .4s}
 
-  /* ===== 执行记录分组 ===== */
+  /* ===== 诊断日志分组 ===== */
   .rgroup{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);margin-bottom:12px;overflow:hidden}
   .rg-head{display:flex;align-items:center;gap:10px;padding:14px 18px;width:100%;text-align:left}
   .rg-head:hover{background:#fafbfc}
@@ -348,7 +348,11 @@
   .rg-head .tags{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
   .rg-head .tags>small{color:var(--ink-4);font-size:12px}
   .rg-body{border-top:1px solid var(--line-soft)}
-  .rline{display:grid;grid-template-columns:72px 150px 86px 120px 1fr;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-soft);font-size:12.5px;color:var(--ink-2)}
+  .rline{display:grid;grid-template-columns:72px 150px 86px 120px 200px 1fr;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-soft);font-size:12.5px;color:var(--ink-2)}
+  .rec-stats{display:flex;gap:12px;margin-bottom:12px}
+  .rec-stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:14px 18px}
+  .rec-stat b{display:block;font-size:22px;margin-top:2px}
+  .rec-stat small{font-size:12px;color:var(--ink-4)}
   .rline:last-child{border-bottom:0}
   .rline .no{font-weight:600;color:var(--ink)}
   .chev{flex:none;color:var(--ink-4);transition:transform .2s;font-size:12px}
@@ -357,6 +361,7 @@
   /* 弹窗 */
   .modal-mask{position:fixed;inset:0;background:rgba(17,24,39,.45);backdrop-filter:blur(2px);display:grid;place-items:center;z-index:30}
   .modal{width:480px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow-lg);position:relative;padding:24px}
+  .modal.wide{width:720px}
   .close{position:absolute;right:16px;top:16px;width:30px;height:30px;border-radius:var(--r-sm);color:var(--ink-4);font-size:15px;display:grid;place-items:center}
   .close:hover{background:var(--surface-2);color:var(--ink)}
   .modal h2{margin:0 0 4px;font-size:17px}
@@ -500,13 +505,13 @@
 
   function toast(msg){const el=$('#toast');el.innerHTML=`<i>✓</i>${msg}`;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2300)}
 
-  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',records:'执行记录',activities:'活动配置',account:'账号管理'};
+  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',records:'诊断日志',account:'账号管理'};
   function nav(){
     $('#nav').innerHTML=`<button class="${view!=='account'?'active':''}" onclick="go('hotels')"><i>▦</i>酒店管理</button>`
       +`<p>系统管理</p><button class="${view==='account'?'active':''}" onclick="go('account')"><i>⚙</i>账号管理</button>`;
     $('#pageTitle').textContent=pageTitles[view];
-    const hotelViews=['diag','tasks','detail','records','activities'];
-    const tabs=[['diag','诊断工作台'],['tasks','诊断任务'],['records','执行记录'],['activities','活动配置']];
+    const hotelViews=['diag','tasks','detail','records'];
+    const tabs=[['diag','诊断工作台'],['tasks','诊断任务'],['records','诊断日志']];
     $('#subnav').innerHTML=activeHotel&&hotelViews.includes(view)?`<div class="subnav">
       <button class="sub-back" onclick="go('hotels')">‹ 返回酒店管理</button>
       <div class="sub-hotel"><b>${activeHotel.name}</b><small>${activeHotel.sub}</small></div>
@@ -527,7 +532,7 @@
     const match=opts.find(o=>o[0]===hotelFilter)[2];
     const visible=hotels.map((h,i)=>({h,i})).filter(({h})=>match(h)&&h.name.includes(hotelQuery.trim()));
     return `<div class="page">
-      <div class="page-head"><div><h1>酒店管理</h1></div></div>
+      <div class="page-head"><div><h1>酒店管理</h1></div><button class="btn btn-outline" onclick="openActs()">活动配置</button></div>
       <div class="notice"><span class="notice-icon">ⓘ</span><div><b>抖音来客和携程官网都授权之后才可进行诊断</b></div></div>
       <div class="panel">
         <div class="panel-toolbar">
@@ -1263,7 +1268,7 @@
     </main>
   </div>`}
 
-  /* ===== 执行记录（按检查路径分组，按诊断次数展示） ===== */
+  /* ===== 诊断日志（按检查路径分组，每次诊断展示累计诊断 / 成功 / 失败） ===== */
   const recordGroups=[
     {path:['店铺管理','门店管理','基本信息','门店名称'],rounds:[
       ['2026-08-28 10:32','fail',1,'门店名称不符合名称公式，已生成修改建议任务'],
@@ -1283,33 +1288,54 @@
   ];
   let recOpen={0:true};
   function toggleRec(i){recOpen[i]=!recOpen[i];render()}
-  function records(){return `<div class="page">
-    <div class="page-head"><div><h1>执行记录</h1><p>按检查路径归类，展开查看每一次诊断的结果与生成任务数</p></div></div>
+  function records(){
+    const total=recordGroups.reduce((a,g)=>a+g.rounds.length,0);
+    const tp=recordGroups.reduce((a,g)=>a+g.rounds.filter(r=>r[1]==='pass').length,0);
+    const tf=total-tp;
+    return `<div class="page">
+    <div class="page-head"><div><h1>诊断日志</h1><p>按检查路径归类，展开查看每一次诊断的结果、生成任务数与累计统计</p></div></div>
+    <div class="rec-stats">
+      <div class="rec-stat"><small>累计诊断</small><b>${total} 次</b></div>
+      <div class="rec-stat"><small>成功</small><b style="color:#15803d">${tp} 次</b></div>
+      <div class="rec-stat"><small>失败</small><b style="color:#b91c1c">${tf} 次</b></div>
+    </div>
     ${recordGroups.map((g,i)=>{const latest=g.rounds[0];
+      const gp=g.rounds.filter(r=>r[1]==='pass').length,gf=g.rounds.length-gp;
       return `<div class="rgroup">
         <button class="rg-head" onclick="toggleRec(${i})">
           <span class="rg-path"><b>${g.path[3]}</b><small>　${g.path.slice(0,3).join(' › ')}</small></span>
           <span class="tags">
-            <i class="tag gray">已诊断 ${g.rounds.length} 次</i>
+            <i class="tag gray">累计诊断 ${g.rounds.length} 次 · 成功 ${gp} · 失败 ${gf}</i>
             <i class="tag ${latest[1]==='pass'?'green':'red'}">${latest[1]==='pass'?'最近通过':'最近不通过'}</i>
             <small>${latest[0]}</small>
             <span class="chev ${recOpen[i]?'open':''}">⌄</span>
           </span>
         </button>
-        ${recOpen[i]?`<div class="rg-body">${g.rounds.map((r,ri)=>`<div class="rline">
+        ${recOpen[i]?`<div class="rg-body">${g.rounds.map((r,ri)=>{const cum=g.rounds.slice(ri).reduce((a,x)=>[a[0]+1,a[1]+(x[1]==='pass'?1:0)],[0,0]);
+          return `<div class="rline">
           <span class="no">第 ${g.rounds.length-ri} 次</span><span>${r[0]}</span>
           <i class="tag ${r[1]==='pass'?'green':'red'}">${r[1]==='pass'?'通过':'不通过'}</i>
           <span>${r[2]?`<b style="color:#b91c1c">生成任务 ${r[2]} 个</b>`:'<span style="color:var(--ink-4)">未生成任务</span>'}</span>
+          <span>累计诊断 ${cum[0]} 次 · <span style="color:#15803d">成功 ${cum[1]}</span> · <span style="color:#b91c1c">失败 ${cum[0]-cum[1]}</span></span>
           <span>${r[3]}</span>
-        </div>`).join('')}</div>`:''}
+        </div>`}).join('')}</div>`:''}
       </div>`}).join('')}
   </div>`}
 
-  /* ===== 活动配置 ===== */
-  function activities(){return `<div class="page">
-    <div class="page-head"><div><h1>活动配置</h1><p>管理员配置允许进入诊断范围的抖音活动</p></div><button class="btn btn-outline" onclick="toast('活动列表已同步')">↻ 同步活动</button></div>
-    <div class="list-card">${[['暑期酒店爆款冲刺','立即报名','平台流量扶持 · 酒店住宿','允许诊断','已开启'],['金秋出游季','立即报名','平台流量扶持 · 酒店住宿','允许诊断','已开启'],['中秋团圆住房季','立即报名','节日主题 · 限量补贴','允许诊断','已开启'],['夏日清凉住宿节','已下线','平台流量扶持 · 酒店住宿','不参与诊断','开启']].map((x,i)=>`<div class="lrow"><strong>${['暑','秋','中','夏'][i]}</strong><div class="lt"><b>${x[0]}</b><small>${x[2]}</small></div><i class="tag ${i===3?'gray':'green'}">${x[1]}</i><span>${x[3]}</span><span style="text-align:right"><button class="btn btn-outline">${x[4]}</button></span></div>`).join('')}</div>
-  </div>`}
+  /* ===== 活动配置（平台通用，适用于全部酒店；入口在酒店管理页） ===== */
+  const actData=[['暑','暑期酒店爆款冲刺','立即报名','平台流量扶持 · 酒店住宿',true],
+    ['秋','金秋出游季','立即报名','平台流量扶持 · 酒店住宿',true],
+    ['中','中秋团圆住房季','立即报名','节日主题 · 限量补贴',true],
+    ['夏','夏日清凉住宿节','已下线','平台流量扶持 · 酒店住宿',false]];
+  function openActs(){$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeActs(event)"><div class="modal wide" onclick="event.stopPropagation()">
+    <button class="close" onclick="closeActs()">×</button>
+    <h2>活动配置</h2>
+    <div class="sub">管理员配置允许进入诊断范围的抖音活动 · 通用配置，适用于全部酒店</div>
+    <div class="list-card" style="margin-top:14px">${actData.map((x,i)=>`<div class="lrow"><strong>${x[0]}</strong><div class="lt"><b>${x[1]}</b><small>${x[3]}</small></div><i class="tag ${x[2]==='已下线'?'gray':'green'}">${x[2]}</i><span>${x[4]?'允许诊断':'不参与诊断'}</span><span style="text-align:right"><button class="btn btn-outline" onclick="toggleAct(${i})">${x[4]?'已开启':'已关闭'}</button></span></div>`).join('')}</div>
+    <div class="modal-foot">开关为平台通用配置，对全部酒店生效；新活动默认关闭；已下线活动保留开关，重新上线时沿用。</div>
+  </div></div>`}
+  function toggleAct(i){actData[i][4]=!actData[i][4];openActs()}
+  function closeActs(e){if(e&&e.target!==e.currentTarget)return;$('#modalRoot').innerHTML=''}
 
   /* ===== 账号管理 ===== */
   function accountPage(){return `<div class="page">
@@ -1349,7 +1375,7 @@
   function authorize(){hotels[authIndex][platform]='ok';reauth=false;toast(`${platform==='douyin'?'抖音来客':'携程官网'}授权成功`);modal();render()}
   function closeModal(e){if(e&&e.target!==e.currentTarget)return;$('#modalRoot').innerHTML='';authIndex=null}
 
-  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,records,activities,account:accountPage};$('#app').innerHTML=pages[view]()}
+  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,records,account:accountPage};$('#app').innerHTML=pages[view]()}
   render();
 </script>
 </body>
