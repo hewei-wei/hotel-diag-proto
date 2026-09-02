@@ -1323,18 +1323,37 @@
   </div>`}
 
   /* ===== 活动配置（平台通用，适用于全部酒店；入口在酒店管理页） ===== */
-  const actData=[['暑','暑期酒店爆款冲刺','立即报名','平台流量扶持 · 酒店住宿',true],
-    ['秋','金秋出游季','立即报名','平台流量扶持 · 酒店住宿',true],
-    ['中','中秋团圆住房季','立即报名','节日主题 · 限量补贴',true],
-    ['夏','夏日清凉住宿节','已下线','平台流量扶持 · 酒店住宿',false]];
+  /* 状态：on 已启用（开启诊断）/ off 已停用（关闭诊断）/ down 已下线（不再允许诊断） */
+  const actData=[['暑','暑期酒店爆款冲刺','平台流量扶持 · 酒店住宿','on'],
+    ['秋','金秋出游季','平台流量扶持 · 酒店住宿','on'],
+    ['中','中秋团圆住房季','节日主题 · 限量补贴','on'],
+    ['夏','夏日清凉住宿节','平台流量扶持 · 酒店住宿','down']];
+  const actState=st=>st==='on'?['已启用','green']:st==='off'?['已停用','gray']:['已下线','gray'];
+  let actConfirm=null;
   function openActs(){$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeActs(event)"><div class="modal wide" onclick="event.stopPropagation()">
     <button class="close" onclick="closeActs()">×</button>
     <h2>活动配置</h2>
     <div class="sub">管理员配置允许进入诊断范围的抖音活动 · 通用配置，适用于全部酒店</div>
-    <div class="list-card" style="margin-top:14px">${actData.map((x,i)=>`<div class="lrow"><strong>${x[0]}</strong><div class="lt"><b>${x[1]}</b><small>${x[3]}</small></div><i class="tag ${x[2]==='已下线'?'gray':'green'}">${x[2]}</i><span>${x[4]?'允许诊断':'不参与诊断'}</span><span style="text-align:right"><button class="btn btn-outline" onclick="toggleAct(${i})">${x[4]?'已开启':'已关闭'}</button></span></div>`).join('')}</div>
-    <div class="modal-foot">开关为平台通用配置，对全部酒店生效；新活动默认关闭；已下线活动保留开关，重新上线时沿用。</div>
+    <div class="list-card" style="margin-top:14px">${actData.map((x,i)=>{const [st,cls]=actState(x[3]);
+      const btns=x[3]==='down'
+        ?`<button class="btn btn-outline" onclick="askActUp(${i})">重新上线</button>`
+        :`<button class="btn btn-outline" onclick="toggleAct(${i})">${st}</button><button class="btn btn-outline tgap" onclick="askActDown(${i})">下线</button>`;
+      return `<div class="lrow" style="grid-template-columns:44px 1.8fr .8fr 1.5fr"><strong>${x[0]}</strong><div class="lt"><b>${x[1]}</b><small>${x[2]}</small></div><i class="tag ${cls}">${st}</i><span style="text-align:right">${btns}</span></div>`}).join('')}</div>
+    <div class="modal-foot">开关为平台通用配置，对全部酒店生效；已停用不再进入诊断，已下线活动不再允许诊断，可重新上线；新活动默认已停用。</div>
   </div></div>`}
-  function toggleAct(i){actData[i][4]=!actData[i][4];openActs()}
+  function toggleAct(i){actData[i][3]=actData[i][3]==='on'?'off':'on';openActs()}
+  function askActDown(i){actConfirm={t:'down',i};
+    $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeActConfirm(event)"><div class="modal" onclick="event.stopPropagation()" style="width:400px">
+    <h2>确认下线该活动？</h2><p class="sub">下线后「${actData[i][1]}」不再进入用户端诊断与报名候选，直至重新上线。</p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeActConfirm()">取消</button><button class="btn btn-primary" onclick="doActConfirm()">确认下线</button></div>
+  </div></div>`}
+  function askActUp(i){actConfirm={t:'up',i};
+    $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeActConfirm(event)"><div class="modal" onclick="event.stopPropagation()" style="width:400px">
+    <h2>确认重新上线该活动？</h2><p class="sub">上线后「${actData[i][1]}」恢复开启/关闭诊断能力，并恢复下线前的开启/关闭状态。</p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeActConfirm()">取消</button><button class="btn btn-primary" onclick="doActConfirm()">确认上线</button></div>
+  </div></div>`}
+  function doActConfirm(){const a=actConfirm;actData[a.i][3]=a.t==='down'?'down':'on';actConfirm=null;openActs()}
+  function closeActConfirm(e){if(e&&e.target!==e.currentTarget)return;actConfirm=null;openActs()}
   function closeActs(e){if(e&&e.target!==e.currentTarget)return;$('#modalRoot').innerHTML=''}
 
   /* ===== 账号管理 ===== */
