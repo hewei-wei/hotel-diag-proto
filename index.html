@@ -641,8 +641,8 @@
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};xspPick=0;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};xspPick=0;go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;xspPick=0;go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;xspPick=0;go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
   function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
@@ -654,7 +654,7 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};xspPick=0;go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;xspPick=0;go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -696,21 +696,8 @@
       <div class="route-text"><textarea maxlength="50" placeholder="${ph}" oninput="this.nextElementSibling.textContent=this.value.length+' / 50'"></textarea><small class="count">0 / 50</small></div>
     </div>
   </div>`}
-  /* 日历房早餐份数：逐房型比对结果与规则待确认口径（与《抖音来客诊断规则表A》「日历房房型与早餐份数」一致） */
-  const CAL_CHECKS=[
-    ['景观棋牌娱乐房（免费携带宠物·免费停车）','抖音 2 份 · 携程 2 份','pass'],
-    ['巨幕投影大床房-重庆西站免费接送站2选1','抖音 0 份 · 携程 2 份','fail'],
-    ['三床家庭房-暑假不加价·免费停车免费早餐','抖音 3 份 · 携程 3 份','pass'],
-    ['景观大床房-重庆西站接站·送站2选1','抖音 1 份 · 携程 1 份','pass'],
-    ['亲子家庭房-赠送小孩早餐·免费携带宠物','抖音 2 份 · 携程 2 份','pass'],
-    ['景观双床房-观龙门公园景观·免费早餐','抖音 1 份 · 携程 2 份','fail']];
-  const CAL_PENDS=[
-    ['用户修改权','Excel 规则仅写明“用户确认改为携程早餐份数”，未覆盖用户自行编辑份数的场景，是否按用户编辑值写入需确认。本任务默认支持：建议份数按携程预填，用户可修改，AI 按用户确认后的份数写入抖音来客。'],
-    ['早餐份数 0 份下限','携程无早餐时标准早餐份数为 0；抖音「编辑日历房型」早餐份数为必填数字，最小值是否允许 0 份需在抖音来客实测确认。'],
-    ['日历房名称联动','日历房名称由系统按“物理房型名称-早餐-退改规则”自动生成（如“景观棋牌娱乐房（免费携带宠物·免费停车）-2份早餐-阶梯退”）；修改早餐份数后名称是否由抖音自动更新、是否需同步校验名称，待确认。'],
-    ['修改入口与生效范围','在「编辑日历房型」修改早餐份数是否要求重新维护价量态（近 3 个月内 30 天房价/房量）、修改对已生成未入住订单的影响，待确认。'],
-    ['携程份数取值口径','携程早餐展示为“无早/单早/双早/三早”，按 0/1/2/3 份映射；携程仅展示“含早”未标明份数时的取值口径待确认。']];
-  const calTask=(advice,room)=>({advice,src:[['酒店','尚宽酒店（重庆西站华岩寺店）· 抖音来客'],['数据范围','日历房已上架 10 个 · 覆盖房型 6/6'],['早餐份数不一致','2 个房型 · 本任务仅处理当前房型']],ignore:'此次忽略',cal:{room},pends:CAL_PENDS});
+  /* 日历房早餐份数：仅展示本任务不通过的房型，通过房型不在任务内展示、也不生成任务（与《抖音来客诊断规则表A》「日历房房型与早餐份数」一致） */
+  const calTask=(advice,room)=>({advice,src:[['酒店','尚宽酒店（重庆西站华岩寺店）· 抖音来客'],['数据范围','日历房已上架 10 个 · 覆盖房型 6/6'],['早餐份数不一致','2 个房型 · 本任务仅处理当前房型']],ignore:'此次忽略',cal:{room}});
   /* 房型信息核对：逐字段差异与规则待确认口径（与《抖音来客诊断规则表A》「房型信息」一致） */
   const RT_PENDS=[
     ['房型名称修改边界','规则将「房型名称」列入逐字段比对，但未明确已关联日历房、团购商品的抖音房型是否允许改名、改名后商品关联是否受影响，待确认。本任务对名称差异仅提示对应关系，不直接改名。'],
@@ -863,9 +850,9 @@
           {cat:'房间',cur:'3 张 · 1 张审核不通过',qty:'4',srcCat:'携程「客房」类别',imgs:['大床房','双床房','卫生间','淋浴间']}
         ]
       }},
-    '早餐份数修正·巨幕投影大床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，检出 2 个房型与携程不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「巨幕投影大床房」：早餐份数 0 份 → 携程当前 2 份。',
+    '早餐份数修正·巨幕投影大床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，一致的房型通过（不在任务内展示），检出 2 个房型不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「巨幕投影大床房」：早餐份数 0 份 → 携程当前 2 份，修改内容支持灵活修改。',
       {roomName:'巨幕投影大床房-重庆西站免费接送站2选1',roomId:'7659677410023846218',spec:'20-25㎡ · 1张1.8m大床 · 有窗 · 可住2人',calName:'巨幕投影大床房-重庆西站免费接送站2选1-0份早餐-限时免费退',calId:'18700426338190247',cur:'0',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
-    '早餐份数修正·景观双床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，检出 2 个房型与携程不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「景观双床房」：早餐份数 1 份 → 携程当前 2 份。',
+    '早餐份数修正·景观双床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，一致的房型通过（不在任务内展示），检出 2 个房型不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「景观双床房」：早餐份数 1 份 → 携程当前 2 份，修改内容支持灵活修改。',
       {roomName:'景观双床房-观龙门公园景观·免费早餐',roomId:'7659677622001534882',spec:'25-30㎡ · 2张1.35m单人床 · 有窗 · 可住2人',calName:'景观双床房-观龙门公园景观·免费早餐-1份早餐-阶梯退',calId:'18700427100226851',cur:'1',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
     '房型信息核对·钟点房':rtTask('携程与抖音「钟点房」名称一致，已自动对应。逐字段核对检出 3 项不一致（楼层、网络服务、房型设施），已按「携程值 → 建议修改值」生成修改内容：楼层 5~10 层 → 3~6 层、网络服务去除有线网络、房型设施补充电热水壶。全部内容可修改，确认后 AI 仅修改本房型中用户确认的字段并写入抖音来客。',
       [['房型对应','钟点房 → 钟点房 · 名称一致自动对应'],['房型数量','携程 8 个 · 抖音来客已上架 11 个'],['本房型差异','3 项 · 楼层、网络服务、房型设施']],
@@ -916,6 +903,10 @@
   /* 装修审核整改：auAct 每张被驳回图片的处理方式（replace=重新上传替换，delete=删除） */
   let auAct={};
   function setAuAct(i,v){auAct[i]=v;render()}
+  /* 早餐份数：用户修改后的份数（null/空 = 按携程预填）；仅允许 0 或正整数 */
+  let calTo=null;
+  const calEff=c=>(calTo??'')!==''?calTo:c.cal.room.to;
+  function setCalTo(v){calTo=String(v).replace(/[^\d]/g,'').replace(/^0+(?=\d)/,'');render()}
   /* 团购核对表单：与抖音来客「创建商品」表单一致，选择项为选择项、输入项为输入框，全部可修改 */
   const GROOMS=['商务大床房','悦享双床房','豪华景观双床房'];
   const GHOLIDAYS=[['中秋节','2026-09-25 至 09-27'],['国庆节','2026-10-01 至 10-07'],['元旦','2027-01-01 至 01-03'],['春节','2027-02-06 至 02-12'],['清明节','2027-04-03 至 04-05'],['劳动节','2027-05-01 至 05-05'],['端午节','2027-06-09 至 06-11']];
@@ -1162,24 +1153,22 @@
         <p class="review-tip">以下为《抖音来客诊断规则表》「酒店设施通用规则」及各设施节点尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
         ${c.pends.map((p,i)=>`<div class="gb-kv"><small>待确认 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
       </div>`
-      :c.cal?`<div class="section"><h3>2　逐房型早餐份数比对结果</h3>
-        <p class="review-tip">房型集合一致后，逐房型比较抖音日历房与携程的早餐份数：一致通过，不一致按房型单独生成任务。不同房型不合并提交，本任务仅处理标注「本任务」的房型。</p>
-        ${CAL_CHECKS.map((o,i)=>`<div class="gb-kv"><small>房型 ${i+1}</small><div class="gb-ctl"><b>${o[0]}</b><span class="gb-unit">${o[1]}　<i class="tag ${o[2]==='pass'?'green':'red'}">${o[2]==='pass'?'通过':'需修改'}</i>${o[0]===c.cal.room.roomName?'　<i class="tag" style="background:var(--primary-soft);color:var(--primary)">本任务</i>':''}</span></div></div>`).join('')}
-      </div>
-      <div class="section"><h3>3　修改内容（与抖音来客「编辑日历房型」一致）</h3>
-        <p class="review-tip">已定位需修改的日历房并预填建议份数，支持修改；确认后 AI 仅修改当前房型的早餐份数，写入并校验成功后任务完成。</p>
+      :c.cal?`<div class="section"><h3>2　本次不通过房型（仅本任务）</h3>
+        <p class="review-tip">房型集合一致后逐房型比较早餐份数：一致的房型已通过，不在任务内展示、也不生成任务；不一致的房型按房型单独生成任务，本任务仅处理下方房型，不同房型不合并提交。</p>
         <div class="gb-card">
-          <div class="gb-head"><b>${c.cal.room.roomName}<small>日历房：${c.cal.room.calName} · ID：${c.cal.room.calId} · 已上架</small></b></div>
+          <div class="gb-head"><b>${c.cal.room.roomName}<small>日历房：${c.cal.room.calName} · ID：${c.cal.room.calId} · 已上架</small></b><i class="tag red">早餐份数不一致</i></div>
           ${gbRow('适用房型',`<b>${c.cal.room.roomName}</b><span class="gb-unit">物理房型 ID：${c.cal.room.roomId} · ${c.cal.room.spec}</span>`)}
           ${gbRow('早餐份数（抖音当前）',`<b>${c.cal.room.cur} 份</b>`)}
-          ${gbRow('携程当前早餐份数',`<b>${c.cal.room.ctrip} 份</b><span class="gb-unit">${c.cal.room.ctripNote}（诊断时采集）</span>`)}
-          ${gbRow('修改内容',`<b>早餐份数 ${c.cal.room.cur} 份 → ${c.cal.room.to} 份</b>`,true)}
-          ${gbRow('早餐份数（修改后）',`<input class="gb-in gb-num" type="text" value="${c.cal.room.to}"><span class="gb-unit">份 · 已按携程当前份数预填，可修改后提交，AI 按此份数写入抖音来客</span>`,true)}
+          ${gbRow('携程当前早餐份数',`<b>${c.cal.room.ctrip} 份</b><span class="gb-unit">${c.cal.room.ctripNote}（诊断时采集 · 携程早餐“无早/1份早餐/2份早餐”按 0/1/2 份映射，以携程实际采集数据返回为准）</span>`)}
+          ${gbRow('修改内容',`<b>早餐份数 ${c.cal.room.cur} 份 → ${calEff(c)} 份</b>`,true)}
+          ${gbRow('早餐份数（修改后）',`<input class="gb-in gb-num" type="text" value="${calEff(c)}" oninput="setCalTo(this.value)"><span class="gb-unit">份 · 已按携程份数预填，可灵活修改；只能填入正整数，抖音来客早餐份数最小值允许 0 份；AI 按此份数写入抖音来客</span>`,true)}
         </div>
       </div>
-      <div class="section"><h3>4　本规则待确认事项（${c.pends.length} 项）</h3>
-        <p class="review-tip">以下为《抖音来客诊断规则表A》「日历房房型与早餐份数」规则尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
-        ${c.pends.map((p,i)=>`<div class="gb-kv"><small>待确认 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
+      <div class="section"><h3>3　修改与提交规则</h3>
+        <div class="gb-kv"><small>取值口径</small><div class="gb-ctl"><b>默认按本任务支持口径预填（携程份数），用户只能填入正整数</b><span class="gb-unit">抖音来客早餐份数最小值允许 0 份</span></div></div>
+        <div class="gb-kv"><small>名称联动</small><div class="gb-ctl"><b>修改早餐份数后，日历房名称由抖音来客自动更新</b><span class="gb-unit">AI 写入后同步校验日历房名称是否已按新份数更新</span></div></div>
+        <div class="gb-kv"><small>价量态与订单</small><div class="gb-ctl"><b>无需重新维护价量态（近 3 个月内 30 天房价 / 房量）</b><span class="gb-unit">修改对已生成未入住订单不影响，仅对修改后新增的订单有影响</span></div></div>
+        <div class="gb-kv"><small>携程映射</small><div class="gb-ctl"><b>携程早餐展示“无早 / 1份早餐 / 2份早餐”按 0 / 1 / 2 份映射</b><span class="gb-unit">具体携程采集的数据按实际数据库返回为准</span></div></div>
       </div>`
       :(c.fields||[]).length?`<div class="section"><h3>2　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
@@ -1189,7 +1178,7 @@
         ${c.rtNew?'':`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`}
         ${c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
           :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
-          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图并校验':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在逐设施写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
+          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图并校验':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在逐设施写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
