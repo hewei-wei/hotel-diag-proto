@@ -338,25 +338,25 @@
   .pbar{height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden}
   .pbar i{display:block;height:100%;background:var(--primary);border-radius:999px;transition:width .4s}
 
-  /* ===== 诊断日志分组 ===== */
-  .rgroup{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);margin-bottom:12px;overflow:hidden}
-  .rg-head{display:flex;align-items:center;gap:10px;padding:14px 18px;width:100%;text-align:left}
-  .rg-head:hover{background:#fafbfc}
-  .rg-path{min-width:0}
-  .rg-path b{font-size:13.5px}
-  .rg-path small{font-size:12px;color:var(--ink-4)}
-  .rg-head .tags{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
-  .rg-head .tags>small{color:var(--ink-4);font-size:12px}
-  .rg-body{border-top:1px solid var(--line-soft)}
-  .rline{display:grid;grid-template-columns:72px 150px 86px 120px 200px 1fr;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-soft);font-size:12.5px;color:var(--ink-2)}
-  .rec-stats{display:flex;gap:12px;margin-bottom:12px}
-  .rec-stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:14px 18px}
-  .rec-stat b{display:block;font-size:22px;margin-top:2px}
-  .rec-stat small{font-size:12px;color:var(--ink-4)}
-  .rline:last-child{border-bottom:0}
-  .rline .no{font-weight:600;color:var(--ink)}
-  .chev{flex:none;color:var(--ink-4);transition:transform .2s;font-size:12px}
-  .chev.open{transform:rotate(180deg)}
+  /* ===== 诊断日志表格 ===== */
+  .lcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);overflow:hidden}
+  .lgrid{display:grid;grid-template-columns:150px 1fr 100px 110px 110px 90px;align-items:center;gap:12px;padding:0 18px}
+  .lhead{height:44px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-3)}
+  .lrow{min-height:60px;border-bottom:1px solid var(--line-soft);font-size:13px}
+  .lrow:hover{background:#fafbfc}
+  .lrow:last-child{border-bottom:0}
+  .lmain b{font-size:13.5px}
+  .lmain small{display:block;font-size:12px;color:var(--ink-4);margin-top:2px}
+  .lnum b{font-size:15px}
+  .lnum small{display:block;font-size:11px;color:var(--ink-4);margin-top:2px}
+  .lbtn{border:1px solid var(--primary-line);background:var(--primary-soft);color:var(--primary);border-radius:var(--r-sm);padding:5px 12px;font-size:12px;font-weight:600}
+  .lbtn:hover{filter:brightness(.97)}
+  .lpanel{border-bottom:1px solid var(--line);background:var(--surface-2);padding:4px 18px 10px}
+  .lt-line{display:grid;grid-template-columns:1.2fr 1.3fr 90px 1.6fr;gap:12px;align-items:start;padding:9px 0;border-bottom:1px dashed var(--line-soft);font-size:12.5px;color:var(--ink-2)}
+  .lt-line:last-child{border-bottom:0}
+  .lt-line b{font-size:12.5px;color:var(--ink)}
+  .lt-line small{display:block;color:var(--ink-4);font-size:11.5px;margin-top:1px}
+  .lt-cap{font-size:11.5px;color:var(--ink-4);padding:8px 0 4px}
 
   /* 弹窗 */
   .modal-mask{position:fixed;inset:0;background:rgba(17,24,39,.45);backdrop-filter:blur(2px);display:grid;place-items:center;z-index:30}
@@ -1268,58 +1268,82 @@
     </main>
   </div>`}
 
-  /* ===== 诊断日志（按检查路径分组，每次诊断展示累计诊断 / 成功 / 失败） ===== */
-  const recordGroups=[
-    {path:['店铺管理','门店管理','基本信息','门店名称'],rounds:[
-      ['2026-08-28 10:32','fail',1,'门店名称不符合名称公式，已生成修改建议任务'],
-      ['2026-08-15 09:18','fail',1,'整改后仍缺少地标简称，再次生成任务'],
-      ['2026-08-08 16:40','pass',0,'全部规则通过']]},
-    {path:['店铺管理','门店管理','基本信息','找店指引'],rounds:[
-      ['2026-08-27 18:06','fail',1,'起点与途经点素材缺失，已生成补充任务'],
-      ['2026-08-20 11:24','pass',0,'全部规则通过']]},
-    {path:['店铺管理','酒店信息管理','酒店政策','加床及儿童'],rounds:[
-      ['2026-08-27 18:06','fail',1,'联合诊断节点未全部配置，已生成联合补充任务'],
-      ['2026-08-13 14:02','pass',0,'五项政策全部通过']]},
-    {path:['店铺管理','酒店信息管理','酒店设施','酒店设施通用规则'],rounds:[
-      ['2026-08-27 18:06','fail',1,'逐设施核对不通过：缺失 3 个、字段不一致 2 个，已生成酒店设施信息核对任务'],
-      ['2026-08-13 14:02','fail',1,'逐设施核对不通过：缺失 2 个，已生成酒店设施信息核对任务']]},
-    {path:['店铺管理','店铺装修','门店装修','外显小图'],rounds:[
-      ['2026-08-27 18:06','fail',1,'与携程「外观」图片不一致，已生成替换建议任务']]}
+  /* ===== 诊断日志（每次诊断一行：诊断次数 / 累计诊断项目数 / 任务数 / 执行成功数 / 执行失败数 / 详情） ===== */
+  const LOG_TASKS={ // 任务名 → [检查路径]
+    '活动报名':['活动管理 · 活动参与与配置'],
+    '中差评回复':['评价回复 · 待回复中差评'],
+    '商家经营分-评价分提升':['评价 · 评价评分'],
+    '团购商品核对任务':['团购 · 团购商品覆盖、价格与名称'],
+    '预售房型补充任务':['预售房型 · 引流预售房型'],
+    '悦享双床房近 7 天价格偏高':['房价房态管理 · 近7天房型价格'],
+    '早餐份数修正·景观双床房':['日历房 · 景观双床房'],
+    '早餐份数修正·巨幕投影大床房':['日历房 · 巨幕投影大床房'],
+    '房型新增·电竞大床房':['房型管理 · 电竞大床房'],
+    '房型信息核对·亲子家庭房':['房型管理 · 亲子家庭房'],
+    '房型信息核对·钟点房':['房型管理 · 钟点房'],
+    '头图相册补充任务':['门店装修 · 头图和相册'],
+    '外显小图替换建议任务':['门店装修 · 外显小图'],
+    '门店装修审核整改任务':['门店装修 · 装修审核不通过'],
+    '酒店设施信息核对任务':['酒店设施 · 酒店设施通用规则'],
+    '酒店设施审核整改任务':['酒店设施 · 酒店设施审核不通过标签'],
+    '酒店政策联合补充任务':['酒店政策 · 五组政策联合诊断'],
+    '找店指引素材补充':['基本信息 · 找店指引'],
+    '营业状态修正任务':['基本信息 · 营业状态'],
+    '房间总数修正任务':['基本信息 · 房间总数'],
+    '联系电话修正任务':['基本信息 · 联系电话'],
+    '门店名称修改建议任务':['基本信息 · 门店名称']
+  };
+  const LOG_ST={done:['已完成','green'],fail:['执行失败','red'],wait:['待处理','gray']};
+  const DIAG_LOG=[ // 时间正序；ts: [任务名, 状态, 失败原因?]；最新一次与「诊断任务」页当前 22 条待处理任务一致
+    {time:'2026-08-08 16:40',ts:[
+      ['营业状态修正任务','done'],['房间总数修正任务','done'],['联系电话修正任务','done'],
+      ['团购商品核对任务','done'],['预售房型补充任务','done'],['早餐份数修正·景观双床房','done'],
+      ['早餐份数修正·巨幕投影大床房','done'],['房型新增·电竞大床房','done'],['房型信息核对·亲子家庭房','done'],
+      ['悦享双床房近 7 天价格偏高','fail','价格护栏校验未通过：调整后价格超出近 30 天成交价波动范围'],['中差评回复','done'],
+      ['活动报名','done'],['商家经营分-评价分提升','done']]},
+    {time:'2026-08-13 14:02',ts:[
+      ['房型信息核对·钟点房','done'],['悦享双床房近 7 天价格偏高','done'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],
+      ['头图相册补充任务','done'],['中差评回复','done']]},
+    {time:'2026-08-15 09:18',ts:[
+      ['门店名称修改建议任务','done'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],['房型新增·电竞大床房','done']]},
+    {time:'2026-08-20 11:24',ts:[
+      ['酒店设施信息核对任务','done'],['悦享双床房近 7 天价格偏高','done'],['团购商品核对任务','done']]},
+    {time:'2026-08-27 18:06',ts:[
+      ['门店装修审核整改任务','done'],['酒店设施审核整改任务','fail','审核不通过标签整组写入被平台拦截，需按驳回原因重新整改'],
+      ['酒店设施信息核对任务','done'],['外显小图替换建议任务','done'],['找店指引素材补充','done'],
+      ['酒店政策联合补充任务','done'],['头图相册补充任务','done'],['中差评回复','done']]},
+    {time:'2026-08-28 10:32',ts:Object.keys(LOG_TASKS).map(n=>[n,'wait'])}
   ];
-  let recOpen={0:true};
-  function toggleRec(i){recOpen[i]=!recOpen[i];render()}
+  let logOpen=null;
+  function toggleLog(i){logOpen=logOpen===i?null:i;render()}
   function records(){
-    const total=recordGroups.reduce((a,g)=>a+g.rounds.length,0);
-    const tp=recordGroups.reduce((a,g)=>a+g.rounds.filter(r=>r[1]==='pass').length,0);
-    const tf=total-tp;
+    const per=diagSteps.reduce((a,s)=>a+s.items.length,0); // 每次诊断的检查项目数
+    const runs=DIAG_LOG.map((r,n)=>({r,n:n+1}))
+      .map(o=>({...o,task:o.r.ts.length,ok:o.r.ts.filter(t=>t[1]==='done').length,bad:o.r.ts.filter(t=>t[1]==='fail').length}))
+      .reverse();
     return `<div class="page">
-    <div class="page-head"><div><h1>诊断日志</h1><p>按检查路径归类，展开查看每一次诊断的结果、生成任务数与累计统计</p></div></div>
-    <div class="rec-stats">
-      <div class="rec-stat"><small>累计诊断</small><b>${total} 次</b></div>
-      <div class="rec-stat"><small>成功</small><b style="color:#15803d">${tp} 次</b></div>
-      <div class="rec-stat"><small>失败</small><b style="color:#b91c1c">${tf} 次</b></div>
+    <div class="page-head"><div><h1>诊断日志</h1><p>每次诊断一行，点击「详情」展开该次诊断的任务列表与每一条执行详情</p></div></div>
+    <div class="lcard">
+      <div class="lgrid lhead"><span>诊断次数</span><span>累计诊断项目数</span><span>任务数</span><span>执行成功数</span><span>执行失败数</span><span>详情</span></div>
+      ${runs.map(o=>{return `<div class="lgrid lrow">
+        <span class="lmain"><b>第 ${o.n} 次诊断</b><small>${o.r.time}</small></span>
+        <span class="lnum"><b>${o.n*per}</b><small>每次诊断 ${per} 项</small></span>
+        <span class="lnum"><b>${o.task}</b><small>个任务</small></span>
+        <span class="lnum"><b style="color:#15803d">${o.ok}</b><small>个已完成</small></span>
+        <span class="lnum"><b style="color:${o.bad?'#b91c1c':'var(--ink-4)'}">${o.bad}</b><small>个失败</small></span>
+        <span><button class="lbtn" onclick="toggleLog(${o.n-1})">${logOpen===o.n-1?'收起':'详情'}</button></span>
+      </div>
+      ${logOpen===o.n-1?`<div class="lpanel">
+        <div class="lt-cap">第 ${o.n} 次诊断 · ${o.r.time} · 共 ${o.task} 条任务详情</div>
+        ${o.r.ts.map(t=>{const s=LOG_ST[t[1]];const note=t[1]==='done'?'已确认并写入抖音来客，结果校验通过':t[1]==='fail'?(t[2]||'写入校验未通过，可在诊断任务中重试'):'已生成任务，等待用户确认并执行';
+          return `<div class="lt-line">
+          <span><b>${t[0]}</b></span>
+          <span>${LOG_TASKS[t[0]]?LOG_TASKS[t[0]][0]:''}</span>
+          <span><i class="tag ${s[1]}">${s[0]}</i></span>
+          <span>${note}</span>
+        </div>`}).join('')}
+      </div>`:''}`}).join('')}
     </div>
-    ${recordGroups.map((g,i)=>{const latest=g.rounds[0];
-      const gp=g.rounds.filter(r=>r[1]==='pass').length,gf=g.rounds.length-gp;
-      return `<div class="rgroup">
-        <button class="rg-head" onclick="toggleRec(${i})">
-          <span class="rg-path"><b>${g.path[3]}</b><small>　${g.path.slice(0,3).join(' › ')}</small></span>
-          <span class="tags">
-            <i class="tag gray">累计诊断 ${g.rounds.length} 次 · 成功 ${gp} · 失败 ${gf}</i>
-            <i class="tag ${latest[1]==='pass'?'green':'red'}">${latest[1]==='pass'?'最近通过':'最近不通过'}</i>
-            <small>${latest[0]}</small>
-            <span class="chev ${recOpen[i]?'open':''}">⌄</span>
-          </span>
-        </button>
-        ${recOpen[i]?`<div class="rg-body">${g.rounds.map((r,ri)=>{const cum=g.rounds.slice(ri).reduce((a,x)=>[a[0]+1,a[1]+(x[1]==='pass'?1:0)],[0,0]);
-          return `<div class="rline">
-          <span class="no">第 ${g.rounds.length-ri} 次</span><span>${r[0]}</span>
-          <i class="tag ${r[1]==='pass'?'green':'red'}">${r[1]==='pass'?'通过':'不通过'}</i>
-          <span>${r[2]?`<b style="color:#b91c1c">生成任务 ${r[2]} 个</b>`:'<span style="color:var(--ink-4)">未生成任务</span>'}</span>
-          <span>累计诊断 ${cum[0]} 次 · <span style="color:#15803d">成功 ${cum[1]}</span> · <span style="color:#b91c1c">失败 ${cum[0]-cum[1]}</span></span>
-          <span>${r[3]}</span>
-        </div>`}).join('')}</div>`:''}
-      </div>`}).join('')}
   </div>`}
 
   /* ===== 活动配置（平台通用，适用于全部酒店；入口在酒店管理页） ===== */
