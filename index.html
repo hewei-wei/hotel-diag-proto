@@ -934,8 +934,7 @@
   function detail(){const t=taskData[taskIdx]||taskData[0];
     let main='',actions='';
     if(t.kind==='route'||t.name==='找店指引素材补充'){
-      main=`<div class="notice"><span class="notice-icon">✦</span><div><b>AI 诊断建议</b><span>抖音来客当前未设置找店指引（图文指引、视频指引均为“暂未设置”）。建议选择一种指引方式，按起点 → 途经点 → 终点的路线补充素材，帮助顾客快速找到门店。</span></div></div>
-      <div class="section"><h3>设置找店指引</h3>
+      main=`<div class="section"><h3>设置找店指引</h3>
         ${guideMode==null?`<div class="guide-choose">
           <div class="guide-row"><b>选择指引方式</b><a class="exlink" onclick="toast('已打开优秀案例参考')">优秀案例</a></div>
           <button class="guide-card" onclick="setGuideMode('pic')"><span class="g-name">图文指引</span><i class="tag gray">暂未设置</i><b>›</b></button>
@@ -956,8 +955,7 @@
         <button class="btn btn-primary" onclick="finishTask('执行中','找店指引已提交，AI 正在同步至抖音来客')" ${guideMode==null?'disabled':''}>提交</button>`;
     }else{
       const c=taskDetailCfg[t.name]||{advice:`「${t.path}」检查不通过，已生成处理建议。请确认以下建议内容，提交后写入抖音来客。`,src:[['检查项',t.path],...(t.type?[['任务类型',t.type]]:[]),['诊断时间',t.diagTime]],fields:[]};
-      main=`${c.noAdvice?'':`<div class="notice"><span class="notice-icon">✦</span><div><b>AI 诊断建议</b><span>${c.advice}</span></div></div>`}
-      <div class="section"><h3>1　来源数据与差异</h3>
+      main=`<div class="section"><h3>1　来源数据与差异</h3>
         <div class="source">${c.src.map(x=>`<div><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}</div>
       </div>
       ${c.reviews?`<div class="section"><h3>2　逐条回复（共 ${c.reviews.length} 条）</h3>
@@ -1071,16 +1069,7 @@
         <p class="review-tip">以下为「外显小图」节点规则尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
         ${c.pends.map((p,i)=>`<div class="gb-kv"><small>待确认 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
       </div>`
-      :c.audit?`<div class="section"><h3>2　审核失败概览（读取自抖音来客「头图和相册」详情）</h3>
-        <p class="review-tip">AI 无需分析失败原因：直接进入「头图和相册」查看哪些图片审核不通过，全部被驳回图片合并为一条整改任务。门店头图与相册其余图片均未受影响。</p>
-        <div class="gb-card">
-          <div class="gb-head"><b><i class="tag red">⨯</i>　${c.audit.failTime} 提交的装修信息审核失败<small>门店装修 › 门店主页 › 头图和相册</small></b></div>
-          ${gbRow('门店头图',`<span class="gb-thumb">封面</span><span class="gb-unit">视频封面 · 未被驳回，无需处理</span>`)}
-          ${gbRow('商家相册分类',c.audit.cats.map(ct=>`<span class="gb-unit" style="margin-right:12px">${ct[0]} ${ct[1]}</span>`).join(''))}
-          ${gbRow('从「全部」上传',`<span class="gb-unit">上传的图片通过审核后，平台将运用算法能力帮你分类</span>`)}
-        </div>
-      </div>
-      <div class="section"><h3>3　被驳回图片（共 ${c.audit.rejected.length} 张，逐张重新上传或删除，可修改）</h3>
+      :c.audit?`<div class="section"><h3>2　被驳回图片（共 ${c.audit.rejected.length} 张，逐张重新上传或删除，可修改）</h3>
         <p class="review-tip">与抖音来客「头图和相册」详情一致，被驳回图片带“审核不通过”标识。为每张选择重新上传替换或删除；删除造成空缺（门店头图为空或相册类别无图）时，将自动生成缺图补充任务。</p>
         ${c.audit.rejected.map((r,i)=>`<div class="gb-card">
           <div class="gb-head"><b>被驳回图片 ${i+1} · ${r.cat}<small>${r.name}</small></b><i class="tag red">审核不通过</i></div>
@@ -1088,10 +1077,6 @@
           ${gbRow('处理方式',`<label class="gb-radio"><input type="radio" name="au-way${i}" ${(auAct[i]||'replace')==='replace'?'checked':''} onchange="setAuAct(${i},'replace')">重新上传替换</label><label class="gb-radio"><input type="radio" name="au-way${i}" ${auAct[i]==='delete'?'checked':''} onchange="setAuAct(${i},'delete')">删除图片</label>`)}
           ${(auAct[i]||'replace')==='replace'?gbRow('重新上传',`<span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片直接上传')">＋ 上传替换图</span><span class="gb-unit">建议比例 4:3，PNG / JPG / JPEG / GIF，不超过 20M；图片清晰，禁止水印、边框、二维码、图片拼接及大量文字</span>`,true):''}
         </div>`).join('')}
-      </div>
-      <div class="section"><h3>4　修改与提交规则</h3>
-        <div class="gb-kv"><small>提交后</small><div class="gb-ctl"><b>AI 将替换 / 删除结果写入抖音来客并重新提交审核</b><span class="gb-unit">提交成功即本轮诊断成功并结束；即使再次被驳回，也不重新生成任务</span></div></div>
-        <div class="gb-kv"><small>删除联动</small><div class="gb-ctl"><b>删除造成空缺时自动生成补充任务</b><span class="gb-unit">门店头图为空或相册类别缺图时，生成「头图相册补充任务」</span></div></div>
       </div>`
       :c.rt?`<div class="section"><h3>2　房型对应关系与数量口径</h3>
         <p class="review-tip">以房型主体名称一致判定同一房型：如携程采集「亲子家庭房」，抖音对应「亲子家庭房-赠送小孩早餐·免费携带宠物」，主体名称一致即诊断通过、自动对应，并继续比对该房型床型、面积等字段是否需与携程一致；抖音多出的房型无需诊断，默认通过。</p>
@@ -1165,12 +1150,6 @@
           ${gbRow('修改内容',`<b>早餐份数 ${c.cal.room.cur} 份 → ${calEff(c)} 份</b>`,true)}
           ${gbRow('早餐份数（修改后）',`<input class="gb-in gb-num" type="text" value="${calEff(c)}" oninput="setCalTo(this.value)"><span class="gb-unit">份 · 已按携程份数预填，可灵活修改；只能填入正整数，抖音来客早餐份数最小值允许 0 份；AI 按此份数写入抖音来客</span>`,true)}
         </div>
-      </div>
-      <div class="section"><h3>3　修改与提交规则</h3>
-        <div class="gb-kv"><small>取值口径</small><div class="gb-ctl"><b>默认按本任务支持口径预填（携程份数），用户只能填入正整数</b><span class="gb-unit">抖音来客早餐份数最小值允许 0 份</span></div></div>
-        <div class="gb-kv"><small>名称联动</small><div class="gb-ctl"><b>修改早餐份数后，日历房名称由抖音来客自动更新</b><span class="gb-unit">AI 写入后同步校验日历房名称是否已按新份数更新</span></div></div>
-        <div class="gb-kv"><small>价量态与订单</small><div class="gb-ctl"><b>无需重新维护价量态（近 3 个月内 30 天房价 / 房量）</b><span class="gb-unit">修改对已生成未入住订单不影响，仅对修改后新增的订单有影响</span></div></div>
-        <div class="gb-kv"><small>携程映射</small><div class="gb-ctl"><b>携程早餐展示“无早 / 1份早餐 / 2份早餐”按 0 / 1 / 2 份映射</b><span class="gb-unit">具体携程采集的数据按实际数据库返回为准</span></div></div>
       </div>`
       :(c.fields||[]).length?`<div class="section"><h3>2　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
