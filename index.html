@@ -440,8 +440,8 @@
       ['外显小图','外显小图与携程「外观」类别图片比对不一致','fail','外显小图替换建议任务','图片替换'],
       ['头图和相册','门店头图与商家相册均已上传图片','fail','头图相册补充任务','图片替换']]},
     {name:'房型管理',path:'商品与货架 › 房型管理 › 房型管理',items:[
-      ['钟点房','名称一致自动对应；楼层、网络服务、房型设施 3 项与携程不一致，该房型单独形成 1 条核对任务','fail','房型信息核对·钟点房','信息完善'],
-      ['亲子家庭房','名称不一致，建议对应「亲子家庭房-赠送小孩早餐·免费携带宠物」，需确认；床型、最大可住人数 2 项不一致','fail','房型信息核对·亲子家庭房','信息完善'],
+      ['钟点房','与抖音「钟点房」主体名称一致自动对应；楼层、网络服务、房型设施 3 项与携程不一致，该房型单独形成 1 条核对任务','fail','房型信息核对·钟点房','信息完善'],
+      ['亲子家庭房','与「亲子家庭房-赠送小孩早餐·免费携带宠物」主体名称一致自动对应；床型、最大可住人数 2 项不一致','fail','房型信息核对·亲子家庭房','信息完善'],
       ['电竞大床房','携程在售、抖音未创建，按缺失房型单独形成 1 条新增任务','fail','房型新增·电竞大床房','信息完善']]},
     {name:'日历房',path:'商品与货架 › 商品管理 › 日历房',items:[
       ['日历房房型集合','日历房已上架 10 个，覆盖“房型管理”全部 6 个房型，集合一致后逐房型比较早餐份数','pass','',''],
@@ -701,19 +701,21 @@
   /* 房型信息核对：逐字段差异与规则待确认口径（与《抖音来客诊断规则表A》「房型信息」一致） */
   /* 房型信息规则确认口径（业务已确认） */
   const RT_RULES=[
-    ['房型名称修改边界','已关联日历房、团购商品的抖音房型允许改名；改名后商品关联相应修改名称展示。'],
-    ['同名房型误匹配','名称相同但床型、面积明显不同的同名房型，需人工复核后才能对应。'],
+    ['房型名称修改边界','已关联日历房、团购商品的抖音房型允许改名；改名后商品相应修改，关联不受影响。'],
+    ['同房型判定口径','以房型主体名称一致为准（如亲子家庭房、景观大床房等）：主体名称一致即判定为同一房型、诊断通过，并比对该房型床型、面积等字段是否需与携程一致；抖音多出的房型无需诊断，默认通过。'],
     ['区间字段的写入口径','楼层、面积默认按区间写入，不取中间值。'],
     ['网络服务映射粒度','携程为「WiFi 免费」时，抖音勾选「可上网＋WiFi 免费」。'],
     ['房型图片覆盖策略','存在差异时仅补缺，头图保持不变。'],
-    ['抖音有而携程未采集的字段','提示用户补充。']];
+    ['抖音有而携程未采集的字段','提示用户补充；抖音来客非必填的字段，用户可不补充。']];
   const rtPends=n=>`<div class="section"><h3>${n}　本规则确认口径（${RT_RULES.length} 项）</h3>
     <p class="review-tip">以下为《抖音来客诊断规则表A》「房型信息」规则的确认口径，AI 按此执行。</p>
     ${RT_RULES.map((p,i)=>`<div class="gb-kv"><small>确认口径 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
   </div>`;
-  const rtTask=(advice,src,match,diffs,ok)=>({advice,src,ignore:'此次忽略',rt:{match,diffs,ok},pends:RT_RULES});
+  const rtTask=(advice,src,match,diffs,ok)=>({noAdvice:true,advice,src,ignore:'此次忽略',rt:{match,diffs,ok},pends:RT_RULES});
   const rtCnt=['房型数量','携程 8 个 · 抖音来客已上架 11 个','不能仅因数量相等或抖音≥携程就判定通过，须逐房型完成字段校验'];
-  const rtExtra=['多出房型','抖音多出的 4 个房型（列表折叠未展开）','按规则不删除、不形成任务'];
+  const rtExtra=['多出房型','抖音多出的 4 个房型（列表折叠未展开）','无需诊断，默认通过；按规则不删除、不形成任务'];
+  /* 床型修改行：与抖音来客「床型 · 多张床」结构一致（床型 + 床宽米 × 张数，且/或连接） */
+  const rtBedRows=beds=>beds.map((b,j)=>`<div class="gb-prow"><select class="gb-sl"><option selected>${b[0]}</option></select><input class="gb-in gb-num" type="text" value="${b[1]}"><span class="gb-unit">米 ×</span><input class="gb-in gb-num" type="text" value="${b[2]}"><span class="gb-unit">张</span>${j===0?'<span class="gb-unit">且</span>':''}</div>`).join('');
   /* 缺失房型新增：总间数由用户填写，未填写时提交置灰 */
   function rtQtySync(v){const b=document.getElementById('rtSubmit');if(b)b.disabled=!v.trim()}
   /* 酒店设施信息核对：规则待确认口径（与《抖音来客诊断规则表》「酒店设施通用规则」及各设施节点一致） */
@@ -843,9 +845,9 @@
         room:{name:'景观大床房·重庆西站接站·送站2选1',id:'7659659835655997461',spec:'22-25㎡ 可住2人'},
         span:'2026-09-01 ~ 2027-02-27',days:'180天',qty:'5'
       }},
-    '头图相册补充任务':{advice:'门店头图与商家相册检查不通过：门店头图未设置；商家相册「外观」与「房间」类别缺图。请核对以下补充方案，图片可更换、张数可修改，提交后 AI 仅将确认的图片写入抖音来客。',src:[['门店头图','未设置'],['商家相册 · 外观','0 张'],['商家相册 · 房间','3 张 · 1 张审核不通过']],ignore:'此次忽略',
+    '头图相册补充任务':{noAdvice:true,advice:'门店头图与商家相册检查不通过：门店头图未设置；商家相册「外观」与「房间」类别缺图。请核对以下补充方案，图片可更换，提交后 AI 仅将确认的图片写入抖音来客。',src:[['门店头图','未设置'],['商家相册 · 外观','0 张'],['商家相册 · 房间','3 张 · 1 张审核不通过']],ignore:'此次忽略',
       album:{
-        head:{srcCat:'携程「精选图」',srcName:'酒店正面日景'},
+        head:{srcCat:'携程「精选图 · 外观」',srcName:'酒店正面日景'},
         cats:[
           {cat:'外观',cur:'0 张',qty:'2',srcCat:'携程「外观」类别',imgs:['外立面','大门口']},
           {cat:'房间',cur:'3 张 · 1 张审核不通过',qty:'4',srcCat:'携程「客房」类别',imgs:['大床房','双床房','卫生间','淋浴间']}
@@ -855,17 +857,17 @@
       {roomName:'巨幕投影大床房-重庆西站免费接送站2选1',roomId:'7659677410023846218',spec:'20-25㎡ · 1张1.8m大床 · 有窗 · 可住2人',calName:'巨幕投影大床房-重庆西站免费接送站2选1-0份早餐-限时免费退',calId:'18700426338190247',cur:'0',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
     '早餐份数修正·景观双床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，一致的房型通过（不在任务内展示），检出 2 个房型不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「景观双床房」：早餐份数 1 份 → 携程当前 2 份，修改内容支持灵活修改。',
       {roomName:'景观双床房-观龙门公园景观·免费早餐',roomId:'7659677622001534882',spec:'25-30㎡ · 2张1.35m单人床 · 有窗 · 可住2人',calName:'景观双床房-观龙门公园景观·免费早餐-1份早餐-阶梯退',calId:'18700427100226851',cur:'1',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
-    '房型信息核对·钟点房':rtTask('携程与抖音「钟点房」名称一致，已自动对应。逐字段核对检出 3 项不一致（楼层、网络服务、房型设施），已按「携程值 → 建议修改值」生成修改内容：楼层 5~10 层 → 3~6 层、网络服务去除有线网络、房型设施补充电热水壶。全部内容可修改，确认后 AI 仅修改本房型中用户确认的字段并写入抖音来客。',
-      [['房型对应','钟点房 → 钟点房 · 名称一致自动对应'],['房型数量','携程 8 个 · 抖音来客已上架 11 个'],['本房型差异','3 项 · 楼层、网络服务、房型设施']],
+    '房型信息核对·钟点房':rtTask('携程「钟点房」与抖音「钟点房」房型主体名称一致，判定为同一房型，诊断通过并自动对应；继续比对该房型字段，检出 3 项不一致（楼层、网络服务、房型设施），修改内容已按抖音来客字段生成，全部可修改，确认后 AI 仅修改本房型中用户确认的字段并写入抖音来客。',
+      [['房型对应','钟点房 → 钟点房 · 主体名称一致自动对应（诊断通过）'],['房型数量','携程 8 个 · 抖音来客已上架 11 个'],['本房型差异','3 项 · 楼层、网络服务、房型设施']],
       {mode:'auto',ctrip:'钟点房',douyin:'钟点房',cnt:rtCnt,extra:rtExtra},
-      [{field:'楼层',cur:'区间 5 ~ 10 层',ctrip:'区间 3 ~ 6 层',to:'3 ~ 6 层'},
-       {field:'网络服务',cur:'可上网 · WiFi 免费＋有线网络免费',ctrip:'仅无线 WiFi（免费）',to:'可上网 · WiFi 免费'},
+      [{field:'楼层',cur:'区间 5 ~ 10 层',ctrip:'区间 3 ~ 6 层',ctl:'range',from:'3',to:'6',unit:'层'},
+       {field:'网络服务',cur:'可上网 · WiFi 免费＋有线网络免费',ctrip:'仅无线 WiFi（免费）',ctl:'net',opts:[['可上网',1],['WiFi 免费',1],['有线网络',0]]},
        {field:'房型设施',cur:'一次性洗漱用品 6 项、毛巾、浴巾、24 小时热水、淋浴、卫生间、电视机、空调、书桌、衣柜、瓶装水、唤醒服务',ctrip:'另含「电热水壶」，抖音未勾选',to:'电热水壶',ctl:'check'}],
       '面积 25~35㎡ · 床型 大床 1.8m × 1张 · 窗户 落地窗 · 最大可住 2 人 · 房型图片'),
-    '房型信息核对·亲子家庭房':rtTask('携程「亲子家庭房」与抖音「亲子家庭房-赠送小孩早餐·免费携带宠物」名称不一致，已给出建议对应关系，需用户确认后才会执行修改；确认后同一任务内展示该房型全部 2 项字段差异（床型、最大可住人数）。全部内容可修改，确认后 AI 仅修改本房型中用户确认的字段。选择「没有对应房型」时本任务转为新增任务。',
-      [['房型对应','亲子家庭房 → 亲子家庭房-赠送小孩早餐·免费携带宠物（待确认）'],['本房型差异','2 项 · 床型、最大可住人数'],['对应关系确认','仅保存匹配关系，不修改抖音']],
-      {mode:'confirm',ctrip:'亲子家庭房',douyin:'亲子家庭房-赠送小孩早餐·免费携带宠物',cands:['亲子家庭房-赠送小孩早餐·免费携带宠物（建议）','三床家庭房-暑假不加价·免费停车免费早餐','景观双床房-观龙门公园景观·免费早餐','没有对应房型（转为新增任务）'],cnt:rtCnt,extra:rtExtra},
-      [{field:'床型',cur:'单人床 1.35m × 1张＋大床 1.8m × 1张',ctrip:'单人床 1.35m × 2张＋大床 1.8m × 1张',to:'单人床 1.35m × 2张＋大床 1.8m × 1张'},
+    '房型信息核对·亲子家庭房':rtTask('携程「亲子家庭房」与抖音「亲子家庭房-赠送小孩早餐·免费携带宠物」房型主体名称一致，判定为同一房型，诊断通过并自动对应；继续比对该房型字段，检出 2 项不一致（床型、最大可住人数），修改内容已按抖音来客字段生成，全部可修改，确认后 AI 仅修改本房型中用户确认的字段并写入抖音来客。',
+      [['房型对应','亲子家庭房 → 亲子家庭房-赠送小孩早餐·免费携带宠物 · 主体名称一致自动对应（诊断通过）'],['本房型差异','2 项 · 床型、最大可住人数'],['抖音多出房型','4 个 · 无需诊断，默认通过']],
+      {mode:'auto',ctrip:'亲子家庭房',douyin:'亲子家庭房-赠送小孩早餐·免费携带宠物',cnt:rtCnt,extra:rtExtra},
+      [{field:'床型',cur:'单人床 1.35m × 1张＋大床 1.8m × 1张',ctrip:'单人床 1.35m × 2张＋大床 1.8m × 1张',ctl:'beds',beds:[['单人床','1.35','2'],['大床','1.8','1']]},
        {field:'最大可住人数',cur:'3 人',ctrip:'4 人',to:'4 人'}],
       '楼层 8~10 层 · 面积 28~30㎡ · 窗户 有窗 · 网络服务 WiFi 免费 · 房型图片'),
     '房型新增·电竞大床房':{noAdvice:true,src:[['缺失房型','电竞大床房 · 携程在售 ¥159 / 晚'],['抖音房型管理','无对应房型 · 走「手动创建」'],['总间数','携程不提供 · 须由用户填写']],ignore:'此次忽略',pends:RT_RULES,
@@ -1035,19 +1037,17 @@
         </div>
       </div>`
       :c.album?`<div class="section"><h3>2　门店头图（缺图，建议补 1 张）</h3>
-        <p class="review-tip">门店头图将默认展示在门店首页和相册二级页，可拖动变更顺序。已按携程素材池预选图片，可更换。</p>
+        <p class="review-tip">门店头图将默认展示在门店首页和相册二级页，可拖动变更顺序。系统已默认展示携程「精选图」中的外观图片，供用户确认，允许修改。</p>
         <div class="gb-card">
           ${gbRow('头图形式',`<label class="gb-radio"><input type="radio" name="hd-form">视频</label><label class="gb-radio"><input type="radio" name="hd-form" checked>图片</label><span class="gb-unit">视频：16:9 · 15~60s · 不超过 200M · 最多 1 个</span>`)}
-          ${gbRow('头图图片',`<span class="gb-thumb">精选图</span><span class="gb-unit">已选${c.album.head.srcCat}：${c.album.head.srcName}</span><a class="exlink" onclick="toast('演示原型：打开携程精选图列表更换')">更换图片</a>`)}
-          <div class="gb-kv"><small>上传规范</small><b>比例 4:3，PNG / JPG / JPEG / GIF，不超过 20M；禁止水印、边框、二维码、图片拼接及大量文字</b></div>
+          ${gbRow('头图图片',`<span class="gb-thumb">外观</span><span class="gb-unit">已默认展示${c.album.head.srcCat}：${c.album.head.srcName}，供用户确认，可修改</span><a class="exlink" onclick="toast('演示原型：打开携程精选图列表更换')">更换图片</a>`,true)}
         </div>
       </div>
       <div class="section"><h3>3　商家相册（缺图类别补充）</h3>
-        <p class="review-tip">按携程图片类别与抖音商家相册类别一一对应补充，张数与图片均可修改；从「全部」上传的图片通过审核后，平台将自动分类。</p>
         ${c.album.cats.map((ct,i)=>`<div class="gb-card">
           <div class="gb-head"><b>相册类别 · ${ct.cat}<small>当前 ${ct.cur}</small></b></div>
-          ${gbRow('建议上传张数',`<input class="gb-in gb-num" type="text" value="${ct.qty}"><span class="gb-unit">张 · 来源：${ct.srcCat}，可修改</span>`)}
-          ${gbRow('已选图片',ct.imgs.map(im=>`<span class="gb-thumb">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开携程${ct.cat}类别图片列表更换')">更换图片</a>`)}
+          ${gbRow('建议上传张数',`<b>${ct.qty} 张</b><span class="gb-unit">张数固定，无需修改</span>`)}
+          ${gbRow('已选图片',ct.imgs.map(im=>`<span class="gb-thumb">${im}</span>`).join('')+`<a class="exlink" onclick="toast('演示原型：打开携程${ct.cat}类别图片列表更换')">更换图片</a><span class="gb-unit">需修改的是所选图片：图片采集自${ct.srcCat}并上传，可更换</span>`,true)}
         </div>`).join('')}
       </div>`
       :c.xsp?`<div class="section"><h3>2　外显小图替换（替换前 → 替换后）</h3>
@@ -1094,24 +1094,25 @@
         <div class="gb-kv"><small>删除联动</small><div class="gb-ctl"><b>删除造成空缺时自动生成补充任务</b><span class="gb-unit">门店头图为空或相册类别缺图时，生成「头图相册补充任务」</span></div></div>
       </div>`
       :c.rt?`<div class="section"><h3>2　房型对应关系与数量口径</h3>
-        <p class="review-tip">${c.rt.match.mode==='confirm'?'携程与抖音房型名称不一致：系统给出建议对应关系，需用户确认后才会执行修改；确认仅保存匹配关系并继续诊断，尚未触发修改时不加入执行中。选择「没有对应房型」时本任务转为新增任务。':'携程与抖音房型名称一致，已自动对应；逐房型完成字段校验后才判定通过。'}</p>
+        <p class="review-tip">以房型主体名称一致判定同一房型：如携程采集「亲子家庭房」，抖音对应「亲子家庭房-赠送小孩早餐·免费携带宠物」，主体名称一致即诊断通过、自动对应，并继续比对该房型床型、面积等字段是否需与携程一致；抖音多出的房型无需诊断，默认通过。</p>
         <div class="gb-card">
           ${gbRow('携程房型',`<b>${c.rt.match.ctrip}</b>`)}
-          ${gbRow('抖音对应房型',`<b>${c.rt.match.douyin}</b><i class="tag ${c.rt.match.mode==='auto'?'green':'red'}">${c.rt.match.mode==='auto'?'名称一致 · 自动对应':'名称不一致 · 待确认'}</i>`)}
-          ${c.rt.match.mode==='confirm'?gbRow('确认对应关系',`<select class="gb-sl">${c.rt.match.cands.map(o=>`<option>${o}</option>`).join('')}</select>`):''}
+          ${gbRow('抖音对应房型',`<b>${c.rt.match.douyin}</b><i class="tag green">主体名称一致 · 自动对应（诊断通过）</i>`)}
           ${gbRow(c.rt.match.cnt[0],`<b>${c.rt.match.cnt[1]}</b><span class="gb-unit">${c.rt.match.cnt[2]}</span>`)}
           ${gbRow(c.rt.match.extra[0],`<b>${c.rt.match.extra[1]}</b><span class="gb-unit">${c.rt.match.extra[2]}</span>`)}
         </div>
       </div>
       <div class="section"><h3>3　字段差异与修改内容（共 ${c.rt.diffs.length} 项，可修改）</h3>
-        <p class="review-tip">每行为一项差异：「抖音当前值」是修改前（由什么），「携程值」是比对依据，「修改内容」是建议修改值（修改为什么）。输入框已按携程值预填，可修改后提交；提交后 AI 仅写入本房型中用户确认的字段，写入并校验成功后任务完成。</p>
         <div class="gb-card">
           <div class="rt-grid rt-hd"><span>检查字段</span><span>抖音当前值（由）</span><span>携程值</span><span>修改内容（修改为 · 可编辑）</span></div>
           ${c.rt.diffs.map(d=>`<div class="rt-grid rt-ln">
             <b>${d.field}</b><span>${d.cur}</span><span>${d.ctrip}</span>
-            <span class="rt-fix">${d.ctl==='check'?`<label class="gb-radio"><input type="checkbox" checked>${d.to}</label><small class="count">勾选后写入，可取消</small>`:`<input class="gb-in" type="text" value="${d.to}"><small class="count">已按携程值预填 · 可修改</small>`}</span>
+            <span class="rt-fix">${d.ctl==='check'?`<label class="gb-radio"><input type="checkbox" checked>${d.to}</label><small class="count">勾选后写入，可取消</small>`
+              :d.ctl==='range'?`<input class="gb-in gb-num" type="text" value="${d.from}"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="${d.to}"><span class="gb-unit">${d.unit} · 按区间写入，可修改，不可改为固定值</span>`
+              :d.ctl==='net'?d.opts.map(o=>`<label class="gb-radio"><input type="checkbox"${o[1]?' checked':''}>${o[0]}</label>`).join('')+`<small class="count">已按携程勾选，可增删</small>`
+              :d.ctl==='beds'?`<label class="gb-radio"><input type="radio" name="bd-t">1张床</label><label class="gb-radio"><input type="radio" name="bd-t">2张床</label><label class="gb-radio"><input type="radio" name="bd-t" checked>多张床</label>${rtBedRows(d.beds)}`
+              :`<input class="gb-in" type="text" value="${d.to}"><small class="count">已按携程值预填 · 可修改</small>`}</span>
           </div>`).join('')}
-          <div class="gb-kv" style="border-top:1px dashed var(--line);margin-top:2px;padding-top:11px"><small>一致字段</small><div class="gb-ctl"><b>${c.rt.ok}</b><span class="gb-unit">与携程一致，已通过，不生成修改项</span></div></div>
         </div>
       </div>
       ${rtPends(4)}`
