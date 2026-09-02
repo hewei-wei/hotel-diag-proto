@@ -422,16 +422,16 @@
   const diagSteps=[
     {name:'基本信息',path:'店铺管理 › 门店管理 › 基本信息',items:[
       ['门店名称','名称公式：酒店名称（城市＋地标简称1＋地标简称2＋店），当前名称需符合公式','fail','门店名称修改建议任务','信息完善'],
-      ['联系电话','联系电话不为空，且与携程 PC 端联系电话一致','fail','联系电话修正任务','信息完善'],
-      ['房间总数','房间总数不为空，且与携程 PC 端房间总数一致','fail','房间总数修正任务','信息完善'],
-      ['营业状态','营业状态为“正常营业”','fail','营业状态修正任务','信息完善'],
+      ['联系电话','不为空且与携程 PC 端一致才通过；当前仅座机 023-61557388，缺手机号，生成修改为携程电话号码的任务','fail','联系电话修正任务','信息完善'],
+      ['房间总数','不为空且与携程 PC 端一致才通过；当前未填写，生成填入携程房间总数 97 间的任务','fail','房间总数修正任务','信息完善'],
+      ['营业状态','状态为“正常营业”自动通过；当前为“暂停营业”，生成修改为“正常营业”的任务','fail','营业状态修正任务','信息完善'],
       ['找店指引','找店指引不为空，含起点、途经点、终点的路线内容与素材','fail','找店指引素材补充','信息完善']]},
     {name:'酒店政策',path:'店铺管理 › 酒店信息管理 › 酒店政策（联合诊断节点）',items:[
-      ['入离政策','五项政策联合诊断：入离时间已按携程数据配置','fail','酒店政策联合补充任务','信息完善'],
-      ['办理入住年龄','五项政策联合诊断：办理入住年龄不为空','fail','酒店政策联合补充任务','信息完善'],
-      ['加床及儿童','五项政策联合诊断：儿童及加床政策与收费标准需配置完整','fail','酒店政策联合补充任务','信息完善'],
-      ['宠物政策','五项政策联合诊断：宠物政策不为空','fail','酒店政策联合补充任务','信息完善'],
-      ['早餐政策','五项政策联合诊断：早餐信息不为空','fail','酒店政策联合补充任务','信息完善']]},
+      ['入离政策','五组联合对比：最晚离店 15:00 与携程「10:30后入住、13:00前退房」不一致','fail','酒店政策联合补充任务','信息完善'],
+      ['办理入住年龄','已配置 最小 18 / 最大不限制，与携程接待提示一致','pass','',''],
+      ['加床及儿童','五组联合对比：现有床 0-12 岁与携程「17 岁及以下免费」不一致、加床「不提供」与携程收费加床不一致、儿童早餐未选择','fail','酒店政策联合补充任务','信息完善'],
+      ['宠物政策','五组联合对比：宠物免费「是」与携程「收费」标签不一致','fail','酒店政策联合补充任务','信息完善'],
+      ['早餐政策','五组联合对比：早餐时间 08:00~10:00 与携程 07:00~10:00 不一致','fail','酒店政策联合补充任务','信息完善']]},
     {name:'酒店设施',path:'店铺管理 › 酒店信息管理 › 酒店设施',items:[
       ['酒店设施审核不通过标签','酒店设施顶部无“审核不通过”标签','fail','酒店设施审核整改任务','信息完善'],
       ['酒店设施通用规则','以携程用户端“服务及设施”为采集边界逐设施核对，合并为一条核对任务：携程有、抖音无→建议改为“有”并补充详情；已为“有”→逐字段校验，不一致按携程修正；携程未采集到的设施不做检测和诊断。本次不通过 5 个设施：充电车位、接机服务、接站服务缺失，停车场、餐厅字段不一致','fail','酒店设施信息核对任务','信息完善']]},
@@ -641,8 +641,8 @@
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;xspPick=0;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;xspPick=0;go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
   function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
@@ -654,7 +654,7 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;xspPick=0;go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -736,8 +736,31 @@
     ['替换后的审核跟踪','外显小图提交后进入平台审核；审核被驳回时是否重新生成任务、审核通过前旧图是否继续展示，Excel 未明确，需确认。']];
   const taskDetailCfg={
     '悦享双床房近 7 天价格偏高':{advice:'携程用户端悦享双床房近 7 天均价 ¥428，抖音来客当前卖价 ¥519，价差 21%，价格竞争力不足。建议按携程近 7 天均价同步调整。',src:[['房型','悦享双床房'],['携程近 7 天均价','¥428'],['抖音来客当前卖价','¥519']],fields:[{label:'建议写入价格',input:'¥428',note:'已按携程近 7 天均价预填，可修改'}],ignore:'此次忽略'},
-    '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式（酒店名称＝城市＋地标简称1＋地标简称2＋店），缺少地标简称。',src:[['当前名称','尚宽酒店'],['名称公式','城市＋地标简称1＋地标简称2＋店'],['建议名称','重庆西站华岩寺尚宽酒店店']],fields:[{label:'城市',options:['重庆']},{label:'地标简称1',options:['西站','华岩寺']}],ignore:'此次忽略'},
-    '酒店政策联合补充任务':{advice:'当前仅配置 2 项儿童与加床政策，需补齐全部五项后一次写入。',src:[['已配置','儿童入住政策、加床政策'],['待补充','儿童早餐、儿童用品、加床收费标准']],fields:[{label:'儿童早餐',options:['免费','半价','全价']},{label:'加床收费标准',options:['¥100/床/晚','¥150/床/晚']}],ignore:'此次忽略'},
+    '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式，缺少地标简称。',src:[['当前名称','尚宽酒店'],['建议名称','重庆西站华岩寺尚宽酒店店']],fields:[{label:'建议名称',input:'重庆西站华岩寺尚宽酒店店'}],ignore:'此次忽略'},
+    /* 基本信息 3 任务：与抖音来客「门店管理」修改弹窗同构，现状→修改为，全部可修改 */
+    '营业状态修正任务':{advice:'诊断规则：营业状态为「正常营业」自动通过、不生成任务；当前门店状态为「暂停营业」，不为「正常营业」，诊断不通过。已按规则预填修改为「正常营业」，可在下方弹窗中改选，确认后 AI 进入抖音来客「门店管理 › 更改营业状态」写入并校验，成功后任务完成。',src:[['门店','尚宽酒店(重庆西站华岩寺店) · 门店ID 7424745436033845260'],['现状 · 抖音当前营业状态','暂停营业'],['修改为','正常营业'],['修改入口','门店管理 › 门店当前营业状态 › 更改营业状态']],ignore:'此次忽略',
+      bt:{modal:'变更营业状态',where:'门店管理 › 门店当前营业状态',cur:'暂停营业',to:'正常营业',
+        tip:'按诊断规则：营业状态为「正常营业」自动通过、不生成任务；不为「正常营业」则生成修改为「正常营业」的修改任务。',
+        curNote:'不为「正常营业」→ 诊断不通过',toNote:'规则要求修改为「正常营业」',
+        opts:['即将开业','正常营业','暂停营业'],optsNote:'与抖音来客「变更营业状态」弹窗选项一致，可改选'}},
+    '房间总数修正任务':{advice:'诊断规则：房间总数不能为空；不为空时须与携程 PC 端一致。当前抖音来客房间总数未填写（未填写不在抖音展示房间总数），生成填入携程房间总数的任务。已按携程 PC 端采集值预填 97 间，可修改，确认后 AI 进入抖音来客「门店管理 › 修改房间总数」写入并校验，成功后任务完成。',src:[['门店','尚宽酒店(重庆西站华岩寺店) · 门店ID 7424745436033845260'],['现状 · 抖音房间总数','未填写 · 未填写不在抖音展示房间总数'],['携程 PC 端房间总数','97 间'],['修改为','97 间'],['修改入口','门店管理 › 房间总数 › 修改房间总数']],ignore:'此次忽略',
+      bt:{modal:'修改房间总数',where:'门店管理 › 房间总数',cur:'未填写',to:'97 间',
+        tip:'按诊断规则：房间总数不能为空；不为空时须与携程 PC 端一致，不一致生成修改建议、为空生成填入建议。',
+        curNote:'为空 → 生成填入建议',toNote:'已按携程 PC 端采集值预填',
+        num:'97',numUnit:'间',numNote:'已按携程 PC 端房间总数预填，可修改',hint:'未填写不在抖音展示房间总数'}},
+    '联系电话修正任务':{advice:'诊断规则：联系电话不能为空；不为空时须与携程 PC 端一致。当前抖音来客仅配置座机 023-61557388，与携程 PC 端（023-61557388；13640576689）不一致，生成修改为携程电话号码的任务。以下已按携程电话预填座机＋手机 2 个（最多 3 个），可修改，确认后 AI 进入抖音来客「门店管理 › 修改联系电话」写入并校验，成功后任务完成。',src:[['门店','尚宽酒店(重庆西站华岩寺店) · 门店ID 7424745436033845260'],['现状 · 抖音联系电话','023-61557388（仅座机 1 个）'],['携程 PC 端联系电话','023-61557388；13640576689'],['修改为','座机 023-61557388 ＋ 手机 13640576689'],['修改入口','门店管理 › 联系电话 › 修改联系电话']],ignore:'此次忽略',
+      bt:{modal:'修改联系电话',where:'门店管理 › 联系电话',cur:'023-61557388（仅座机 1 个）',to:'座机 023-61557388 ＋ 手机 13640576689',
+        tip:'按诊断规则：联系电话不能为空；不为空时须与携程 PC 端一致，不一致生成修改建议、为空生成填入建议。',
+        curNote:'与携程 PC 端不一致 → 诊断不通过',toNote:'已按携程 PC 端电话预填',
+        phones:[['座机','023','61557388'],['手机','','13640576689']],addTel:'＋ 添加电话（2/3）',telNote:'与抖音来客「修改联系电话」弹窗一致，已按携程预填，可修改；最多 3 个'}},
+    '酒店政策联合补充任务':{advice:'已按《抖音来客诊断规则表》对五组政策做联合对比：现状读取自抖音来客「酒店信息管理 › 酒店政策」，携程值采集自携程PC端，共检出 4 处需修改（最晚离店时间、儿童使用现有床收费标准与加床政策、宠物免费、早餐时间）；办理入住年龄与携程一致；入住方式由用户选择；儿童早餐携程未采集到数据，AI 不推测、由用户自行选择。五个分组全部完成后才允许提交，提交后 AI 统一写入抖音来客并校验。',src:[['采集来源','携程PC端 · 酒店政策（诊断时采集）'],['对比对象','抖音来客「酒店信息管理 › 酒店政策」五组'],['对比结果','4 处需修改 · 办理入住年龄一致'],['AI 不推测项','儿童早餐（携程未采集）· 由用户选择']],ignore:'此次忽略',
+      pol:{items:[
+        {name:'入离政策',cur:'最早入住 其他时间 10:30 · 最晚入住 不限 · 最早离店 不限 · 最晚离店 其他时间 15:00',ctrip:'10:30后入住 · 13:00前退房',to:'最晚离店时间 15:00 → 13:00，其余保持不变',chg:1},
+        {name:'办理入住年龄',cur:'最小年龄 18 · 最大年龄 不限制',ctrip:'接待提示：仅限 18 岁以上成人办理入住',to:'最小年龄 18 · 最大年龄 不限制（与现状一致，核对通过）',chg:0},
+        {name:'加床及儿童',cur:'可携带儿童 是 · 现有床 0-12 岁免费 · 加床 不提供 · 婴儿床 不提供',ctrip:'17 岁及以下儿童使用现有床铺免费 · 收费加床 · 不提供婴儿床',to:'现有床 0-17 岁免费 · 额外收费提供加床（成人 ¥100/晚 · 儿童 ¥80/晚）· 婴儿床不提供',chg:1},
+        {name:'宠物政策',cur:'允许宠物 是 · 允许带宠物免费 是',ctrip:'允许携带宠物 · 收费标签',to:'允许宠物 是 · 允许带宠物免费 否',chg:1},
+        {name:'早餐政策',cur:'提供早餐 · 自助餐 · 中式 · 谷物/鸡蛋/当地特色/蔬菜热菜 · 每日开放 08:00~10:00',ctrip:'提供早餐：自助餐 · 中式 · 谷物/鸡蛋/当地特色/蔬菜热菜 · 07:00~10:00',to:'早餐时间 08:00~10:00 → 07:00~10:00，其余保持不变',chg:1}
+      ]}},
     /* 酒店设施信息核对：停车场/充电车位/餐厅/接机服务/接站服务合并为一条核对任务，全部数据一并写入（口径已确认） */
     '酒店设施信息核对任务':{advice:'对照携程用户端“服务及设施”逐设施核对抖音来客「酒店信息管理 › 酒店设施」：检出 5 个设施不通过——充电车位、接机服务、接站服务为“携程有、抖音无”，建议改为“有”并补充详情；停车场、餐厅已为“有”但部分字段与携程不一致，按携程修正。携程未采集到的设施不做检测和诊断。以下修改内容已按携程映射预填，全部可修改，确认后提交，AI 将全部数据一并写入抖音来客。',src:[['采集来源','携程用户端“服务及设施”'],['抖音当前值','抖音来客 · 酒店信息管理 › 酒店设施'],['诊断不通过','5 个设施：缺失补充 3 · 字段修正 2']],ignore:'此次忽略',rules:FAC_RULES,
       fac:{list:[
@@ -882,6 +905,9 @@
   /* 活动报名意向状态：actSel 每个活动选择（参加/不参加），未选择默认参加 */
   let actSel={};
   function setActSel(i,v){actSel[i]=v}
+  /* 酒店政策联合补充：polSel 记录用户必选项（儿童早餐 年龄/身高），未选择时提交不可用 */
+  let polSel={};
+  function setPolSel(k,v){polSel[k]=v;render()}
   /* 团购商品核对状态：gbSel 每个不通过项的确认意向（新增方案/价格/名称），未选择默认确认；gbPriv 礼遇添加表单展开态 */
   let gbSel={},gbPriv={};
   /* 外显小图替换：xspPick 当前选中的携程「外观」替换图片序号 */
@@ -1107,6 +1133,17 @@
         </div>
       </div>
       ${rtPends(3)}`
+      :c.bt?`<div class="section"><h3>2　差异与修改内容（${c.bt.cur} → ${c.bt.to}）</h3>
+        <p class="review-tip">${c.bt.tip}下方弹窗与抖音来客「${c.bt.modal}」一致，修改内容已预填、可修改，确认后 AI 写入抖音来客并校验。</p>
+        <div class="gb-card">
+          <div class="gb-head"><b>${c.bt.modal}<small>店铺管理 › 门店管理 · ${c.bt.where}</small></b></div>
+          ${gbRow('现状 · 抖音当前值',`<b>${c.bt.cur}</b><span class="gb-unit">${c.bt.curNote}</span>`)}
+          ${gbRow('修改为',`<b>${c.bt.to}</b><span class="gb-unit">${c.bt.toNote}</span>`,true)}
+          ${c.bt.opts?gbRow('营业状态',c.bt.opts.map(o=>`<label class="gb-radio"><input type="radio" name="bt-opt"${o===c.bt.to?' checked':''}>${o}</label>`).join('')+`<span class="gb-unit">${c.bt.optsNote}</span>`,true):''}
+          ${c.bt.num!==undefined?gbRow('房间总数',`<input class="gb-in gb-num" type="text" value="${c.bt.num}"><span class="gb-unit">${c.bt.numUnit} · ${c.bt.numNote}</span><small class="count">${c.bt.hint}</small>`,true):''}
+          ${c.bt.phones?gbRow('门店电话',c.bt.phones.map(p=>`<div class="gb-qtyrow"><select class="gb-sl"><option selected>${p[0]}</option><option>${p[0]==='座机'?'手机':'座机'}</option></select>${p[0]==='座机'?`<input class="gb-in gb-num" type="text" value="${p[1]}" placeholder="区号">`:''}<input class="gb-in" type="text" value="${p[2]}"><a class="exlink" onclick="toast('演示原型：可删除该电话，至少保留 1 个')">删除</a></div>`).join('')+`<a class="exlink" onclick="toast('演示原型：可继续添加电话，最多 3 个')">${c.bt.addTel}</a><span class="gb-unit">${c.bt.telNote}</span>`,true):''}
+        </div>
+      </div>`
       :c.fac?`<div class="section"><h3>2　诊断不通过设施与修改内容（${c.fac.list.length} 个 · 全部可修改）</h3>
         ${c.fac.list.map((f,fi)=>`<div class="gb-card">
           <div class="gb-head"><b>${f.name}<small>店铺管理 › 酒店信息管理 › 酒店设施 › ${f.name}</small></b><i class="tag ${f.tag==='缺失补充'?'red':'gray'}">${f.tag}</i>
@@ -1130,6 +1167,58 @@
           ${gbRow('早餐份数（修改后）',`<input class="gb-in gb-num" type="text" value="${calEff(c)}" oninput="setCalTo(this.value)"><span class="gb-unit">份 · 已按携程份数预填，可灵活修改；只能填入正整数，抖音来客早餐份数最小值允许 0 份；AI 按此份数写入抖音来客</span>`,true)}
         </div>
       </div>`
+      :c.pol?`<div class="section"><h3>2　五组政策对比（现状 → 携程 → 修改为）</h3>
+        <p class="review-tip">现状读取自抖音来客「酒店信息管理 › 酒店政策」当前配置；携程值采集自携程PC端；「修改为」为 AI 按映射规则预填的内容，全部可修改。</p>
+        ${c.pol.items.map((g,i)=>`<div class="gb-card">
+          <div class="gb-head"><b>${i+2}.${i+1}　${g.name}</b><i class="tag ${g.chg?'red':'green'}">${g.chg?'有差异 · 需修改':'一致 · 核对通过'}</i></div>
+          ${gbRow('现状（抖音来客）',`<span class="gb-unit">${g.cur}</span>`)}
+          ${gbRow('携程',`<span class="gb-unit">${g.ctrip}</span>`)}
+          ${gbRow('修改为',`<b>${g.to}</b>`,true)}
+        </div>`).join('')}
+      </div>
+      <div class="section"><h3>3　按抖音来客表单修改（可编辑，与「酒店政策」页面字段一致）</h3>
+        <div class="gb-card">
+          <div class="gb-head"><b>入离政策<small>入住时间 / 离店时间 / 入住方式</small></b></div>
+          ${gbRow('最早入住',`<label class="gb-radio"><input type="radio" name="pol-ei">不限</label><label class="gb-radio"><input type="radio" name="pol-ei" checked>其他时间</label><input class="gb-in" type="time" value="10:30">`)}
+          ${gbRow('最晚入住',`<label class="gb-radio"><input type="radio" name="pol-li" checked>不限</label><label class="gb-radio"><input type="radio" name="pol-li">其他时间</label>`)}
+          ${gbRow('最早离店时间',`<label class="gb-radio"><input type="radio" name="pol-eo" checked>不限</label><label class="gb-radio"><input type="radio" name="pol-eo">其他时间</label>`)}
+          ${gbRow('最晚离店时间',`<label class="gb-radio"><input type="radio" name="pol-lo">不限</label><label class="gb-radio"><input type="radio" name="pol-lo" checked>其他时间</label><input class="gb-in" type="time" value="13:00"><span class="gb-unit">按携程「13:00 前退房」由 15:00 改为 13:00，可修改</span>`,true)}
+          ${gbRow('入住方式',`<select class="gb-sl"><option>前台领取钥匙/门卡</option><option>自助机办理</option><option>其他</option></select><select class="gb-sl"><option>住宿内</option><option>住宿外</option></select><span class="gb-unit">由用户选择入住方式</span>`)}
+        </div>
+        <div class="gb-card">
+          <div class="gb-head"><b>办理入住年龄<small>与携程一致 · 核对通过</small></b></div>
+          ${gbRow('办理入住年龄',`<select class="gb-sl"><option>16</option><option selected>18</option><option>21</option></select><span class="gb-unit">最小年龄</span><select class="gb-sl"><option selected>不限制</option><option>70</option></select><span class="gb-unit">最大年龄 · 与携程接待提示一致，可修改</span>`)}
+        </div>
+        <div class="gb-card">
+          <div class="gb-head"><b>加床及儿童<small>儿童 / 儿童使用现有床 / 加床政策 / 儿童早餐</small></b></div>
+          ${gbRow('是否可携带18岁以下儿童',`<label class="gb-radio"><input type="radio" name="pol-ch" checked>是</label><label class="gb-radio"><input type="radio" name="pol-ch">否</label>`)}
+          ${gbRow('允许几岁以上儿童',`<select class="gb-sl"><option selected>年龄不限</option><option>3岁以上</option><option>6岁以上</option></select>`)}
+          ${gbRow('儿童使用现有床 · 允许人数',`<select class="gb-sl"><option selected>1</option><option>2</option></select>`)}
+          ${gbRow('收费标准',`<span class="gb-unit">年龄</span><select class="gb-sl"><option selected>0岁</option><option>3岁</option></select><span class="gb-unit">~</span><select class="gb-sl"><option>12岁</option><option selected>17岁</option></select><span class="gb-unit">收费方式</span><select class="gb-sl"><option selected>免费</option><option>收费</option></select><span class="gb-unit">按携程「17 岁及以下免费」由 0-12 岁改为 0-17 岁</span>`,true)}
+          ${gbRow('酒店是否提供加床',`<label class="gb-radio"><input type="radio" name="pol-eb">不提供</label><label class="gb-radio"><input type="radio" name="pol-eb">免费提供加床</label><label class="gb-radio"><input type="radio" name="pol-eb" checked>额外收费提供加床</label><span class="gb-unit">按携程「收费加床」由「不提供」改为「额外收费提供加床」</span>`,true)}
+          ${gbRow('加床收费详情',`<input class="gb-in" type="text" value="成人 ¥100/晚"><input class="gb-in" type="text" value="儿童 ¥80/晚"><span class="gb-unit">成人及儿童加床收费详情按携程规则预填，可修改</span>`,true)}
+          ${gbRow('是否提供加婴儿床',`<label class="gb-radio"><input type="radio" name="pol-cb" checked>不提供加婴儿床</label><label class="gb-radio"><input type="radio" name="pol-cb">提供加婴儿床</label><span class="gb-unit">与携程一致</span>`)}
+          ${gbRow('儿童早餐',`<label class="gb-radio"><input type="radio" name="pol-bf" ${polSel.bf==='age'?'checked':''} onchange="setPolSel('bf','age')">年龄</label><label class="gb-radio"><input type="radio" name="pol-bf" ${polSel.bf==='height'?'checked':''} onchange="setPolSel('bf','height')">身高</label><span class="gb-unit">携程未采集到儿童早餐数据，AI 不推测；选择后该分组完成（提交前必选）</span>`,true)}
+        </div>
+        <div class="gb-card">
+          <div class="gb-head"><b>宠物政策<small>是否允许宠物 / 宠物收费</small></b></div>
+          ${gbRow('是否允许宠物',`<label class="gb-radio"><input type="radio" name="pol-pt" checked>是</label><label class="gb-radio"><input type="radio" name="pol-pt">否</label>`)}
+          ${gbRow('允许带宠物免费',`<select class="gb-sl"><option>是</option><option selected>否</option></select><span class="gb-unit">按携程「收费」标签由「是」改为「否」，可修改</span>`,true)}
+        </div>
+        <div class="gb-card">
+          <div class="gb-head"><b>早餐政策<small>是否提供 / 形式 / 类型 / 种类 / 早餐时间</small></b></div>
+          ${gbRow('是否提供早餐',`<label class="gb-radio"><input type="radio" name="pol-bk" checked>提供</label><label class="gb-radio"><input type="radio" name="pol-bk">不提供</label>`)}
+          ${gbRow('形式',`<label class="gb-radio"><input type="checkbox">单点</label><label class="gb-radio"><input type="checkbox" checked>自助餐</label><label class="gb-radio"><input type="checkbox">固定套餐</label><label class="gb-radio"><input type="checkbox">盒装食品/包装食品</label>`)}
+          ${gbRow('类型',`<span class="gb-unit">中式 ×</span>`)}
+          ${gbRow('种类',`<span class="gb-unit">谷物 ×　鸡蛋 ×　当地特色 ×　蔬菜/热菜 ×</span>`)}
+          ${gbRow('早餐时间',`<label class="gb-radio"><input type="radio" name="pol-bt" checked>每日开放</label><label class="gb-radio"><input type="radio" name="pol-bt">指定时间</label><input class="gb-in" type="time" value="07:00"><span class="gb-unit">~</span><input class="gb-in" type="time" value="10:00"><span class="gb-unit">按携程由 08:00~10:00 改为 07:00~10:00，可修改</span>`,true)}
+        </div>
+      </div>
+      <div class="section"><h3>4　修改与提交规则</h3>
+        <div class="gb-kv"><small>提交条件</small><div class="gb-ctl"><b>五个分组全部完成，才允许保存和提交</b><span class="gb-unit">任一分组未完成时提交不可用（当前待选：儿童早餐 年龄/身高）</span></div></div>
+        <div class="gb-kv"><small>提交后</small><div class="gb-ctl"><b>AI 统一填写抖音来客酒店政策</b><span class="gb-unit">写入成功并完成结果校验后，任务标记为已完成</span></div></div>
+        <div class="gb-kv"><small>忽略口径</small><div class="gb-ctl"><b>此次忽略：关闭本次联合任务，下次诊断周期仍继续诊断整组</b><span class="gb-unit">以后不再提示：关闭后该酒店政策联合节点不再自动诊断，直至用户主动恢复</span></div></div>
+      </div>`
       :(c.fields||[]).length?`<div class="section"><h3>2　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
@@ -1137,8 +1226,9 @@
         <button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
         ${c.rtNew?'':`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`}
         ${c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
+          :c.pol?`<button class="btn btn-primary" ${polSel.bf?'':'disabled'} onclick="finishTask('执行中','酒店政策已提交，AI 正在统一填写抖音来客五组政策并校验')">提交</button>`
           :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
-          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图并校验':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
+          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图并校验':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':c.bt?'修改已提交，AI 正在写入抖音来客并校验结果':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
