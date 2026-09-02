@@ -699,18 +699,19 @@
   /* 日历房早餐份数：仅展示本任务不通过的房型，通过房型不在任务内展示、也不生成任务（与《抖音来客诊断规则表A》「日历房房型与早餐份数」一致） */
   const calTask=(advice,room)=>({advice,src:[['酒店','尚宽酒店（重庆西站华岩寺店）· 抖音来客'],['数据范围','日历房已上架 10 个 · 覆盖房型 6/6'],['早餐份数不一致','2 个房型 · 本任务仅处理当前房型']],ignore:'此次忽略',cal:{room}});
   /* 房型信息核对：逐字段差异与规则待确认口径（与《抖音来客诊断规则表A》「房型信息」一致） */
-  const RT_PENDS=[
-    ['房型名称修改边界','规则将「房型名称」列入逐字段比对，但未明确已关联日历房、团购商品的抖音房型是否允许改名、改名后商品关联是否受影响，待确认。本任务对名称差异仅提示对应关系，不直接改名。'],
-    ['同名房型误匹配','规则按「名称一致」自动对应，未覆盖名称相同但床型、面积明显不同的同名房型是否需人工复核，待确认。'],
-    ['区间字段的写入口径','携程楼层、面积展示为区间（如 3~6 层、25-35㎡），抖音支持「固定值 / 区间」两种模式；默认按区间写入还是取中间值写固定值，待确认。本任务默认按区间写入。'],
-    ['网络服务映射粒度','携程网络仅区分无线 / 有线，抖音为「可上网＋WiFi（收费 / 免费）＋有线网络（收费 / 免费）」结构；差异修改删除已勾选的有线网络是否影响前台外显，待确认。'],
-    ['房型图片覆盖策略','携程房型图片为多张，抖音「编辑房型」房型图片最多 10 张且区分头图；存在差异时是全量覆盖抖音已有图片还是仅补缺、头图是否保持不变，待确认。'],
-    ['抖音有而携程未采集的字段','规则仅规定「携程有、抖音无对应字段不展示」；反向场景（如吸烟政策、英文名称，携程未采集）是保持抖音当前值还是提示用户补充，待确认。本任务默认保持抖音当前值、新增时不预填。']];
-  const rtPends=()=>`<div class="section"><h3>4　本规则待确认事项（${RT_PENDS.length} 项）</h3>
-    <p class="review-tip">以下为《抖音来客诊断规则表A》「房型信息」规则尚未明确、需与业务确认的口径；确认前 AI 仅按已确认部分执行。</p>
-    ${RT_PENDS.map((p,i)=>`<div class="gb-kv"><small>待确认 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
+  /* 房型信息规则确认口径（业务已确认） */
+  const RT_RULES=[
+    ['房型名称修改边界','已关联日历房、团购商品的抖音房型允许改名；改名后商品关联相应修改名称展示。'],
+    ['同名房型误匹配','名称相同但床型、面积明显不同的同名房型，需人工复核后才能对应。'],
+    ['区间字段的写入口径','楼层、面积默认按区间写入，不取中间值。'],
+    ['网络服务映射粒度','携程为「WiFi 免费」时，抖音勾选「可上网＋WiFi 免费」。'],
+    ['房型图片覆盖策略','存在差异时仅补缺，头图保持不变。'],
+    ['抖音有而携程未采集的字段','提示用户补充。']];
+  const rtPends=n=>`<div class="section"><h3>${n}　本规则确认口径（${RT_RULES.length} 项）</h3>
+    <p class="review-tip">以下为《抖音来客诊断规则表A》「房型信息」规则的确认口径，AI 按此执行。</p>
+    ${RT_RULES.map((p,i)=>`<div class="gb-kv"><small>确认口径 ${i+1}</small><div class="gb-ctl"><b>${p[0]}</b><span class="gb-unit">${p[1]}</span></div></div>`).join('')}
   </div>`;
-  const rtTask=(advice,src,match,diffs,ok)=>({advice,src,ignore:'此次忽略',rt:{match,diffs,ok},pends:RT_PENDS});
+  const rtTask=(advice,src,match,diffs,ok)=>({advice,src,ignore:'此次忽略',rt:{match,diffs,ok},pends:RT_RULES});
   const rtCnt=['房型数量','携程 8 个 · 抖音来客已上架 11 个','不能仅因数量相等或抖音≥携程就判定通过，须逐房型完成字段校验'];
   const rtExtra=['多出房型','抖音多出的 4 个房型（列表折叠未展开）','按规则不删除、不形成任务'];
   /* 缺失房型新增：总间数由用户填写，未填写时提交置灰 */
@@ -867,7 +868,7 @@
       [{field:'床型',cur:'单人床 1.35m × 1张＋大床 1.8m × 1张',ctrip:'单人床 1.35m × 2张＋大床 1.8m × 1张',to:'单人床 1.35m × 2张＋大床 1.8m × 1张'},
        {field:'最大可住人数',cur:'3 人',ctrip:'4 人',to:'4 人'}],
       '楼层 8~10 层 · 面积 28~30㎡ · 窗户 有窗 · 网络服务 WiFi 免费 · 房型图片'),
-    '房型新增·电竞大床房':{advice:'携程用户端在售房型「电竞大床房」（¥159 / 晚）在抖音来客「房型管理」中无对应房型，按缺失房型单独形成 1 条新增任务。以下已按抖音「创建房型」表单预填携程可映射字段，全部可修改；携程未采集的字段（吸烟政策、有线网络）不预填、由用户选择；「总间数」携程不提供，须由用户填写后才能提交。提交后 AI 进入抖音来客「房型管理 → 创建房型 → 手动创建」，仅创建当前房型。',src:[['缺失房型','电竞大床房 · 携程在售 ¥159 / 晚'],['抖音房型管理','无对应房型 · 走「手动创建」'],['总间数','携程不提供 · 须由用户填写']],ignore:'此次忽略',pends:RT_PENDS,
+    '房型新增·电竞大床房':{noAdvice:true,src:[['缺失房型','电竞大床房 · 携程在售 ¥159 / 晚'],['抖音房型管理','无对应房型 · 走「手动创建」'],['总间数','携程不提供 · 须由用户填写']],ignore:'此次忽略',pends:RT_RULES,
       rtNew:{
         name:'电竞大床房',price:'¥159 / 晚',
         remark:'携程房间详情：配备高配电脑与电竞桌椅，适合游戏爱好者入住。',
@@ -953,7 +954,7 @@
         <button class="btn btn-primary" onclick="finishTask('执行中','找店指引已提交，AI 正在同步至抖音来客')" ${guideMode==null?'disabled':''}>提交</button>`;
     }else{
       const c=taskDetailCfg[t.name]||{advice:`「${t.path}」检查不通过，已生成处理建议。请确认以下建议内容，提交后写入抖音来客。`,src:[['检查项',t.path],...(t.type?[['任务类型',t.type]]:[]),['诊断时间',t.diagTime]],fields:[]};
-      main=`<div class="notice"><span class="notice-icon">✦</span><div><b>AI 诊断建议</b><span>${c.advice}</span></div></div>
+      main=`${c.noAdvice?'':`<div class="notice"><span class="notice-icon">✦</span><div><b>AI 诊断建议</b><span>${c.advice}</span></div></div>`}
       <div class="section"><h3>1　来源数据与差异</h3>
         <div class="source">${c.src.map(x=>`<div><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}</div>
       </div>
@@ -1113,27 +1114,27 @@
           <div class="gb-kv" style="border-top:1px dashed var(--line);margin-top:2px;padding-top:11px"><small>一致字段</small><div class="gb-ctl"><b>${c.rt.ok}</b><span class="gb-unit">与携程一致，已通过，不生成修改项</span></div></div>
         </div>
       </div>
-      ${rtPends()}`
-      :c.rtNew?`<div class="section"><h3>2　缺失房型 · 新增方案（与抖音来客「创建房型」表单一致）</h3>
-        <p class="review-tip">携程在售、抖音「房型管理」无对应房型。以下已预填携程可映射字段，全部可修改；携程未采集的字段（吸烟政策、有线网络）不预填、由用户选择；「总间数」为必填，携程不提供，须由用户填写后才能提交。提交后 AI 进入抖音来客「房型管理 → 创建房型 → 手动创建」，仅创建当前房型，写入并校验成功后任务完成。</p>
+      ${rtPends(4)}`
+      :c.rtNew?`<div class="section"><h3>2　缺失房型 · 需填入的字段（与抖音来客「创建房型」一致）</h3>
+        <p class="review-tip">携程在售、抖音「房型管理」无对应房型。以下仅展示需填入的字段，已按携程预填、全部可修改；楼层与面积按区间写入，不可改为固定值；吸烟政策、英文名称、有线网络携程未提供，提示用户补充；「总间数」必填，携程不提供，须由用户填写后才能提交。提交后 AI 进入抖音来客「房型管理 → 创建房型 → 手动创建」，仅创建当前房型。</p>
         <div class="gb-card">
           <div class="gb-head"><b>${c.rtNew.name} · 新增房型<small>携程用户端在售 · ${c.rtNew.price}（诊断时采集）</small></b></div>
           ${gbRow('中文名称',`<input class="gb-in" type="text" value="${c.rtNew.name}"><span class="gb-unit">已按携程房型名称预填，可修改</span>`)}
-          ${gbRow('英文名称',`<input class="gb-in" type="text" placeholder="选填"><span class="gb-unit">携程未采集，AI 不推测，可留空</span>`)}
+          ${gbRow('英文名称',`<input class="gb-in" type="text" placeholder="请补充"><span class="gb-unit">携程未提供，请补充，可留空</span>`)}
           ${gbRow('房型图片',`<span class="gb-thumb">携程房型图 1</span><span class="gb-thumb">携程房型图 2</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a><span class="gb-unit">已按携程房型图预填 2 张（最多 10 张，第 1 张为头图），可修改</span>`)}
           ${gbRow('总间数',`<input id="rtQty" class="gb-in gb-num" type="text" placeholder="请填写" oninput="rtQtySync(this.value)"><span class="gb-unit gb-req">间 · 携程不提供总间数，须由用户填写后才能提交</span>`,true)}
-          ${gbRow('楼层',`<label class="gb-radio"><input type="radio" name="rt-fl">固定值</label><label class="gb-radio"><input type="radio" name="rt-fl" checked>区间</label><input class="gb-in gb-num" type="text" value="6"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="8"><span class="gb-unit">层 · 已按携程预填，可修改</span>`)}
-          ${gbRow('面积（㎡）',`<label class="gb-radio"><input type="radio" name="rt-ar">固定值</label><label class="gb-radio"><input type="radio" name="rt-ar" checked>区间</label><input class="gb-in gb-num" type="text" value="20.00"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="25.00"><span class="gb-unit">已按携程预填，可修改</span>`)}
-          ${gbRow('窗户',`<select class="gb-sl">${gbOpts(['有窗','部分房间有窗','无窗'],'有窗')}</select><span class="gb-unit">窗型</span><select class="gb-sl">${gbOpts(['正常窗户','天窗','封闭窗','飘窗','落地窗','装饰性窗面','窗户较小'],'落地窗')}</select>`)}
-          ${gbRow('床型',`<label class="gb-radio"><input type="radio" name="rt-bd" checked>1张床</label><label class="gb-radio"><input type="radio" name="rt-bd">2张床</label><label class="gb-radio"><input type="radio" name="rt-bd">多张床</label><span class="gb-unit">床型设置</span><select class="gb-sl">${gbOpts(['大床','双人床','单人床','上下铺'],'大床')}</select><input class="gb-in gb-num" type="text" value="2.00"><span class="gb-unit">米 × 1张</span>`)}
+          ${gbRow('楼层',`<input class="gb-in gb-num" type="text" value="6"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="8"><span class="gb-unit">层 · 按区间写入，可修改，不可改为固定值</span>`)}
+          ${gbRow('面积（㎡）',`<input class="gb-in gb-num" type="text" value="20.00"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="25.00"><span class="gb-unit">按区间写入，可修改，不可改为固定值</span>`)}
+          ${gbRow('窗户',`<input class="gb-in" type="text" value="有窗 · 落地窗"><span class="gb-unit">已按携程预填，可修改</span>`)}
+          ${gbRow('床型',`<input class="gb-in" type="text" value="大床 2.00 米 × 1张"><span class="gb-unit">已按携程预填，可修改</span>`)}
           ${gbRow('最大可住人数',`<input class="gb-in gb-num" type="text" value="2"><span class="gb-unit">人 · 已按携程预填，可修改</span>`)}
-          ${gbRow('吸烟政策',`<select class="gb-sl">${['请选择','可吸烟','不可吸烟','部分房间可吸烟'].map(o=>`<option>${o}</option>`).join('')}</select><span class="gb-unit">携程未采集吸烟信息，AI 不推测，由用户选择</span>`)}
-          ${gbRow('网络',`<label class="gb-radio"><input type="radio" name="rt-net" checked>可上网</label><label class="gb-radio"><input type="radio" name="rt-net">部分房间可上网</label><label class="gb-radio"><input type="radio" name="rt-net">不可上网</label><label class="gb-radio"><input type="checkbox" checked>WiFi 免费</label><label class="gb-radio"><input type="checkbox">有线网络</label><span class="gb-unit">携程仅采集到无线 WiFi，有线网络未预填</span>`)}
+          ${gbRow('吸烟政策',`<select class="gb-sl"><option>请选择</option></select><span class="gb-unit">携程未提供，请补充</span>`)}
+          ${gbRow('网络',`<label class="gb-radio"><input type="checkbox" checked>可上网</label><label class="gb-radio"><input type="checkbox" checked>WiFi 免费</label><label class="gb-radio"><input type="checkbox">有线网络</label><span class="gb-unit">携程 WiFi 免费 → 勾选「可上网＋WiFi 免费」，可增勾有线网络</span>`)}
           ${gbRow('房型特殊说明',`<textarea class="gb-ta" maxlength="300" oninput="this.nextElementSibling.textContent=this.value.length+' / 300'">${c.rtNew.remark}</textarea><small class="count">${c.rtNew.remark.length} / 300</small>`)}
-          ${gbRow('房型设施',`<div class="gb-hol"><b>已按携程房间设施预填可映射项（可增删）</b>${c.rtNew.facs.map(f=>`<label class="gb-hol-it"><input type="checkbox" checked>${f}</label>`).join('')}</div><span class="gb-unit">携程「高配电脑主机」在抖音无对应字段，不展示、不填写</span>`)}
+          ${gbRow('房型设施',`<div class="gb-hol">${c.rtNew.facs.map(f=>`<label class="gb-hol-it"><input type="checkbox" checked>${f}</label>`).join('')}</div><span class="gb-unit">仅展示需勾选写入的设施，可增删</span>`)}
         </div>
       </div>
-      ${rtPends()}`
+      ${rtPends(3)}`
       :c.fac?`<div class="section"><h3>2　诊断不通过设施与修改内容（${c.fac.list.length} 个 · 全部可修改）</h3>
         <p class="review-tip">逐设施独立确认，互不合并：「缺少什么」为抖音当前缺口，「携程采集值」为比对依据，「修改内容」为建议修改值（修改为什么）；下方表单与抖音来客「酒店设施」字段一致并已按携程映射预填，可逐字段修改。选择「暂无此设施」时 AI 将该设施保持或改为「无」。确认后提交，AI 逐设施写入抖音来客，写入并校验成功后任务完成。</p>
         ${c.fac.list.map((f,fi)=>`<div class="gb-card">
