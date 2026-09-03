@@ -208,10 +208,6 @@
   .btn-add-via{border:1px dashed var(--primary);color:var(--primary);background:var(--surface);border-radius:var(--r-sm);padding:8px 16px;font-size:13px;font-weight:600;margin-bottom:12px}
   /* 中差评逐条回复 */
   .review-tip{font-size:12px;color:var(--ink-3);margin:0 0 14px;line-height:1.8}
-  .act-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 16px;border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:10px;background:var(--surface)}
-  .act-info{min-width:0}
-  .act-info b{display:block;font-size:13.5px;margin-bottom:3px}
-  .act-info small{color:var(--ink-3);font-size:12px}
   .act-sel{display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0}
   .act-sel span{font-size:12px;color:var(--ink-3)}
   .act-sel select{padding:7px 28px 7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;font-size:13px;color:var(--ink)}
@@ -276,7 +272,7 @@
   .reply-edit textarea{width:100%;min-height:76px;margin-top:6px;border:1px solid var(--primary-line);border-radius:var(--r-sm);background:var(--primary-soft);padding:10px 12px;font-size:13px;line-height:1.8;resize:vertical;box-sizing:border-box;font-family:inherit}
   .reply-edit textarea:focus{outline:none;border-color:var(--primary);background:var(--surface)}
 
-  /* 记录 / 活动 列表 */
+  /* 列表 */
   .list-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);overflow:hidden}
   .lrow{display:grid;grid-template-columns:44px 1.6fr .6fr .8fr .5fr;align-items:center;gap:12px;min-height:64px;padding:0 18px;border-bottom:1px solid var(--line-soft);font-size:13px}
   .lrow:hover{background:#fafbfc}
@@ -361,7 +357,6 @@
   /* 弹窗 */
   .modal-mask{position:fixed;inset:0;background:rgba(17,24,39,.45);backdrop-filter:blur(2px);display:grid;place-items:center;z-index:30}
   .modal{width:480px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow-lg);position:relative;padding:24px}
-  .modal.wide{width:720px}
   .close{position:absolute;right:16px;top:16px;width:30px;height:30px;border-radius:var(--r-sm);color:var(--ink-4);font-size:15px;display:grid;place-items:center}
   .close:hover{background:var(--surface-2);color:var(--ink)}
   .modal h2{margin:0 0 4px;font-size:17px}
@@ -465,9 +460,7 @@
     {name:'评价',path:'经营成长 › 商家经营分 › 评价',items:[
       ['评价评分','评价评分满分则通过；未满分形成线下经营建议任务','fail','商家经营分-评价分提升','经营建议']]},
     {name:'评价回复',path:'经营成长 › 评价管理 › 评价回复',items:[
-      ['待回复中差评','无待回复中差评则通过；存在时按评价逐条生成回复建议任务','fail','中差评回复','评价回复']]},
-    {name:'活动管理',path:'带货与推广 › 活动广场 › 活动管理',items:[
-      ['活动参与与配置','采集活动广场全部活动；对“在线＋管理员打开＋立即报名”的活动生成报名建议任务','fail','活动报名','活动报名']]}
+      ['待回复中差评','无待回复中差评则通过；存在时按评价逐条生成回复建议任务','fail','中差评回复','评价回复']]}
   ];
   let diagRun=null,diagT=[];
   /* 联合诊断节点：任务名 → 代表检查项（多项不通过合并为一个任务，任务行挂在代表项上） */
@@ -532,7 +525,7 @@
     const match=opts.find(o=>o[0]===hotelFilter)[2];
     const visible=hotels.map((h,i)=>({h,i})).filter(({h})=>match(h)&&h.name.includes(hotelQuery.trim()));
     return `<div class="page">
-      <div class="page-head"><div><h1>酒店管理</h1></div><button class="btn btn-outline" onclick="openActs()">活动配置</button></div>
+      <div class="page-head"><div><h1>酒店管理</h1></div></div>
       <div class="notice"><span class="notice-icon">ⓘ</span><div><b>抖音来客和携程官网都授权之后才可进行诊断</b></div></div>
       <div class="panel">
         <div class="panel-toolbar">
@@ -646,8 +639,8 @@
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
   function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
@@ -659,7 +652,7 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};actSel={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -832,12 +825,6 @@
           '诚恳致歉！让您到店等待四十分钟是我们的失误，我们已为您的账户发放一张无门槛住宿券作为补偿，下次入住可直接抵扣，期待您再来体验。',
           '感谢您的耐心反馈。我们已复盘当日排房流程，明确超售时须第一时间致歉并提供补偿方案，前台应急培训已完成，欢迎您再次选择我们。']}
       ]},
-    '活动报名':{advice:'当前有 3 个可报名的活动本酒店尚未参加，参加后可获得平台流量扶持。请逐个确认报名意向后提交。',src:[['可报名活动','3 个'],['本酒店已参加','0 个']],ignore:'此次忽略',
-      acts:[
-        {name:'暑期酒店爆款冲刺',desc:'平台流量扶持 · 酒店住宿',time:'2026-09-01 至 2026-09-30'},
-        {name:'金秋出游季',desc:'平台流量扶持 · 酒店住宿',time:'2026-09-15 至 2026-10-15'},
-        {name:'中秋团圆住房季',desc:'节日主题 · 限量补贴',time:'2026-09-25 至 2026-10-08'}
-      ]},
     '商家经营分-评价分提升':{advice:'本酒店好评率较低，每日至少达到 3 条以上抖音店铺好评，请提醒酒店线下完成此任务。',src:[['好评情况','好评率较低'],['目标要求','每日 3 条以上抖音店铺好评'],['完成方式','酒店线下完成后确认']],offline:true},
     '团购商品核对任务':{advice:'团购商品共 3 类 4 项不通过：预售房型「商务大床房」的日常与最近节假日团购商品均缺失；商品「【三天两晚】悦享双床房＋双人早餐」当前售价高于携程对比总价；商品「来重庆西站别踩雷！2天1晚｜周末不加价」名称需修改。请逐项核对以下内容，全部内容均可修改，提交后 AI 按确认结果写入抖音来客。',src:[['需核对问题','3 类 4 项'],['涉及预售房型','商务大床房、悦享双床房'],['最近节假日','中秋节 09-25 至 09-27']],ignore:'此次忽略',
       gbuy:{
@@ -918,9 +905,6 @@
   let replySel={},replyText={};
   function pickReply(i,j){replySel[i]=j;const c=taskDetailCfg[taskData[taskIdx].name];replyText[i]=c.reviews[i].replies[j];render()}
   function setReplyText(i,v){replyText[i]=v}
-  /* 活动报名意向状态：actSel 每个活动选择（参加/不参加），未选择默认参加 */
-  let actSel={};
-  function setActSel(i,v){actSel[i]=v}
   /* 酒店政策联合补充：polSel 记录用户必选项（儿童早餐 年龄/身高），未选择时提交不可用 */
   let polSel={};
   function setPolSel(k,v){polSel[k]=v;render()}
@@ -997,13 +981,6 @@
           </div>
           <div class="reply-edit"><small>回复内容（可修改后提交）</small><textarea oninput="setReplyText(${i},this.value)">${txt}</textarea></div>
         </div>`}).join('')}
-      </div>`
-      :c.acts?`<div class="section"><h3>2　确认报名意向（共 ${c.acts.length} 个活动）</h3>
-        <p class="review-tip">以下为可报名且本酒店尚未参加的活动，默认选择“参加”，可改为“不参加”，确认后提交。</p>
-        ${c.acts.map((a,i)=>`<div class="act-row">
-          <div class="act-info"><b>${a.name}</b><small>${a.desc} · 活动时间 ${a.time}</small></div>
-          <label class="act-sel"><span>报名意向</span><select onchange="setActSel(${i},this.value)"><option${(actSel[i]||'参加')==='参加'?' selected':''}>参加</option><option${actSel[i]==='不参加'?' selected':''}>不参加</option></select></label>
-        </div>`).join('')}
       </div>`
       :c.gbuy?`${c.gbuy.plans.length?`<div class="section"><h3>2　需新增的团购商品（${c.gbuy.plans[0].room}，共 ${c.gbuy.plans.length} 个方案）</h3>
         <p class="review-tip">该预售房型的日常与最近节假日团购商品均缺失。以下新增方案已按抖音来客「创建商品」表单预填全部字段，均可修改；两个方案可独立确认，默认均为确认新增。</p>
@@ -1257,7 +1234,7 @@
           :c.pol?`<button class="btn btn-primary" ${polSel.bf?'':'disabled'} onclick="finishTask('执行中','酒店政策已提交，AI 正在统一填写抖音来客五组政策并校验')">提交</button>`
           :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
           :c.faudit?'<button class="btn btn-primary" onclick="finishTask(\'执行中\',\'已提交审核，AI 正在使用替换图片在抖音来客重新提交设施审核，提交成功并完成结果校验后任务标记为已完成；暂无此设施将改为「无」\')">提交审核</button>'
-          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.acts?'报名意向已提交，AI 正在写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图并校验':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':c.bt?'修改已提交，AI 正在写入抖音来客并校验结果':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
+          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图并校验':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':c.bt?'修改已提交，AI 正在写入抖音来客并校验结果':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
@@ -1270,7 +1247,6 @@
 
   /* ===== 诊断日志（每次诊断一行：诊断次数 / 累计诊断项目数 / 任务数 / 执行成功数 / 执行失败数 / 详情） ===== */
   const LOG_TASKS={ // 任务名 → [检查路径]
-    '活动报名':['活动管理 · 活动参与与配置'],
     '中差评回复':['评价回复 · 待回复中差评'],
     '商家经营分-评价分提升':['评价 · 评价评分'],
     '团购商品核对任务':['团购 · 团购商品覆盖、价格与名称'],
@@ -1294,13 +1270,13 @@
     '门店名称修改建议任务':['基本信息 · 门店名称']
   };
   const LOG_ST={done:['已完成','green'],fail:['执行失败','red'],wait:['待处理','gray']};
-  const DIAG_LOG=[ // 时间正序；ts: [任务名, 状态, 失败原因?]；最新一次与「诊断任务」页当前 22 条待处理任务一致
+  const DIAG_LOG=[ // 时间正序；ts: [任务名, 状态, 失败原因?]；最新一次与「诊断任务」页当前 21 条待处理任务一致
     {time:'2026-08-08 16:40',ts:[
       ['营业状态修正任务','done'],['房间总数修正任务','done'],['联系电话修正任务','done'],
       ['团购商品核对任务','done'],['预售房型补充任务','done'],['早餐份数修正·景观双床房','done'],
       ['早餐份数修正·巨幕投影大床房','done'],['房型新增·电竞大床房','done'],['房型信息核对·亲子家庭房','done'],
       ['悦享双床房近 7 天价格偏高','fail','价格护栏校验未通过：调整后价格超出近 30 天成交价波动范围'],['中差评回复','done'],
-      ['活动报名','done'],['商家经营分-评价分提升','done']]},
+      ['商家经营分-评价分提升','done']]},
     {time:'2026-08-13 14:02',ts:[
       ['房型信息核对·钟点房','done'],['悦享双床房近 7 天价格偏高','done'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],
       ['头图相册补充任务','done'],['中差评回复','done']]},
@@ -1345,40 +1321,6 @@
       </div>`:''}`}).join('')}
     </div>
   </div>`}
-
-  /* ===== 活动配置（平台通用，适用于全部酒店；入口在酒店管理页） ===== */
-  /* 状态：on 已启用（开启诊断）/ off 已停用（关闭诊断）/ down 已下线（不再允许诊断） */
-  const actData=[['暑','暑期酒店爆款冲刺','平台流量扶持 · 酒店住宿','on'],
-    ['秋','金秋出游季','平台流量扶持 · 酒店住宿','on'],
-    ['中','中秋团圆住房季','节日主题 · 限量补贴','on'],
-    ['夏','夏日清凉住宿节','平台流量扶持 · 酒店住宿','down']];
-  const actState=st=>st==='on'?['已启用','green']:st==='off'?['已停用','gray']:['已下线','gray'];
-  let actConfirm=null;
-  function openActs(){$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeActs(event)"><div class="modal wide" onclick="event.stopPropagation()">
-    <button class="close" onclick="closeActs()">×</button>
-    <h2>活动配置</h2>
-    <div class="sub">管理员配置允许进入诊断范围的抖音活动 · 通用配置，适用于全部酒店</div>
-    <div class="list-card" style="margin-top:14px">${actData.map((x,i)=>{const [st,cls]=actState(x[3]);
-      const btns=x[3]==='down'
-        ?`<button class="btn btn-outline" onclick="askActUp(${i})">重新上线</button>`
-        :`<button class="btn btn-outline" onclick="toggleAct(${i})">${st}</button><button class="btn btn-outline tgap" onclick="askActDown(${i})">下线</button>`;
-      return `<div class="lrow" style="grid-template-columns:44px 1.8fr .8fr 1.5fr"><strong>${x[0]}</strong><div class="lt"><b>${x[1]}</b><small>${x[2]}</small></div><i class="tag ${cls}">${st}</i><span style="text-align:right">${btns}</span></div>`}).join('')}</div>
-    <div class="modal-foot">开关为平台通用配置，对全部酒店生效；已停用不再进入诊断，已下线活动不再允许诊断，可重新上线；新活动默认已停用。</div>
-  </div></div>`}
-  function toggleAct(i){actData[i][3]=actData[i][3]==='on'?'off':'on';openActs()}
-  function askActDown(i){actConfirm={t:'down',i};
-    $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeActConfirm(event)"><div class="modal" onclick="event.stopPropagation()" style="width:400px">
-    <h2>确认下线该活动？</h2><p class="sub">下线后「${actData[i][1]}」不再进入用户端诊断与报名候选，直至重新上线。</p>
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeActConfirm()">取消</button><button class="btn btn-primary" onclick="doActConfirm()">确认下线</button></div>
-  </div></div>`}
-  function askActUp(i){actConfirm={t:'up',i};
-    $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeActConfirm(event)"><div class="modal" onclick="event.stopPropagation()" style="width:400px">
-    <h2>确认重新上线该活动？</h2><p class="sub">上线后「${actData[i][1]}」恢复开启/关闭诊断能力，并恢复下线前的开启/关闭状态。</p>
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeActConfirm()">取消</button><button class="btn btn-primary" onclick="doActConfirm()">确认上线</button></div>
-  </div></div>`}
-  function doActConfirm(){const a=actConfirm;actData[a.i][3]=a.t==='down'?'down':'on';actConfirm=null;openActs()}
-  function closeActConfirm(e){if(e&&e.target!==e.currentTarget)return;actConfirm=null;openActs()}
-  function closeActs(e){if(e&&e.target!==e.currentTarget)return;$('#modalRoot').innerHTML=''}
 
   /* ===== 账号管理 ===== */
   function accountPage(){return `<div class="page">
