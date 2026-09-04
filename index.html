@@ -139,7 +139,7 @@
   .tbl-cap{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px}
   .tbl-cap h3{margin:0;font-size:14px;font-weight:600}
   .tbl-cap small{font-size:12px;color:var(--ink-4);font-variant-numeric:tabular-nums}
-  .ugrid{display:grid;grid-template-columns:1.05fr 1fr 1.1fr .75fr 1.1fr 1.1fr minmax(230px,1.5fr);align-items:center;gap:10px;padding:0 18px}
+  .ugrid{display:grid;grid-template-columns:1.1fr 1.1fr .75fr 1.1fr 1.1fr minmax(230px,1.5fr);align-items:center;gap:10px;padding:0 18px}
   .rgrid{display:grid;grid-template-columns:1.05fr .7fr 1.7fr 1.7fr minmax(120px,.9fr);align-items:center;gap:10px;padding:0 18px}
   .resgrid{display:grid;grid-template-columns:minmax(230px,2.1fr) .8fr 1.25fr 1.25fr .55fr minmax(130px,1fr);align-items:center;gap:10px;padding:0 18px}
   .srow{min-height:52px;border-bottom:1px solid var(--line-soft);transition:background .15s}
@@ -562,12 +562,12 @@
   ];
   const NEW_TS='2026-09-04 15:20';
   const users=[
-    {name:'禾薇运营',account:'admin',roles:['超级管理员'],phone:'138 8888 6620',admin:true,status:1,created:'2026-05-12 09:20',updated:'2026-08-26 14:02'},
-    {name:'李春燕',account:'lichunyan',roles:['运营管理员'],phone:'139 0752 3368',admin:false,status:1,hotels:[0,1],created:'2026-06-18 10:24',updated:'2026-08-30 11:47'},
-    {name:'王芷琪',account:'wangzhiqi',roles:['酒店店长'],phone:'136 2291 7745',admin:false,status:1,hotels:[2],created:'2026-07-02 16:05',updated:'2026-09-01 09:33'}
+    {phone:'13888886620',roles:['超级管理员'],admin:true,status:1,created:'2026-05-12 09:20',updated:'2026-08-26 14:02'},
+    {phone:'13907523368',roles:['运营管理员'],admin:false,status:1,hotels:[0,1],created:'2026-06-18 10:24',updated:'2026-08-30 11:47'},
+    {phone:'13622917745',roles:['酒店店长'],admin:false,status:1,hotels:[2],created:'2026-07-02 16:05',updated:'2026-09-01 09:33'}
   ];
   let curUser=0,newAccOpen=false,accHotelsFor=null,editUserFor=null,delUserFor=null,resetFor=null,roleEditFor=null,resEditFor=null,resDelFor=null,roleNew=false,
-      newAcc={account:'',pwd:'',pwd2:'',name:'',roles:[],status:1},utmp={name:'',roles:[]},rtmp={name:'',remark:'',status:1,resKeys:[]},ntmp=null,pwdForm={p1:'',p2:''},
+      newAcc={phone:'',pwd:'',roles:[],status:1},utmp={roles:[],status:1},rtmp={name:'',remark:'',status:1,resKeys:[]},ntmp=null,pwdForm={p1:'',p2:''},
       userQ='',userStatus='all',resQ='',resType='all',resOpen={m0:true},resCustom=[],newHotel={name:''};
   const isSub=()=>!users[curUser].admin;
   /* 权限判定：资源需同时满足「角色勾选（账户全部启用角色资源并集）」与「菜单管理全局开启」 */
@@ -617,7 +617,7 @@
     $('#nav').innerHTML=(menuOn(u,0)?`<button class="${hotActive?'active':''}" onclick="go('hotels')"><i>▦</i>酒店管理</button>`:'')
       +(u.admin?`<p>系统管理</p><button class="${view==='users'?'active':''}" onclick="go('users')"><i>☰</i>用户管理</button><button class="${view==='roles'?'active':''}" onclick="go('roles')"><i>✦</i>角色管理</button><button class="${view==='res'?'active':''}" onclick="go('res')"><i>⑃</i>菜单管理</button>`:'')
       +`<button class="${view==='profile'?'active':''}" onclick="go('profile')"><i>☺</i>我的信息</button>`;
-    $('#accbox').innerHTML=`<div class="account"><span class="avatar">${u.name[0]}</span><div class="account-meta"><b>${u.name}</b><small>${u.roles.join('、')}</small></div></div>`;
+    $('#accbox').innerHTML=`<div class="account"><span class="avatar">${u.phone.slice(0,3)}</span><div class="account-meta"><b>${u.phone}</b><small>${u.roles.join('、')}</small></div></div>`;
     $('#pageTitle').textContent=pageTitles[view];
     const hotelViews=['diag','tasks','detail','records'];
     const tabs=[['diag','诊断工作台'],['tasks','诊断任务'],['records','诊断日志']];
@@ -1386,76 +1386,69 @@
   /* ----- 通用：用户菜单 / 弹窗关闭 / 切换账号 ----- */
   function closeAccModal(){$('#modalRoot').innerHTML='';newAccOpen=false;accHotelsFor=null;editUserFor=null;delUserFor=null;resetFor=null;roleEditFor=null;resEditFor=null;resDelFor=null;roleNew=false}
 
-  /* ----- 用户管理：账户名 / 用户名称 / 角色 / 状态 / 创建 / 更新 ----- */
+  /* ----- 用户管理：手机号 / 角色 / 状态 / 创建 / 更新 ----- */
   function setUserQ(v){userQ=v;render();const i=$('#userSearch');if(i){i.focus();i.setSelectionRange(v.length,v.length)}}
   function resetUserQ(){userQ='';userStatus='all';render();toast('重置成功')}
-  function toggleUserStatus(ui,on){const u=users[ui];if(u.account==='admin'){toast('内置管理员账户不可禁用');return}u.status=on?1:0;u.updated=NEW_TS;render();toast(`已${on?'启用':'禁用'}账户「${u.name}」`)}
+  function toggleUserStatus(ui,on){const u=users[ui];if(u.admin){toast('内置管理员账户不可禁用');return}u.status=on?1:0;u.updated=NEW_TS;render();toast(`已${on?'启用':'禁用'}账户「${u.phone}」`)}
   function usersPage(){
     if(!users[curUser].admin)return denyPage('用户管理');
     const q=userQ.trim();
-    const list=users.filter(u=>(userStatus==='all'||String(u.status)===userStatus)&&(!q||u.name.includes(q)||u.account.includes(q)));
+    const list=users.filter(u=>(userStatus==='all'||String(u.status)===userStatus)&&(!q||u.phone.includes(q)));
     return `<div class="page">
     <div class="page-head"><div><h1>用户管理</h1><p>管理平台登录账户：新增账户、绑定角色、启用禁用与密码重置</p></div><button class="btn btn-primary" onclick="openNewAcc()">+ 新增账户</button></div>
     <div class="notice"><span class="notice-icon">ⓘ</span><div><b>子账户登录后仅可查看被配置的酒店；任务节点权限由管理员在菜单管理中统一开启或关闭</b></div></div>
     <div class="qbar">
-      <div class="qfield"><label>账户名 / 用户名称</label><input id="userSearch" value="${attr(userQ)}" placeholder="请输入账户名或用户名称" oninput="setUserQ(this.value)"></div>
+      <div class="qfield"><label>手机号</label><input id="userSearch" value="${attr(userQ)}" placeholder="请输入手机号" oninput="setUserQ(this.value)"></div>
       <div class="qfield"><label>账户状态</label><select onchange="userStatus=this.value;render()"><option value="all" ${userStatus==='all'?'selected':''}>全部</option><option value="1" ${userStatus==='1'?'selected':''}>启用</option><option value="0" ${userStatus==='0'?'selected':''}>禁用</option></select></div>
       <button class="btn btn-primary" onclick="render()">查询</button>
       <button class="btn btn-outline" onclick="resetUserQ()">重置</button>
     </div>
     <div class="panel">
       <div class="tbl-cap"><h3>数据列表</h3></div>
-      <div class="ugrid table-head"><span>账户名</span><span>用户名称</span><span>角色</span><span>账户状态</span><span>创建时间</span><span>更新时间</span><span style="text-align:right">操作</span></div>
+      <div class="ugrid table-head"><span>手机号</span><span>角色</span><span>账户状态</span><span>创建时间</span><span>更新时间</span><span style="text-align:right">操作</span></div>
       ${list.map(u=>{const ui=users.indexOf(u);return `<div class="ugrid srow">
-        <span class="time">${u.account}</span>
-        <span class="hotel-name">${u.name}</span>
+        <span class="hotel-name">${u.phone}</span>
         <span class="time">${u.roles.join('、')}</span>
         <span style="display:flex;align-items:center;gap:8px"><span class="sw ${u.status?'on':''}" onclick="toggleUserStatus(${ui},${u.status?0:1})"></span><small class="time">${u.status?'启用':'禁用'}</small></span>
         <span class="time">${u.created}</span>
         <span class="time">${u.updated}</span>
-        <span class="row-actions">${u.account==='admin'?'<span class="linkbtn dim">内置账户</span>':`<button class="linkbtn" onclick="openEditUser(${ui})">编辑</button><button class="linkbtn" onclick="openAccHotels(${ui})">配置酒店</button><button class="linkbtn" onclick="openResetPwd(${ui})">重置密码</button><button class="linkbtn danger" onclick="openDelUser(${ui})">删除</button>`}</span>
+        <span class="row-actions">${u.admin?'<span class="linkbtn dim">内置账户</span>':`<button class="linkbtn" onclick="openEditUser(${ui})">编辑</button><button class="linkbtn" onclick="openAccHotels(${ui})">配置酒店</button><button class="linkbtn" onclick="openResetPwd(${ui})">重置密码</button><button class="linkbtn danger" onclick="openDelUser(${ui})">删除</button>`}</span>
       </div>`}).join('')}
       <div class="tbl-foot"><small>共 ${list.length} 条</small><div class="pager"><button disabled>‹</button><button class="cur">1</button><button disabled>›</button></div></div>
     </div>
   </div>`}
-  function openNewAcc(){newAccOpen=true;newAcc={account:'',pwd:'',pwd2:'',name:'',roles:[],status:1};
-    smModal('新增账户','密码由 8-16 位数字、大小写字母组成，不能包含空格',
-    `<div class="field"><label>账户名</label><input value="${attr(newAcc.account)}" placeholder="请输入你的账户名!" oninput="newAcc.account=this.value"></div>
+  function openNewAcc(){newAccOpen=true;newAcc={phone:'',pwd:'',roles:[],status:1};
+    smModal('新增账户','手机号为登录凭证；密码由 8-16 位数字、大小写字母组成，不能包含空格',
+    `<div class="field"><label>手机号</label><input value="${attr(newAcc.phone)}" placeholder="请输入手机号" oninput="newAcc.phone=this.value"></div>
     <div class="field"><label>密码</label><input type="password" placeholder="请输入你的密码!" oninput="newAcc.pwd=this.value"></div>
-    <div class="field"><label>确认密码</label><input type="password" placeholder="请确认你的密码!" oninput="newAcc.pwd2=this.value"></div>
-    <div class="field"><label>用户名称</label><input value="${attr(newAcc.name)}" placeholder="请输入你的用户名称!" oninput="newAcc.name=this.value"></div>
     <div class="field"><label>角色（可多选）</label><div class="perm-grid">${ROLES.filter(r=>!r.builtin).map(r=>`<div class="perm-row"><span>${r.name}<small>${r.remark}</small></span><input type="checkbox" ${newAcc.roles.includes(r.name)?'checked':''} onchange="accRoleChk('${r.name}',this.checked)"></div>`).join('')}</div></div>
     <div class="field"><label>账户状态</label><div class="perm-row"><span>启用</span><span class="sw on" onclick="newAcc.status=newAcc.status?0:1;this.classList.toggle('on',!!newAcc.status);this.previousElementSibling.textContent=newAcc.status?'启用':'禁用'"></span></div></div>`,
     '确认新增','applyNewAcc()')}
   function accRoleChk(n,on){if(on&&!newAcc.roles.includes(n))newAcc.roles.push(n);if(!on)newAcc.roles=newAcc.roles.filter(x=>x!==n)}
   function applyNewAcc(){
-    if(!newAcc.account.trim()){toast('请输入你的账户名!');return}
-    if(/\s/.test(newAcc.account)){toast('禁止输入空格');return}
+    if(!newAcc.phone.trim()){toast('请输入手机号');return}
+    if(!/^1\d{10}$/.test(newAcc.phone.trim())){toast('请输入正确的 11 位手机号');return}
+    if(users.some(u=>u.phone===newAcc.phone.trim())){toast('该手机号已存在');return}
     const pe=pwdError(newAcc.pwd);if(pe){toast(pe);return}
-    if(!newAcc.pwd2){toast('请确认你的密码!');return}
-    if(newAcc.pwd!==newAcc.pwd2){toast('二次密码不一致');return}
-    if(!newAcc.name.trim()){toast('请输入你的用户名称!');return}
     if(!newAcc.roles.length){toast('请至少选择一个角色');return}
-    users.push({name:newAcc.name.trim(),account:newAcc.account.trim(),roles:[...newAcc.roles],phone:'',admin:false,status:newAcc.status,hotels:[],created:NEW_TS,updated:NEW_TS});
+    users.push({phone:newAcc.phone.trim(),roles:[...newAcc.roles],admin:false,status:newAcc.status,hotels:[],created:NEW_TS,updated:NEW_TS});
     closeAccModal();render();toast('操作成功')}
-  function openEditUser(ui){const u=users[ui];editUserFor=ui;utmp={name:u.name,roles:[...u.roles],status:u.status};
-    smModal('编辑账户','账户名为登录凭证，创建后不可修改',
-    `<div class="field"><label>账户名</label><input value="${attr(u.account)}" disabled></div>
-    <div class="field"><label>用户名称</label><input value="${attr(utmp.name)}" placeholder="请输入你的用户名称!" oninput="utmp.name=this.value"></div>
+  function openEditUser(ui){const u=users[ui];editUserFor=ui;utmp={roles:[...u.roles],status:u.status};
+    smModal('编辑账户','手机号为登录凭证，创建后不可修改',
+    `<div class="field"><label>手机号</label><input value="${attr(u.phone)}" disabled></div>
     <div class="field"><label>角色（可多选）</label><div class="perm-grid">${ROLES.filter(r=>!r.builtin).map(r=>`<div class="perm-row"><span>${r.name}<small>${r.remark}</small></span><input type="checkbox" ${utmp.roles.includes(r.name)?'checked':''} onchange="utmpRoleChk('${r.name}',this.checked)"></div>`).join('')}</div></div>
     <div class="field"><label>账户状态</label><div class="perm-row"><span>${utmp.status?'启用':'禁用'}</span><span class="sw ${utmp.status?'on':''}" onclick="utmp.status=utmp.status?0:1;this.classList.toggle('on',!!utmp.status);this.previousElementSibling.textContent=utmp.status?'启用':'禁用'"></span></div></div>`,
     '保存','applyEditUser('+ui+')')}
   function utmpRoleChk(n,on){if(on&&!utmp.roles.includes(n))utmp.roles.push(n);if(!on)utmp.roles=utmp.roles.filter(x=>x!==n)}
   function applyEditUser(ui){const u=users[ui];
-    if(!utmp.name.trim()){toast('请输入你的用户名称!');return}
     if(!utmp.roles.length){toast('请至少选择一个角色');return}
-    u.name=utmp.name.trim();u.roles=[...utmp.roles];u.status=utmp.status;u.updated=NEW_TS;
+    u.roles=[...utmp.roles];u.status=utmp.status;u.updated=NEW_TS;
     closeAccModal();render();toast('操作成功')}
-  function openResetPwd(ui){const u=users[ui];resetFor=ui;confirmModal('重置密码',`确认重置「${u.name}」的登录密码吗？重置后初始密码为 A1234567，请通知该用户尽快登录并修改密码。`,'applyResetPwd()')}
+  function openResetPwd(ui){const u=users[ui];resetFor=ui;confirmModal('重置密码',`确认重置「${u.phone}」的登录密码吗？重置后初始密码为 A1234567，请通知该用户尽快登录并修改密码。`,'applyResetPwd()')}
   function applyResetPwd(){closeAccModal();render();toast('重置成功，初始密码为 A1234567')}
   function openDelUser(ui){const u=users[ui];
     if(ui===curUser){toast('不能删除当前登录账户');return}
-    delUserFor=ui;confirmModal('删除提示',`确认删除该条数据吗?（账户「${u.account} · ${u.name}」）`,'applyDelUser()')}
+    delUserFor=ui;confirmModal('删除提示',`确认删除该条数据吗?（账户「${u.phone}」）`,'applyDelUser()')}
   function applyDelUser(){users.splice(delUserFor,1);closeAccModal();render();toast('删除成功')}
 
   /* ----- 新增酒店弹窗 ----- */
@@ -1470,12 +1463,12 @@
   /* ----- 配置酒店 / 任务权限（业务数据权限，按账户维度） ----- */
   function openAccHotels(ui){accHotelsFor=ui;renderAccHotels()}
   function renderAccHotels(){const u=users[accHotelsFor];$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
-    <h3>配置酒店 · ${u.name}</h3><p class="m-sub">勾选后该酒店将出现在子账户的酒店管理页面，可查看和诊断</p>
+    <h3>配置酒店 · ${u.phone}</h3><p class="m-sub">勾选后该酒店将出现在子账户的酒店管理页面，可查看和诊断</p>
     ${hotels.map((h,i)=>`<label class="perm-row ${u.hotels.includes(i)?'':'off'}"><span><b>${h.name}</b><small>${h.sub}</small></span><input type="checkbox" ${u.hotels.includes(i)?'checked':''} onchange="toggleAccHotel(${i},this.checked)"></label>`).join('')}
     <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="saveAccHotels()">保存配置</button></div>
   </div></div>`}
   function toggleAccHotel(i,on){const u=users[accHotelsFor];if(on&&!u.hotels.includes(i))u.hotels.push(i);if(!on)u.hotels=u.hotels.filter(x=>x!==i);renderAccHotels()}
-  function saveAccHotels(){const u=users[accHotelsFor];closeAccModal();render();toast(`已保存 ${u.name} 的酒店配置（${u.hotels.length} 家）`)}
+  function saveAccHotels(){const u=users[accHotelsFor];closeAccModal();render();toast(`已保存 ${u.phone} 的酒店配置（${u.hotels.length} 家）`)}
 
   /* ----- 角色管理：角色绑定菜单/按钮/接口三类资源 ----- */
   function toggleRoleStatus(ri,on){const r=ROLES[ri];if(r.builtin){toast('内置角色不可停用');return}r.status=on?1:0;render();toast(`已${on?'启用':'停用'}角色「${r.name}」`)}
@@ -1652,8 +1645,7 @@
     <div class="page-head"><div><h1>我的信息</h1><p>查看当前登录账户信息，定期修改密码保障账户安全</p></div></div>
     <div class="card"><h3>账户信息</h3>
       <div class="perm-grid" style="margin-top:10px">
-        <div class="perm-row"><span class="time">账户名</span><b>${u.account}</b></div>
-        <div class="perm-row"><span class="time">用户名称</span><b>${u.name}</b></div>
+        <div class="perm-row"><span class="time">手机号</span><b>${u.phone}</b></div>
         <div class="perm-row"><span class="time">角色</span><b>${u.roles.join('、')}</b></div>
         <div class="perm-row"><span class="time">账户状态</span><span class="badge ${u.status?'ok':'expired'}"><i></i>${u.status?'启用':'禁用'}</span></div>
       </div>
