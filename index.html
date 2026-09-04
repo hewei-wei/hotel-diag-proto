@@ -698,7 +698,7 @@
     </div>
   </div>`}
   /* 日历房早餐份数：仅展示本任务不通过的房型，通过房型不在任务内展示、也不生成任务（与《抖音来客诊断规则表A》「日历房房型与早餐份数」一致） */
-  const calTask=(advice,room)=>({advice,src:[['酒店','尚宽酒店（重庆西站华岩寺店）· 抖音来客'],['数据范围','日历房已上架 10 个 · 覆盖房型 6/6'],['早餐份数不一致','2 个房型 · 本任务仅处理当前房型']],ignore:'此次忽略',cal:{room}});
+  const calTask=(advice,room)=>({advice,ignore:'此次忽略',cal:{room}});
   /* 房型信息核对：逐字段差异与修改内容（与《抖音来客诊断规则表A》「房型信息」一致） */
   const rtTask=(advice,src,diffs)=>({noAdvice:true,advice,src,ignore:'此次忽略',rt:{diffs}});
   /* 床型修改控件：与抖音来客「床型」表单一致 —— 单选 1张床/2张床/多张床；2张床先选双床类型（相同床/不同床），再填床型设置（床型 + 床宽米） */
@@ -802,8 +802,9 @@
           '感谢您的耐心反馈。我们已复盘当日排房流程，明确超售时须第一时间致歉并提供补偿方案，前台应急培训已完成，欢迎您再次选择我们。']}
       ]},
     '商家经营分-评价分提升':{advice:'本酒店好评率较低，每日至少达到 3 条以上抖音店铺好评，请提醒酒店线下完成此任务。',src:[['好评情况','好评率较低'],['目标要求','每日 3 条以上抖音店铺好评'],['完成方式','酒店线下完成后确认']],offline:true},
-    '团购商品核对任务':{advice:'团购商品共 4 类 5 项不通过：钟点房团购缺失；携程最高价房型「豪华景观双床房」三天两晚团购缺失；携程第二低价格房型「景观大床房」2天1晚团购缺失（三天两晚已在售）；商品「【三天两晚】悦享双床房＋双人早餐」当前售价高于携程对比总价；商品「来重庆西站别踩雷！2天1晚｜周末不加价」名称需修改。请逐项核对以下内容，全部内容均可修改，提交后 AI 按确认结果写入抖音来客。',src:[['覆盖要求','最低价 2天1晚 · 第二低 三天两晚＋2天1晚 · 最高价 三天两晚 · 钟点房'],['覆盖情况','景观棋牌娱乐房 2天1晚在售 · 景观大床房缺 2天1晚 · 豪华景观双床房缺 三天两晚 · 钟点房缺失'],['最近节假日','中秋节 09-25 至 09-27']],ignore:'此次忽略',
+    '团购商品核对任务':{advice:'团购商品共 4 类 5 项不通过：钟点房团购缺失；携程最高价房型「豪华景观双床房」三天两晚团购缺失；携程第二低价格房型「景观大床房」2天1晚团购缺失（三天两晚已在售）；商品「【三天两晚】悦享双床房＋双人早餐」当前售价高于携程对比总价；商品「来重庆西站别踩雷！2天1晚｜周末不加价」名称需修改。请逐项核对以下内容，全部内容均可修改，提交后 AI 按确认结果写入抖音来客。',ignore:'此次忽略',
       gbuy:{
+        tip:'识别到抖音来客团购缺失景观大床房两天一晚预售和豪华景观双床房三天两晚套餐，下面将进行补充。',
         hour:{text:'检测到团购管理中没有钟点房，需要与酒店确认并建议去抖音来客系统新增钟点房团购，方便为酒店引流。'},
         plans:[
           {room:'景观大床房',tag:'2天1晚团购商品（缺失）',cat:'住宿/酒店宾馆/舒适型酒店',ptype:'预售券',slot:'全日房',name:'景观大床房1晚＋双人早餐＋华岩寺',mealQty:'2',nights:'1',list:'399',price:'303',img:true,holiday:'节假日不可用（全年节假日均不可入住）',book:'需要提前预约 · 提前 1 天',tin:'14:00',tout:'12:00'},
@@ -949,10 +950,10 @@
         <button class="btn btn-primary" onclick="finishTask('执行中','找店指引已提交，AI 正在同步至抖音来客')" ${guideMode==null?'disabled':''}>提交</button>`;
     }else{
       const c=taskDetailCfg[t.name]||{advice:`「${t.path}」检查不通过，已生成处理建议。请确认以下建议内容，提交后写入抖音来客。`,src:[['检查项',t.path],...(t.type?[['任务类型',t.type]]:[]),['诊断时间',t.diagTime]],fields:[]};
-      main=`<div class="section"><h3>1　来源数据与差异</h3>
+      main=`${c.src?`<div class="section"><h3>1　来源数据与差异</h3>
         <div class="source">${c.src.map(x=>`<div><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}</div>
-      </div>
-      ${c.reviews?`<div class="section"><h3>2　逐条回复（共 ${c.reviews.length} 条）</h3>
+      </div>`:''}
+      ${c.reviews?`<div class="section"><h3>${c.src?2:1}　逐条回复（共 ${c.reviews.length} 条）</h3>
         <p class="review-tip">每条评价提供三套答复语供选择，选中内容同步展示在下方编辑框中，可修改后一并提交。</p>
         ${c.reviews.map((r,i)=>{const sel=replySel[i]||0;const txt=replyText[i]!==undefined?replyText[i]:r.replies[sel];
           return `<div class="review-item">
@@ -964,8 +965,8 @@
           <div class="reply-edit"><small>回复内容（可修改后提交）</small><textarea oninput="setReplyText(${i},this.value)">${txt}</textarea></div>
         </div>`}).join('')}
       </div>`
-      :c.gbuy?`${c.gbuy.plans.length?`<div class="section"><h3>2　需新增的团购商品（共 ${c.gbuy.plans.length} 个方案）</h3>
-        <p class="review-tip">以下房型缺少覆盖要求中的团购商品。以下新增方案已按抖音来客「创建商品」表单预填全部字段，均可修改；各方案可独立确认，默认均为确认新增。</p>
+      :c.gbuy?`${c.gbuy.plans.length?`<div class="section"><h3>1　需新增的团购商品（共 ${c.gbuy.plans.length} 个方案）</h3>
+        <p class="review-tip">${c.gbuy.tip}</p>
         ${c.gbuy.plans.map((p,i)=>`<div class="gb-card">
           <div class="gb-head"><b>${p.room} · ${p.tag}<small>${p.name}</small></b>
             <label class="act-sel"><span>新增意向</span><select onchange="setGbSel('m${i}',this.value)"><option${(gbSel['m'+i]||'确认新增')==='确认新增'?' selected':''}>确认新增</option><option${gbSel['m'+i]==='暂不新增'?' selected':''}>暂不新增</option></select></label></div>
@@ -991,13 +992,13 @@
           ${gbRow('消费规则（入离时间）',`<span class="gb-unit">最早入住</span><input class="gb-in gb-time" type="text" value="${p.tin}"><span class="gb-unit">最晚退房</span><input class="gb-in gb-time" type="text" value="${p.tout}">`)}
         </div>`).join('')}
       </div>`:''}
-      ${c.gbuy.hour?`<div class="section"><h3>3　钟点房团购提示</h3>
+      ${c.gbuy.hour?`<div class="section"><h3>2　钟点房团购提示</h3>
         <div class="gb-card">
           <div class="gb-head"><b>钟点房团购（缺失）</b><label class="act-sel"><span>处理意向</span><select onchange="setGbSel('h0',this.value)"><option${(gbSel['h0']||'去与酒店确认')==='去与酒店确认'?' selected':''}>去与酒店确认</option><option${gbSel['h0']==='暂不处理'?' selected':''}>暂不处理</option></select></label></div>
           <p class="review-tip" style="margin:0">${c.gbuy.hour.text}</p>
         </div>
       </div>`:''}
-      ${c.gbuy.prices.length?`<div class="section"><h3>${c.gbuy.hour?4:3}　价格需修改的商品（共 ${c.gbuy.prices.length} 个）</h3>
+      ${c.gbuy.prices.length?`<div class="section"><h3>${c.gbuy.hour?3:2}　价格需修改的商品（共 ${c.gbuy.prices.length} 个）</h3>
         <p class="review-tip">以下商品当前售价高于携程对比总价，建议售价已预填、可修改，确认后 AI 按修改后的价格写入抖音来客。</p>
         ${c.gbuy.prices.map((p,i)=>`<div class="gb-card">
           <div class="gb-head"><b>${p.prod}<small>${p.sub}</small></b>
@@ -1006,7 +1007,7 @@
           ${gbRow('建议售价',`<input class="gb-in gb-num" type="text" value="${p.suggest}"><span class="gb-unit">元 · 已按携程对比结果预填，可修改</span>`,true)}
         </div>`).join('')}
       </div>`:''}
-      ${c.gbuy.names.length?`<div class="section"><h3>${c.gbuy.hour?5:4}　名称需修改的商品（共 ${c.gbuy.names.length} 个）</h3>
+      ${c.gbuy.names.length?`<div class="section"><h3>${c.gbuy.hour?4:3}　名称需修改的商品（共 ${c.gbuy.names.length} 个）</h3>
         <p class="review-tip">以下商品名称需修改，建议名称已预填、可修改，确认后 AI 按修改后的名称写入抖音来客。</p>
         ${c.gbuy.names.map((n,i)=>`<div class="gb-card">
           <div class="gb-head"><b>${n.prod}<small>${n.sub}</small></b>
@@ -1124,7 +1125,7 @@
           ${f.rows.map(r=>facRow(r,fi)).join('')}
         </div>`).join('')}
       </div>`
-      :c.cal?`<div class="section"><h3>2　本次不通过房型（仅本任务）</h3>
+      :c.cal?`<div class="section"><h3>1　本次不通过房型（仅本任务）</h3>
         <div class="gb-card">
           <div class="gb-head"><b>${c.cal.room.roomName}<small>日历房：${c.cal.room.calName} · ID：${c.cal.room.calId} · 已上架</small></b><i class="tag red">早餐份数不一致</i></div>
           ${gbRow('适用房型',`<b>${c.cal.room.roomName}</b><span class="gb-unit">物理房型 ID：${c.cal.room.roomId} · ${c.cal.room.spec}</span>`)}
