@@ -135,6 +135,40 @@
   .empty-state{padding:56px 0;text-align:center;color:var(--ink-3)}
   .empty-state i{display:grid;place-items:center;width:44px;height:44px;margin:0 auto 10px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);font-size:17px;font-style:normal;color:var(--ink-4)}
 
+  /* 系统管理：查询区 + 数据列表 + 分页（对齐 Ant Design Pro 表格样式） */
+  .qbar{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;padding:14px 18px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--shadow-sm);margin-bottom:14px}
+  .qfield{display:flex;flex-direction:column;gap:5px}
+  .qfield>label{font-size:12px;color:var(--ink-3)}
+  .qfield input,.qfield select{height:34px;min-width:190px;border:1px solid #d1d5db;border-radius:var(--r-sm);padding:0 10px;font-size:13px;color:var(--ink);background:var(--surface)}
+  .qfield input:focus,.qfield select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .tbl-cap{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px}
+  .tbl-cap h3{margin:0;font-size:14px;font-weight:600}
+  .tbl-cap small{font-size:12px;color:var(--ink-4);font-variant-numeric:tabular-nums}
+  .ugrid{display:grid;grid-template-columns:1.05fr 1fr 1.1fr .75fr 1.1fr 1.1fr minmax(230px,1.5fr);align-items:center;gap:10px;padding:0 18px}
+  .rgrid{display:grid;grid-template-columns:1.05fr .7fr 1.7fr 1.7fr minmax(120px,.9fr);align-items:center;gap:10px;padding:0 18px}
+  .resgrid{display:grid;grid-template-columns:minmax(230px,2.1fr) .8fr 1.25fr 1.25fr .55fr minmax(130px,1fr);align-items:center;gap:10px;padding:0 18px}
+  .srow{min-height:52px;border-bottom:1px solid var(--line-soft);transition:background .15s}
+  .srow:hover{background:#fafbfc}
+  .srow:last-child{border-bottom:0}
+  .tree-tw{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-right:8px;border:1px solid #d1d5db;border-radius:4px;font-size:10px;color:var(--ink-3);cursor:pointer;user-select:none;flex:none}
+  .tree-tw:hover{border-color:var(--primary);color:var(--primary)}
+  .typechip{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:6px;font-size:11.5px;font-weight:500}
+  .typechip.tmenu{background:var(--primary-soft);color:var(--primary)}
+  .typechip.tbtn{background:#ecfdf5;color:#059669}
+  .typechip.tapi{background:#fef3c7;color:#b45309}
+  .linkbtn{background:none;border:0;padding:0;height:auto;font-size:12.5px;color:var(--primary);cursor:pointer;font-weight:400}
+  .linkbtn:hover{text-decoration:underline}
+  .linkbtn.danger{color:#dc2626}
+  .linkbtn.dim{color:var(--ink-4);cursor:default}
+  .linkbtn.dim:hover{text-decoration:none}
+  .tbl-foot{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--line);background:var(--surface)}
+  .tbl-foot small{font-size:12px;color:var(--ink-4);font-variant-numeric:tabular-nums}
+  .pager{display:flex;gap:5px}
+  .pager button{min-width:28px;height:28px;padding:0 7px;border:1px solid #d1d5db;border-radius:6px;font-size:12.5px;color:var(--ink-2);background:var(--surface)}
+  .pager button.cur{background:var(--primary);border-color:var(--primary);color:#fff}
+  .pager button:disabled{color:var(--ink-4);cursor:not-allowed;background:var(--surface)}
+  .umenu .udiv{height:1px;background:var(--line);margin:5px 4px}
+
   /* 二级导航（右侧内容区顶部，进入酒店后展示） */
   .subnav{position:sticky;top:60px;z-index:15;display:flex;align-items:center;gap:16px;height:52px;padding:0 32px;background:var(--surface);border-bottom:1px solid var(--line)}
   .sub-back{flex:none;display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-3);height:30px;padding:0 10px;border-radius:var(--r-sm)}
@@ -511,14 +545,41 @@
   const TASK_DEFS=[...new Set(diagSteps.flatMap(s=>s.items.map(i=>i[0])))].map(n=>({key:n,name:n,on:1}));
   const TASK_NODES=TASK_DEFS.map(d=>d.key);
   const TASK_GROUPS=diagSteps.map(s=>({path:s.path,defs:TASK_DEFS.filter(d=>s.items.some(i=>i[0]===d.key))}));
-  const users=[
-    {name:'禾薇运营',role:'管理员',phone:'138 8888 6620',admin:true},
-    {name:'李春燕',role:'普通员工',phone:'139 0752 3368',admin:false,hotels:[0,1],tasks:{}},
-    {name:'王芷琪',role:'普通员工',phone:'136 2291 7745',admin:false,hotels:[2],tasks:{'待回复中差评':false}}
+  /* ===== 系统管理（RBAC 标准）：账号 —角色—资源 三层关系 =====
+     资源树 = 菜单 / 按钮 / 接口 三类；诊断任务节点作为「诊断任务」菜单下的按钮级资源；
+     permMenus / permButtons / TASK_DEFS 是运行时权限状态，菜单管理页的资源树直接读写它们 */
+  const API_RES_HOTELS=[{name:'查询酒店列表',code:'GET /api/hotels',path:'/api/hotels',on:1},{name:'新增酒店',code:'POST /api/hotels',path:'/api/hotels',on:1},{name:'保存平台授权',code:'POST /api/hotels/auth',path:'/api/hotels/auth',on:1}];
+  const API_RES_DIAG=[{name:'发起诊断',code:'POST /api/diag/start',path:'/api/diag/start',on:1},{name:'查询诊断进度',code:'GET /api/diag/steps',path:'/api/diag/steps',on:1},{name:'生成诊断任务',code:'POST /api/diag/tasks',path:'/api/diag/tasks',on:1}];
+  const API_RES_TASKS=[{name:'查询任务列表',code:'GET /api/tasks',path:'/api/tasks',on:1},{name:'提交任务修改',code:'POST /api/tasks/submit',path:'/api/tasks/submit',on:1},{name:'忽略任务',code:'POST /api/tasks/ignore',path:'/api/tasks/ignore',on:1}];
+  const API_RES_RECORDS=[{name:'查询诊断日志',code:'GET /api/diag/records',path:'/api/diag/records',on:1}];
+  const MENU_META=[
+    {code:'hotel',path:'/hotels',comp:'hotels/index',desc:'酒店接入、平台授权与诊断入口',api:()=>API_RES_HOTELS},
+    {code:'hotel:diag',path:'/diag',comp:'diag/index',desc:'连接抖音来客与携程执行联合诊断',api:()=>API_RES_DIAG},
+    {code:'hotel:tasks',path:'/tasks',comp:'tasks/index',desc:'诊断任务处理与跟踪',api:()=>API_RES_TASKS},
+    {code:'hotel:records',path:'/records',comp:'records/index',desc:'历史诊断记录查看',api:()=>API_RES_RECORDS}
   ];
-  let curUser=0,userMenuOpen=false,newAccOpen=false,accHotelsFor=null,accTasksFor=null,newAcc={name:'',phone:''},newHotel={name:''},renaming=null;
+  const SYS_MENUS=[
+    {name:'用户管理',code:'sys:user',path:'/system/users',comp:'system/user/index',apis:[{name:'查询账户列表',code:'GET /api/sys/users',path:'/api/sys/users',on:1},{name:'保存账户',code:'POST /api/sys/users',path:'/api/sys/users',on:1},{name:'重置密码',code:'POST /api/sys/users/reset-pwd',path:'/api/sys/users/reset-pwd',on:1}]},
+    {name:'角色管理',code:'sys:role',path:'/system/roles',comp:'system/role/index',apis:[{name:'查询角色列表',code:'GET /api/sys/roles',path:'/api/sys/roles',on:1},{name:'保存角色',code:'POST /api/sys/roles',path:'/api/sys/roles',on:1}]},
+    {name:'菜单管理',code:'sys:menu',path:'/system/menus',comp:'system/menu/index',apis:[{name:'查询资源树',code:'GET /api/sys/resources',path:'/api/sys/resources',on:1},{name:'保存资源',code:'POST /api/sys/resources',path:'/api/sys/resources',on:1}]}
+  ];
+  const ROLES=[
+    {name:'超级管理员',status:1,builtin:1,remark:'系统内置角色，拥有全部菜单、按钮、接口权限；不可编辑与删除',menus:'all'},
+    {name:'运营管理员',status:1,remark:'负责酒店接入、平台授权与诊断全流程管理',menus:[0,1,2,3]},
+    {name:'酒店店长',status:1,remark:'查看本店诊断结果并处理诊断任务',menus:[0,1,2]},
+    {name:'质检专员',status:1,remark:'只读查看诊断任务与诊断日志',menus:[2,3]}
+  ];
+  const PWD_HIST=['Jqd@2026','Jqd@2025','Jqd@2024'];
+  const NEW_TS='2026-09-04 15:20';
+  const users=[
+    {name:'禾薇运营',account:'admin',roles:['超级管理员'],phone:'138 8888 6620',admin:true,status:1,created:'2026-05-12 09:20',updated:'2026-08-26 14:02'},
+    {name:'李春燕',account:'lichunyan',roles:['运营管理员'],phone:'139 0752 3368',admin:false,status:1,hotels:[0,1],tasks:{},created:'2026-06-18 10:24',updated:'2026-08-30 11:47'},
+    {name:'王芷琪',account:'wangzhiqi',roles:['酒店店长'],phone:'136 2291 7745',admin:false,status:1,hotels:[2],tasks:{'待回复中差评':false},created:'2026-07-02 16:05',updated:'2026-09-01 09:33'}
+  ];
+  let curUser=0,userMenuOpen=false,newAccOpen=false,accHotelsFor=null,accTasksFor=null,editUserFor=null,delUserFor=null,resetFor=null,roleEditFor=null,resEditFor=null,resDelFor=null,roleNew=false,
+      newAcc={account:'',pwd:'',pwd2:'',name:'',roles:[],status:1},utmp={name:'',roles:[]},rtmp={name:'',remark:'',menus:[],status:1},ntmp=null,pwdForm={p1:'',p2:''},
+      userQ='',userStatus='all',resQ='',resType='all',resOpen={m0:true},resCustom=[],newHotel={name:''};
   const isSub=()=>!users[curUser].admin;
-  const subUsers=()=>users.filter(u=>!u.admin);
   const menuOn=(u,k)=>u.admin||permMenus[k].on===1;
   const btnOn=k=>users[curUser].admin||(permButtons.find(b=>b.key===k)||{on:1}).on===1;
   const taskOn=(u,node)=>u.admin||((TASK_DEFS.find(d=>d.key===node)||{on:1}).on===1&&u.tasks[node]!==false);
@@ -557,15 +618,16 @@
 
   function toast(msg){const el=$('#toast');el.innerHTML=`<i>✓</i>${msg}`;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2300)}
 
-  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',records:'诊断日志',account:'账号管理',perms:'权限管理'};
+  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',records:'诊断日志',users:'用户管理',roles:'角色管理',res:'菜单管理',profile:'我的信息'};
+  const isSysView=v=>v==='users'||v==='roles'||v==='res';
   function nav(){
     const u=users[curUser];
-    const hotActive=view!=='account'&&view!=='perms';
+    const hotActive=!isSysView(view)&&view!=='profile';
     $('#nav').innerHTML=(menuOn(u,0)?`<button class="${hotActive?'active':''}" onclick="go('hotels')"><i>▦</i>酒店管理</button>`:'')
-      +(u.admin?`<p>系统管理</p><button class="${view==='account'?'active':''}" onclick="go('account')"><i>⚙</i>账号管理</button><button class="${view==='perms'?'active':''}" onclick="go('perms')"><i>✦</i>权限管理</button>`:'');
+      +(u.admin?`<p>系统管理</p><button class="${view==='users'?'active':''}" onclick="go('users')"><i>☰</i>用户管理</button><button class="${view==='roles'?'active':''}" onclick="go('roles')"><i>✦</i>角色管理</button><button class="${view==='res'?'active':''}" onclick="go('res')"><i>⑃</i>菜单管理</button>`:'');
     $('#accbox').innerHTML=`<div class="accwrap">
-      <div class="account" onclick="toggleUserMenu()"><span class="avatar">${u.name[0]}</span><div class="account-meta"><b>${u.name}</b><small>${u.role}</small></div><span>⌄</span></div>
-      ${userMenuOpen?`<div class="umenu"><p>切换账号</p>${users.map((x,xi)=>`<button class="umitem ${xi===curUser?'cur':''}" onclick="switchUser(${xi})"><b>${x.name}</b><i>${x.role}</i></button>`).join('')}</div>`:''}
+      <div class="account" onclick="toggleUserMenu()"><span class="avatar">${u.name[0]}</span><div class="account-meta"><b>${u.name}</b><small>${u.roles.join('、')}</small></div><span>⌄</span></div>
+      ${userMenuOpen?`<div class="umenu"><p>切换账号</p>${users.map((x,xi)=>`<button class="umitem ${xi===curUser?'cur':''}" onclick="switchUser(${xi})"><b>${x.name}</b><i>${x.roles.join('、')}${x.status===0?' · 已禁用':''}</i></button>`).join('')}<div class="udiv"></div><button class="umitem" onclick="go('profile')"><b>我的信息</b><i>账户与密码</i></button></div>`:''}
     </div>`;
     $('#pageTitle').textContent=pageTitles[view];
     const hotelViews=['diag','tasks','detail','records'];
@@ -577,7 +639,7 @@
     </div>`:'';
   }
   function go(v){const vk={hotels:0,diag:1,tasks:2,detail:2,records:3}[v];
-    if((v==='account'||v==='perms')&&!users[curUser].admin){toast('仅管理员可访问系统管理');return}
+    if(isSysView(v)&&!users[curUser].admin){toast('仅管理员可访问系统管理');return}
     if(vk!=null&&!menuOn(users[curUser],vk)){toast('当前账号未开通该页面权限，请联系管理员');return}
     view=v;if(v==='hotels')activeHotel=null;render()}
   function diagnose(i){if(!both(hotels[i]))return;if(isSub()&&!users[curUser].hotels.includes(i)){toast('该酒店未配置给您，请联系管理员');return}activeHotel=hotels[i];if(!diagRun||diagRun.hotel!==hotels[i])initDiag();diagRun.hotel=hotels[i];view='diag';render()}
@@ -1329,40 +1391,92 @@
     </div>
   </div>`}
 
-  /* ===== 账号管理 ===== */
-  /* ===== 账号管理：管理员管理名下子账号（新增 / 配置酒店 / 任务权限恢复） ===== */
+  /* ===== 系统管理：用户管理 / 角色管理 / 菜单管理 / 我的信息（RBAC 标准；表格样式对齐 Ant Design Pro） ===== */
   const hotelName=i=>hotels[i].name;
-  const accHotelTags=u=>u.hotels.length?u.hotels.map(hotelName).join('、'):'未配置酒店';
-  const accTaskStat=u=>{const closed=Object.keys(u.tasks).filter(k=>u.tasks[k]===false).length;return closed?`${closed} 项已关闭`:'全部开启'};
-  function accountPage(){
-    if(!users[curUser].admin)return `<div class="page"><div class="page-head"><div><h1>账号管理</h1></div></div><div class="empty-state"><i>🔒</i>仅管理员可访问账号管理</div></div>`;
+  const denyPage=t=>`<div class="page"><div class="page-head"><div><h1>${t}</h1></div></div><div class="empty-state"><i>🔒</i>仅管理员可访问${t}</div></div>`;
+  const RES_LABEL={menu:'菜单',btn:'按钮',api:'接口'};
+  const smModal=(title,sub,body,ok,fn)=>{$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">${title?`<h3>${title}</h3>`:''}${sub?`<p class="m-sub">${sub}</p>`:''}${body}<div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="${fn}">${ok}</button></div></div></div>`};
+  const confirmModal=(title,msg,fn)=>smModal(title,'',`<p style="margin:0;font-size:13px;color:var(--ink-2)">${msg}</p>`,'确定',fn);
+  /* 密码策略统一校验：返回错误文案或 null */
+  const pwdError=p=>!p?'请输入你的密码!':/\s/.test(p)?'密码不能包含空格':p.length<8||p.length>16?'密码长度必须在8-16位之间':!(/[0-9]/.test(p)&&/[A-Z]/.test(p)&&/[a-z]/.test(p)&&/[^0-9a-zA-Z]/.test(p))?'密码必须包含数字、大写字母、小写字母和特殊符号':null;
+
+  /* ----- 通用：用户菜单 / 弹窗关闭 / 切换账号 ----- */
+  function toggleUserMenu(){userMenuOpen=!userMenuOpen;render()}
+  function switchUser(xi){const x=users[xi];if(x.status===0){userMenuOpen=false;render();toast('该账户已禁用，无法登录');return}curUser=xi;userMenuOpen=false;view='hotels';activeHotel=null;render();toast('已切换为 '+x.name)}
+  function closeAccModal(){$('#modalRoot').innerHTML='';newAccOpen=false;accHotelsFor=null;accTasksFor=null;editUserFor=null;delUserFor=null;resetFor=null;roleEditFor=null;resEditFor=null;resDelFor=null;roleNew=false}
+
+  /* ----- 用户管理：账户名 / 用户名称 / 角色 / 状态 / 创建 / 更新 ----- */
+  function setUserQ(v){userQ=v;render();const i=$('#userSearch');if(i){i.focus();i.setSelectionRange(v.length,v.length)}}
+  function resetUserQ(){userQ='';userStatus='all';render();toast('重置成功')}
+  function toggleUserStatus(ui,on){const u=users[ui];if(u.account==='admin'){toast('内置管理员账户不可禁用');return}u.status=on?1:0;u.updated=NEW_TS;render();toast(`已${on?'启用':'禁用'}账户「${u.name}」`)}
+  function usersPage(){
+    if(!users[curUser].admin)return denyPage('用户管理');
+    const q=userQ.trim();
+    const list=users.filter(u=>(userStatus==='all'||String(u.status)===userStatus)&&(!q||u.name.includes(q)||u.account.includes(q)));
     return `<div class="page">
-    <div class="page-head"><div><h1>账号管理</h1><p>管理您名下的子账号：新增子账号、配置可查看的酒店、恢复被关闭的任务权限</p></div><button class="btn btn-primary" onclick="openNewAcc()">+ 新增子账号</button></div>
-    <div class="notice"><span class="notice-icon">ⓘ</span><div><b>子账号登录后仅可查看和诊断被配置的酒店；子账号将任务处理为「以后不再提醒」后，该任务权限自动关闭，可在此恢复</b></div></div>
+    <div class="page-head"><div><h1>用户管理</h1><p>管理平台登录账户：新增账户、绑定角色、启用禁用与密码重置</p></div><button class="btn btn-primary" onclick="openNewAcc()">+ 新增账户</button></div>
+    <div class="notice"><span class="notice-icon">ⓘ</span><div><b>子账户登录后仅可查看被配置的酒店；任务处理为「以后不再提醒」后对应任务权限自动关闭，可在「任务权限」中恢复</b></div></div>
+    <div class="qbar">
+      <div class="qfield"><label>账户名 / 用户名称</label><input id="userSearch" value="${attr(userQ)}" placeholder="请输入账户名或用户名称" oninput="setUserQ(this.value)"></div>
+      <div class="qfield"><label>账户状态</label><select onchange="userStatus=this.value;render()"><option value="all" ${userStatus==='all'?'selected':''}>全部</option><option value="1" ${userStatus==='1'?'selected':''}>启用</option><option value="0" ${userStatus==='0'?'selected':''}>禁用</option></select></div>
+      <button class="btn btn-primary" onclick="render()">查询</button>
+      <button class="btn btn-outline" onclick="resetUserQ()">重置</button>
+    </div>
     <div class="panel">
-      <div class="grid-row table-head"><span>子账号</span><span>手机号</span><span>配置酒店</span><span>任务权限</span><span style="text-align:right">操作</span></div>
-      ${subUsers().map(u=>{const ui=users.indexOf(u);return `<div class="grid-row hotel-row">
+      <div class="tbl-cap"><h3>数据列表</h3></div>
+      <div class="ugrid table-head"><span>账户名</span><span>用户名称</span><span>角色</span><span>账户状态</span><span>创建时间</span><span>更新时间</span><span style="text-align:right">操作</span></div>
+      ${list.map(u=>{const ui=users.indexOf(u);return `<div class="ugrid srow">
+        <span class="time">${u.account}</span>
         <span class="hotel-name">${u.name}</span>
-        <span class="time">${u.phone}</span>
-        <span class="time ${u.hotels.length?'':'empty'}">${accHotelTags(u)}</span>
-        <span class="time">${accTaskStat(u)}</span>
-        <span class="row-actions"><button class="btn btn-outline" onclick="openAccHotels(${ui})">配置酒店</button><button class="btn btn-outline" onclick="openAccTasks(${ui})">任务权限</button></span>
+        <span class="time">${u.roles.join('、')}</span>
+        <span style="display:flex;align-items:center;gap:8px"><span class="sw ${u.status?'on':''}" onclick="toggleUserStatus(${ui},${u.status?0:1})"></span><small class="time">${u.status?'启用':'禁用'}</small></span>
+        <span class="time">${u.created}</span>
+        <span class="time">${u.updated}</span>
+        <span class="row-actions">${u.account==='admin'?'<span class="linkbtn dim">内置账户</span>':`<button class="linkbtn" onclick="openEditUser(${ui})">编辑</button><button class="linkbtn" onclick="openAccHotels(${ui})">配置酒店</button><button class="linkbtn" onclick="openAccTasks(${ui})">任务权限</button><button class="linkbtn" onclick="openResetPwd(${ui})">重置密码</button><button class="linkbtn danger" onclick="openDelUser(${ui})">删除</button>`}</span>
       </div>`}).join('')}
+      <div class="tbl-foot"><small>共 ${list.length} 条</small><div class="pager"><button disabled>‹</button><button class="cur">1</button><button disabled>›</button></div></div>
     </div>
   </div>`}
-  /* ----- 子账号相关弹窗与操作 ----- */
-  function toggleUserMenu(){userMenuOpen=!userMenuOpen;render()}
-  function switchUser(xi){curUser=xi;userMenuOpen=false;view='hotels';activeHotel=null;render();toast('已切换为 '+users[xi].name)}
-  function closeAccModal(){$('#modalRoot').innerHTML='';newAccOpen=false;accHotelsFor=null;accTasksFor=null}
-  function openNewAcc(){newAccOpen=true;$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
-    <h3>新增子账号</h3><p class="m-sub">创建后默认开通全部菜单权限，可再按需调整</p>
-    <div class="field"><label>员工姓名</label><input id="accName" value="${attr(newAcc.name)}" placeholder="请输入员工姓名" oninput="newAcc.name=this.value"></div>
-    <div class="field"><label>登录手机号</label><input id="accPhone" value="${attr(newAcc.phone)}" placeholder="请输入手机号" oninput="newAcc.phone=this.value"></div>
-    <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="applyNewAcc()">确认新增</button></div>
-  </div></div>`}
-  function applyNewAcc(){if(!newAcc.name.trim()||!newAcc.phone.trim()){toast('请填写姓名和手机号');return}
-    users.push({name:newAcc.name.trim(),role:'普通员工',phone:newAcc.phone.trim(),admin:false,hotels:[],menus:[1,1,1,1],tasks:{}});
-    newAcc={name:'',phone:''};closeAccModal();render();toast('子账号已创建，已默认开通全部菜单权限')}
+  function openNewAcc(){newAccOpen=true;newAcc={account:'',pwd:'',pwd2:'',name:'',roles:[],status:1};
+    smModal('新增账户','密码需 8-16 位，且必须包含数字、大写字母、小写字母和特殊符号',
+    `<div class="field"><label>账户名</label><input value="${attr(newAcc.account)}" placeholder="请输入你的账户名!" oninput="newAcc.account=this.value"></div>
+    <div class="field"><label>密码</label><input type="password" placeholder="请输入你的密码!" oninput="newAcc.pwd=this.value"></div>
+    <div class="field"><label>确认密码</label><input type="password" placeholder="请确认你的密码!" oninput="newAcc.pwd2=this.value"></div>
+    <div class="field"><label>用户名称</label><input value="${attr(newAcc.name)}" placeholder="请输入你的用户名称!" oninput="newAcc.name=this.value"></div>
+    <div class="field"><label>角色（可多选）</label><div class="perm-grid">${ROLES.filter(r=>!r.builtin).map(r=>`<div class="perm-row"><span>${r.name}<small>${r.remark}</small></span><input type="checkbox" ${newAcc.roles.includes(r.name)?'checked':''} onchange="accRoleChk('${r.name}',this.checked)"></div>`).join('')}</div></div>
+    <div class="field"><label>账户状态</label><div class="perm-row"><span>启用</span><span class="sw on" onclick="newAcc.status=newAcc.status?0:1;this.classList.toggle('on',!!newAcc.status);this.previousElementSibling.textContent=newAcc.status?'启用':'禁用'"></span></div></div>`,
+    '确认新增','applyNewAcc()')}
+  function accRoleChk(n,on){if(on&&!newAcc.roles.includes(n))newAcc.roles.push(n);if(!on)newAcc.roles=newAcc.roles.filter(x=>x!==n)}
+  function applyNewAcc(){
+    if(!newAcc.account.trim()){toast('请输入你的账户名!');return}
+    if(/\s/.test(newAcc.account)){toast('禁止输入空格');return}
+    const pe=pwdError(newAcc.pwd);if(pe){toast(pe);return}
+    if(!newAcc.pwd2){toast('请确认你的密码!');return}
+    if(newAcc.pwd!==newAcc.pwd2){toast('二次密码不一致');return}
+    if(!newAcc.name.trim()){toast('请输入你的用户名称!');return}
+    if(!newAcc.roles.length){toast('请至少选择一个角色');return}
+    users.push({name:newAcc.name.trim(),account:newAcc.account.trim(),roles:[...newAcc.roles],phone:'',admin:false,status:newAcc.status,hotels:[],tasks:{},created:NEW_TS,updated:NEW_TS});
+    closeAccModal();render();toast('操作成功')}
+  function openEditUser(ui){const u=users[ui];editUserFor=ui;utmp={name:u.name,roles:[...u.roles],status:u.status};
+    smModal('编辑账户','账户名为登录凭证，创建后不可修改',
+    `<div class="field"><label>账户名</label><input value="${attr(u.account)}" disabled></div>
+    <div class="field"><label>用户名称</label><input value="${attr(utmp.name)}" placeholder="请输入你的用户名称!" oninput="utmp.name=this.value"></div>
+    <div class="field"><label>角色（可多选）</label><div class="perm-grid">${ROLES.filter(r=>!r.builtin).map(r=>`<div class="perm-row"><span>${r.name}<small>${r.remark}</small></span><input type="checkbox" ${utmp.roles.includes(r.name)?'checked':''} onchange="utmpRoleChk('${r.name}',this.checked)"></div>`).join('')}</div></div>
+    <div class="field"><label>账户状态</label><div class="perm-row"><span>${utmp.status?'启用':'禁用'}</span><span class="sw ${utmp.status?'on':''}" onclick="utmp.status=utmp.status?0:1;this.classList.toggle('on',!!utmp.status);this.previousElementSibling.textContent=utmp.status?'启用':'禁用'"></span></div></div>`,
+    '保存','applyEditUser('+ui+')')}
+  function utmpRoleChk(n,on){if(on&&!utmp.roles.includes(n))utmp.roles.push(n);if(!on)utmp.roles=utmp.roles.filter(x=>x!==n)}
+  function applyEditUser(ui){const u=users[ui];
+    if(!utmp.name.trim()){toast('请输入你的用户名称!');return}
+    if(!utmp.roles.length){toast('请至少选择一个角色');return}
+    u.name=utmp.name.trim();u.roles=[...utmp.roles];u.status=utmp.status;u.updated=NEW_TS;
+    closeAccModal();render();toast('操作成功')}
+  function openResetPwd(ui){const u=users[ui];resetFor=ui;confirmModal('重置密码',`确认重置「${u.name}」的登录密码吗？重置成功后请通知该用户尽快登录并修改密码。`,'applyResetPwd()')}
+  function applyResetPwd(){closeAccModal();render();toast('重置成功')}
+  function openDelUser(ui){const u=users[ui];
+    if(ui===curUser){toast('不能删除当前登录账户');return}
+    delUserFor=ui;confirmModal('删除提示',`确认删除该条数据吗?（账户「${u.account} · ${u.name}」）`,'applyDelUser()')}
+  function applyDelUser(){users.splice(delUserFor,1);closeAccModal();render();toast('删除成功')}
+
   /* ----- 新增酒店弹窗 ----- */
   function openAddHotel(){newHotel={name:''};$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
     <h3>新增酒店</h3><p class="m-sub">输入酒店名称即可新增；新增后抖音来客与携程官网默认未授权，需完成授权后才可诊断</p>
@@ -1372,9 +1486,10 @@
   function applyAddHotel(){if(!newHotel.name.trim()){toast('请输入酒店名称');return}
     hotels.push({name:newHotel.name.trim(),sub:'待补充门店信息',douyin:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]});
     newHotel={name:''};closeAccModal();render();toast('酒店已新增，抖音来客与携程官网默认未授权')}
+  /* ----- 配置酒店 / 任务权限（业务数据权限，按账户维度） ----- */
   function openAccHotels(ui){accHotelsFor=ui;renderAccHotels()}
   function renderAccHotels(){const u=users[accHotelsFor];$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
-    <h3>配置酒店 · ${u.name}</h3><p class="m-sub">勾选后该酒店将出现在子账号的酒店管理页面，可查看和诊断</p>
+    <h3>配置酒店 · ${u.name}</h3><p class="m-sub">勾选后该酒店将出现在子账户的酒店管理页面，可查看和诊断</p>
     ${hotels.map((h,i)=>`<label class="perm-row ${u.hotels.includes(i)?'':'off'}"><span><b>${h.name}</b><small>${h.sub}</small></span><input type="checkbox" ${u.hotels.includes(i)?'checked':''} onchange="toggleAccHotel(${i},this.checked)"></label>`).join('')}
     <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="saveAccHotels()">保存配置</button></div>
   </div></div>`}
@@ -1388,38 +1503,184 @@
   </div></div>`}
   function setAccTask(node,on){const u=users[accTasksFor];if(on)delete u.tasks[node];else u.tasks[node]=false;renderAccTasks()}
   function saveAccTasks(){const u=users[accTasksFor];closeAccModal();render();toast(`已保存 ${u.name} 的任务权限`)}
-  /* ===== 权限管理：菜单权限 + 任务权限（按子账号配置） ===== */
+
+  /* ----- 角色管理：角色绑定菜单/按钮/接口三类资源 ----- */
+  const roleResSummary=r=>r.builtin?'全部资源':`${r.menus.length} 个菜单（按钮 / 接口随菜单继承）`;
+  function toggleRoleStatus(ri,on){const r=ROLES[ri];if(r.builtin){toast('内置角色不可停用');return}r.status=on?1:0;render();toast(`已${on?'启用':'停用'}角色「${r.name}」`)}
+  function rolesPage(){
+    if(!users[curUser].admin)return denyPage('角色管理');
+    return `<div class="page">
+    <div class="page-head"><div><h1>角色管理</h1><p>角色向下绑定菜单、按钮、接口三类资源；账户与角色多对多，权限取各角色并集</p></div><button class="btn btn-primary" onclick="openRoleModal(-1)">+ 新增角色</button></div>
+    <div class="panel">
+      <div class="tbl-cap"><h3>数据列表</h3></div>
+      <div class="rgrid table-head"><span>角色名称</span><span>状态</span><span>备注</span><span>菜单权限</span><span style="text-align:right">操作</span></div>
+      ${ROLES.map((r,ri)=>`<div class="rgrid srow">
+        <span class="hotel-name">${r.name}${r.builtin?'　<small class="time">内置</small>':''}</span>
+        <span><span class="sw ${r.status?'on':''}" onclick="toggleRoleStatus(${ri},${r.status?0:1})"></span></span>
+        <span class="time" style="font-size:12.5px">${r.remark}</span>
+        <span class="time">${roleResSummary(r)}</span>
+        <span class="row-actions">${r.builtin?'<span class="linkbtn dim">内置角色</span>':`<button class="linkbtn" onclick="openRoleModal(${ri})">编辑</button><button class="linkbtn danger" onclick="openDelRole(${ri})">删除</button>`}</span>
+      </div>`).join('')}
+      <div class="tbl-foot"><small>共 ${ROLES.length} 条</small><div class="pager"><button disabled>‹</button><button class="cur">1</button><button disabled>›</button></div></div>
+    </div>
+  </div>`}
+  const menuKidsText=k=>{const groups=['酒店管理','诊断工作台','诊断任务','诊断日志'];
+    const bs=permButtons.filter(b=>b.group===groups[k]).map(b=>b.name);
+    const apis=MENU_META[k].api().map(a=>a.name);
+    const tasks=k===2?`；诊断任务节点按钮 ${TASK_DEFS.length} 个`:'';
+    return `按钮：${bs.join('、')}；接口：${apis.join('、')}${tasks}`};
+  function openRoleModal(ri){roleNew=ri<0;roleEditFor=ri;const r=roleNew?null:ROLES[ri];
+    rtmp={name:r?r.name:'',remark:r?r.remark:'',menus:r&&Array.isArray(r.menus)?[...r.menus]:[],status:r?r.status:1};
+    smModal(roleNew?'新增角色':'编辑角色','勾选菜单默认带该菜单下全部按钮与接口子资源',
+    `<div class="field"><label>角色名称</label><input value="${attr(rtmp.name)}" placeholder="请输入角色名称" oninput="rtmp.name=this.value"></div>
+    <div class="field"><label>状态</label><div class="perm-row"><span>${rtmp.status?'启用':'停用'}</span><span class="sw ${rtmp.status?'on':''}" onclick="rtmp.status=rtmp.status?0:1;this.classList.toggle('on',!!rtmp.status);this.previousElementSibling.textContent=rtmp.status?'启用':'停用'"></span></div></div>
+    <div class="field"><label>备注</label><input value="${attr(rtmp.remark)}" placeholder="请输入角色备注" oninput="rtmp.remark=this.value"></div>
+    <div class="field"><label>菜单权限</label><div class="perm-grid">${permMenus.map((m,k)=>`<div class="perm-row"><span><b>${m.name}</b><small>${menuKidsText(k)}</small></span><input type="checkbox" ${rtmp.menus.includes(k)?'checked':''} onchange="rtmpMenuChk(${k},this.checked)"></div>`).join('')}</div></div>`,
+    '保存','applyRoleModal()')}
+  function rtmpMenuChk(k,on){if(on&&!rtmp.menus.includes(k))rtmp.menus.push(k);if(!on)rtmp.menus=rtmp.menus.filter(x=>x!==k)}
+  function applyRoleModal(){
+    if(!rtmp.name.trim()){toast('请输入角色名称');return}
+    if(ROLES.some((r,i)=>i!==roleEditFor&&r.name===rtmp.name.trim())){toast('角色名称已存在');return}
+    if(roleNew)ROLES.push({name:rtmp.name.trim(),status:rtmp.status,remark:rtmp.remark.trim()||'—',menus:[...rtmp.menus]});
+    else{const r=ROLES[roleEditFor];r.name=rtmp.name.trim();r.status=rtmp.status;r.remark=rtmp.remark.trim()||'—';r.menus=[...rtmp.menus]}
+    closeAccModal();render();toast('操作成功')}
+  function openDelRole(ri){const r=ROLES[ri];
+    if(r.builtin){toast('系统内置角色不可删除');return}
+    if(users.some(u=>u.roles.includes(r.name))){toast(`「${r.name}」已关联账户，不可删除`);return}
+    confirmModal('删除提示','确定要删除角色吗？','applyDelRole('+ri+')')}
+  function applyDelRole(ri){ROLES.splice(ri,1);closeAccModal();render();toast('删除成功')}
+
+  /* ----- 菜单管理：资源树（菜单 / 按钮 / 接口），运行时权限状态直接读写 ----- */
   function setMenuPerm(k,on){permMenus[k].on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${permMenus[k].name}」菜单权限`)}
   function setBtnPerm(key,on){const b=permButtons.find(b=>b.key===key);b.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${b.name}」按钮权限`)}
   function setTaskPerm(key,on){const d=TASK_DEFS.find(d=>d.key===key);d.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${d.name}」任务权限`)}
-  function renameStart(t,k){renaming={t,k};render();setTimeout(()=>{const i=document.getElementById('rnInput');if(i){i.focus();i.select()}},0)}
-  function renameCommit(t,k,v){v=(v||'').trim();renaming=null;
-    if(v){let d=null;
-      if(t==='menu')d=permMenus[k];
-      else if(t==='btn')d=permButtons.find(b=>b.key===k);
-      else if(t==='task')d=TASK_DEFS.find(d=>d.key===k);
-      if(d&&d.name!==v){d.name=v;render();toast('权限名称已更新');return}}
-    render()}
-  const nameCell=(t,k,name)=>renaming&&renaming.t===t&&renaming.k===k
-    ?`<input id="rnInput" value="${attr(name)}" onblur="renameCommit('${t}','${k}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">`
-    :`<span>${name}　<a class="exlink" style="font-size:11px" onclick="renameStart('${t}','${k}')">✎</a></span>`;
-  function permsPage(){
-    if(!users[curUser].admin)return `<div class="page"><div class="page-head"><div><h1>权限管理</h1></div></div><div class="empty-state"><i>🔒</i>仅管理员可访问权限管理</div></div>`;
+  function resTree(){
+    const groups=['酒店管理','诊断工作台','诊断任务','诊断日志'];
+    const withCustom=(id,kids)=>kids.concat(resCustom.filter(c=>c.parent===id).map(c=>({id:'c'+c.cid,type:c.type,name:c.name,code:c.code,path:c.path,sort:c.sort,on:1})));
+    const menus=permMenus.map((m,k)=>{
+      const bs=permButtons.filter(b=>b.group===groups[k]).map((b,bi)=>({type:'btn',name:b.name,code:'btn:'+b.key,path:'—',sort:bi+1,on:b.on===1,bind:{t:'btn',k:b.key}}));
+      const tks=k===2?TASK_DEFS.map((d,di)=>({type:'btn',name:d.name,code:'task:'+d.key,path:'—',sort:bs.length+di+1,on:d.on===1,bind:{t:'task',k:d.key}})):[];
+      const apis=MENU_META[k].api().map((a,ai)=>({type:'api',name:a.name,code:a.code,path:a.path,sort:100+ai,on:a.on===1,apiRef:a}));
+      return {id:'m'+k,type:'menu',name:m.name,code:MENU_META[k].code,path:MENU_META[k].path,comp:MENU_META[k].comp,desc:MENU_META[k].desc,sort:k+1,on:m.on===1,bind:{t:'menu',k},kids:withCustom('m'+k,bs.concat(tks,apis))};
+    });
+    menus.push({id:'sys',type:'menu',name:'系统管理',code:'sys',path:'/system',comp:'—',desc:'平台账户、角色与资源管理',sort:5,on:1,fixed:true,kids:withCustom('sys',SYS_MENUS.map((s,si)=>({id:'sys'+si,type:'menu',name:s.name,code:s.code,path:s.path,comp:s.comp,desc:'',sort:si+1,on:1,fixed:true,bind:null,kids:withCustom('sys'+si,s.apis.map((a,ai)=>({type:'api',name:a.name,code:a.code,path:a.path,sort:ai+1,on:a.on===1,apiRef:a,fixed:true})))})))});
+    return menus;
+  }
+  function findRes(rows,id){for(const r of rows){if(r.id===id)return r;if(r.kids){const f=findRes(r.kids,id);if(f)return f}}return null}
+  function twRes(id){resOpen[id]=!resOpen[id];render()}
+  function setResOn(id,on){const r=findRes(resTree(),id);if(!r)return;
+    if(r.bind){if(r.bind.t==='menu')setMenuPerm(r.bind.k,on?1:0);else if(r.bind.t==='btn')setBtnPerm(r.bind.k,on?1:0);else setTaskPerm(r.bind.k,on?1:0);return}
+    if(r.apiRef){r.apiRef.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${r.name}」接口权限`);return}}
+  function expRes(v){resTree().forEach(m=>{resOpen[m.id]=!!v;(m.kids||[]).forEach(k=>{if(k.kids)resOpen[k.id]=!!v})});render()}
+  function setResQ(v){resQ=v;render();const i=$('#resSearch');if(i){i.focus();i.setSelectionRange(v.length,v.length)}}
+  function resetResQ(){resQ='';resType='all';resOpen={m0:true};render();toast('重置成功')}
+  function resPage(){
+    if(!users[curUser].admin)return denyPage('菜单管理');
+    const q=resQ.trim();
+    const match=r=>(resType==='all'||r.type===resType)&&(!q||r.name.includes(q)||r.code.includes(q))||((r.kids||[]).some(match));
+    const forceOpen=q||resType!=='all';
+    const rowHtml=(r,depth)=>{const kids=(r.kids||[]).filter(match);const open=resOpen[r.id]||forceOpen;
+      return `<div class="resgrid srow">
+      <span class="hotel-name" style="display:flex;align-items:center;padding-left:${depth*22}px">${(r.kids&&r.kids.length)?`<span class="tree-tw" onclick="twRes('${r.id}')">${open?'−':'+'}</span>`:'<span style="display:inline-block;width:28px"></span>'}${r.name}</span>
+      <span><span class="typechip t${r.type}">${RES_LABEL[r.type]}</span></span>
+      <span class="time">${r.code}</span>
+      <span class="time">${r.path}</span>
+      <span class="time">${r.sort}</span>
+      <span class="row-actions">${r.fixed?'':`<span class="sw ${r.on?'on':''}" onclick="setResOn('${r.id}',${r.on?0:1})"></span>`}<button class="linkbtn" onclick="openResEdit('${r.id}')">编辑</button><button class="linkbtn danger" onclick="openResDel('${r.id}')">删除</button></span>
+      </div>${open?kids.map(k=>rowHtml(k,depth+1)).join(''):''}`};
+    const tree=resTree().filter(match);
+    const count=rows=>rows.reduce((n,r)=>n+1+((resOpen[r.id]||forceOpen)?count((r.kids||[]).filter(match)):0),0);
     return `<div class="page">
-    <div class="page-head"><div><h1>权限管理</h1><p>通用权限配置，对所有子账号生效；点击 ✎ 可编辑权限名称，管理员自身不受权限限制</p></div></div>
-    <div class="card">
-      <h3>菜单权限</h3><p>控制子账号可访问的菜单页面</p>
-      <div class="perm-grid" style="margin-top:10px">${permMenus.map((m,k)=>`<div class="perm-row ${m.on?'':'off'}">${nameCell('menu',k,m.name)}<span class="sw ${m.on?'on':''}" onclick="setMenuPerm(${k},${m.on?0:1})"></span></div>`).join('')}</div>
+    <div class="page-head"><div><h1>菜单管理</h1><p>统一维护菜单、按钮、接口三类资源；按钮与接口挂在所属菜单下，权限判定覆盖前端路由、操作显隐与后端接口</p></div><button class="btn btn-primary" onclick="openResNew()">+ 新增资源</button></div>
+    <div class="qbar">
+      <div class="qfield"><label>资源名称 / 编码</label><input id="resSearch" value="${attr(resQ)}" placeholder="请输入资源名称或资源编码" oninput="setResQ(this.value)"></div>
+      <div class="qfield"><label>资源类型</label><select onchange="resType=this.value;render()"><option value="all" ${resType==='all'?'selected':''}>全部</option><option value="menu" ${resType==='menu'?'selected':''}>菜单</option><option value="btn" ${resType==='btn'?'selected':''}>按钮</option><option value="api" ${resType==='api'?'selected':''}>接口</option></select></div>
+      <button class="btn btn-primary" onclick="render()">查询</button>
+      <button class="btn btn-outline" onclick="resetResQ()">重置</button>
+      <span style="flex:1"></span>
+      <button class="btn btn-outline" onclick="expRes(1)">展开全部</button>
+      <button class="btn btn-outline" onclick="expRes(0)">收起</button>
     </div>
-    <div class="card" style="margin-top:16px">
-      <h3>按钮权限</h3><p>酒店管理及二级页面所有按钮的权限</p>
-      ${['酒店管理','诊断工作台','诊断任务','任务详情','诊断日志'].map(g=>{const bs=permButtons.filter(b=>b.group===g);return bs.length?`<div class="m-sec">${g}</div><div class="perm-grid">${bs.map(b=>`<div class="perm-row ${b.on?'':'off'}">${nameCell('btn',b.key,b.name)}<span class="sw ${b.on?'on':''}" onclick="setBtnPerm('${b.key}',${b.on?0:1})"></span></div>`).join('')}</div>`:''}).join('')}
-    </div>
-    <div class="card" style="margin-top:16px">
-      <h3>任务权限</h3><p>按抖音来客诊断路径展示诊断任务节点；子账号将任务处理为「以后不再提醒」后对应权限自动关闭，可在账号管理中为单个子账号恢复</p>
-      ${TASK_GROUPS.map(g=>`<div class="m-sec">${g.path}</div><div class="perm-grid">${g.defs.map(d=>`<div class="perm-row ${d.on?'':'off'}">${nameCell('task',d.key,d.name)}<span class="sw ${d.on?'on':''}" onclick="setTaskPerm('${d.key}',${d.on?0:1})"></span></div>`).join('')}</div>`).join('')}
+    <div class="panel">
+      <div class="tbl-cap"><h3>数据列表</h3></div>
+      <div class="resgrid table-head"><span>资源名称</span><span>资源类型</span><span>资源编码</span><span>资源路径</span><span>显示排序</span><span style="text-align:right">操作</span></div>
+      ${tree.map(r=>rowHtml(r,0)).join('')}
+      <div class="tbl-foot"><small>共 ${count(tree)} 条</small><div class="pager"><button disabled>‹</button><button class="cur">1</button><button disabled>›</button></div></div>
     </div>
   </div>`}
+  function openResNew(){ntmp={parent:'m0',type:'btn',name:'',code:'',path:'',comp:'',sort:'',desc:''};
+    smModal('新增资源','按钮和接口必须挂在所属菜单下；资源编码是权限判定唯一键',
+    `<div class="field"><label>上级资源</label><select onchange="ntmp.parent=this.value">${permMenus.map((m,k)=>`<option value="m${k}">${m.name}</option>`).join('')}${SYS_MENUS.map((s,si)=>`<option value="sys${si}">系统管理 / ${s.name}</option>`).join('')}</select></div>
+    <div class="field"><label>资源类型</label><div class="perm-row" style="gap:14px">${[['btn','按钮'],['api','接口'],['menu','菜单']].map(x=>`<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="radio" name="resType" ${ntmp.type===x[0]?'checked':''} onchange="ntmp.type='${x[0]}'">${x[1]}</label>`).join('')}</div></div>
+    <div class="field"><label>资源名称</label><input placeholder="请输入资源名称" oninput="ntmp.name=this.value"></div>
+    <div class="field"><label>资源编码</label><input placeholder="请输入资源编码" oninput="ntmp.code=this.value"></div>
+    <div class="field"><label>资源路径</label><input placeholder="请输入资源路径" oninput="ntmp.path=this.value"></div>
+    <div class="field"><label>显示排序（0-999）</label><input placeholder="请输入显示排序" oninput="ntmp.sort=this.value"></div>
+    <div class="field"><label>资源描述</label><input placeholder="请输入资源描述" oninput="ntmp.desc=this.value"></div>`,
+    '确认新增','applyResNew()')}
+  function applyResNew(){
+    if(!ntmp.name.trim()){toast('请输入资源名称');return}
+    if(!ntmp.code.trim()){toast('请输入资源编码');return}
+    const s=Number(ntmp.sort);
+    if(!Number.isInteger(s)||s<0||s>999){toast('超出最大排序数值，请重新输入');return}
+    resCustom.push({cid:Date.now()%1000000,parent:ntmp.parent,type:ntmp.type,name:ntmp.name.trim(),code:ntmp.code.trim(),path:ntmp.path.trim()||'—',sort:s,desc:ntmp.desc.trim()});
+    closeAccModal();render();toast('新增资源成功')}
+  function openResEdit(id){const r=findRes(resTree(),id);if(!r)return;resEditFor=id;
+    ntmp={name:r.name,code:r.code,path:r.path,comp:r.comp||'',sort:String(r.sort),desc:r.desc||''};
+    smModal('编辑资源',r.bind?'业务内置资源：名称与路径可修改，删除请关闭权限':'资源信息编辑',
+    `<div class="field"><label>资源类型</label><input value="${RES_LABEL[r.type]}" disabled></div>
+    <div class="field"><label>资源名称</label><input value="${attr(ntmp.name)}" placeholder="请输入资源名称" oninput="ntmp.name=this.value"></div>
+    <div class="field"><label>资源编码</label><input value="${attr(ntmp.code)}" placeholder="请输入资源编码" oninput="ntmp.code=this.value"></div>
+    <div class="field"><label>资源路径</label><input value="${attr(ntmp.path)}" placeholder="请输入资源路径" oninput="ntmp.path=this.value"></div>
+    ${r.type==='menu'?`<div class="field"><label>组件路径</label><input value="${attr(ntmp.comp)}" placeholder="请输入组件路径" oninput="ntmp.comp=this.value"></div>`:''}
+    <div class="field"><label>显示排序（0-999）</label><input value="${attr(ntmp.sort)}" placeholder="请输入显示排序" oninput="ntmp.sort=this.value"></div>
+    <div class="field"><label>资源描述</label><input value="${attr(ntmp.desc)}" placeholder="请输入资源描述" oninput="ntmp.desc=this.value"></div>`,
+    '保存','applyResEdit()')}
+  function applyResEdit(){const r=findRes(resTree(),resEditFor);if(!r){closeAccModal();return}
+    if(!ntmp.name.trim()){toast('请输入资源名称');return}
+    if(!ntmp.code.trim()){toast('请输入资源编码');return}
+    const s=Number(ntmp.sort);
+    if(!Number.isInteger(s)||s<0||s>999){toast('超出最大排序数值，请重新输入');return}
+    const cust=resCustom.find(c=>'c'+c.cid===r.id);
+    if(cust){cust.name=ntmp.name.trim();cust.code=ntmp.code.trim();cust.path=ntmp.path.trim()||'—';cust.sort=s;cust.desc=ntmp.desc.trim()}
+    else if(r.bind&&r.bind.t==='menu'){permMenus[r.bind.k].name=ntmp.name.trim();MENU_META[r.bind.k].code=ntmp.code.trim();MENU_META[r.bind.k].path=ntmp.path.trim();MENU_META[r.bind.k].comp=ntmp.comp}
+    else if(r.bind&&r.bind.t==='btn'){permButtons.find(b=>b.key===r.bind.k).name=ntmp.name.trim()}
+    else if(r.bind&&r.bind.t==='task'){TASK_DEFS.find(d=>d.key===r.bind.k).name=ntmp.name.trim()}
+    else if(r.apiRef){r.apiRef.name=ntmp.name.trim();r.apiRef.code=ntmp.code.trim();r.apiRef.path=ntmp.path.trim()}
+    else if(r.id==='sys'){/* 顶层系统管理节点仅展示 */}
+    else if(r.id&&r.id.indexOf('sys')===0){const sm=SYS_MENUS[+r.id.slice(3)];if(sm){sm.name=ntmp.name.trim();sm.code=ntmp.code.trim();sm.path=ntmp.path.trim()}}
+    closeAccModal();render();toast('编辑资源成功')}
+  function openResDel(id){const r=findRes(resTree(),id);if(!r)return;
+    if(r.fixed){toast('系统内置资源不可删除');return}
+    if(r.bind||r.apiRef){toast('业务内置资源不支持删除，可编辑或关闭权限');return}
+    resDelFor=id;confirmModal('删除提示','确定删除该条数据吗?','applyResDel()')}
+  function applyResDel(){const i=resCustom.findIndex(c=>'c'+c.cid===resDelFor);if(i>-1)resCustom.splice(i,1);closeAccModal();render();toast('删除成功')}
+
+  /* ----- 我的信息：账户信息 + 修改密码（改密成功强制重新登录） ----- */
+  function profilePage(){
+    const u=users[curUser];
+    return `<div class="page">
+    <div class="page-head"><div><h1>我的信息</h1><p>查看当前登录账户信息，定期修改密码保障账户安全</p></div></div>
+    <div class="card"><h3>账户信息</h3>
+      <div class="perm-grid" style="margin-top:10px">
+        <div class="perm-row"><span class="time">账户名</span><b>${u.account}</b></div>
+        <div class="perm-row"><span class="time">用户名称</span><b>${u.name}</b></div>
+        <div class="perm-row"><span class="time">角色</span><b>${u.roles.join('、')}</b></div>
+        <div class="perm-row"><span class="time">账户状态</span><span class="badge ${u.status?'ok':'expired'}"><i></i>${u.status?'启用':'禁用'}</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3>修改密码</h3><p>密码由 8-16 位数字、大小写字母和特殊符号组成，不能包含空格；新密码不得与前三个旧密码相同，修改成功后需重新登录</p>
+      <div class="field" style="max-width:360px"><label>新密码</label><input type="password" placeholder="请输入你的密码!" oninput="pwdForm.p1=this.value"></div>
+      <div class="field" style="max-width:360px"><label>确认密码</label><input type="password" placeholder="请确认你的密码!" oninput="pwdForm.p2=this.value"></div>
+      <button class="btn btn-primary" style="margin-top:6px" onclick="applyPwd()">确认修改</button>
+    </div>
+  </div>`}
+  function applyPwd(){const pe=pwdError(pwdForm.p1);if(pe){toast(pe);return}
+    if(!pwdForm.p2){toast('请确认你的密码!');return}
+    if(pwdForm.p1!==pwdForm.p2){toast('二次密码不一致');return}
+    if(PWD_HIST.includes(pwdForm.p1)){toast('新密码不得与前三个旧密码相同');return}
+    PWD_HIST.unshift(pwdForm.p1);PWD_HIST.length=3;pwdForm={p1:'',p2:''};
+    toast('修改成功,请重新登录');setTimeout(()=>{curUser=0;view='hotels';activeHotel=null;render()},1200)}
 
   /* ===== 授权弹窗 ===== */
   function openAuth(i){authIndex=i;platform=hotels[i].douyin!=='ok'?'douyin':hotels[i].ctrip!=='ok'?'ctrip':'douyin';method='sms';reauth=false;modal()}
@@ -1442,7 +1703,7 @@
   function authorize(){hotels[authIndex][platform]='ok';reauth=false;toast(`${platform==='douyin'?'抖音来客':'携程官网'}授权成功`);modal();render()}
   function closeModal(e){if(e&&e.target!==e.currentTarget)return;$('#modalRoot').innerHTML='';authIndex=null}
 
-  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,records,account:accountPage,perms:permsPage};$('#app').innerHTML=pages[view]()}
+  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,records,users:usersPage,roles:rolesPage,res:resPage,profile:profilePage};$('#app').innerHTML=pages[view]()}
   render();
 </script>
 </body>
