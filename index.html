@@ -532,11 +532,10 @@
     {key:'submit',name:'提交 / 已完成 / 暂无此设施',group:'任务详情',on:1},
     {key:'logDetail',name:'详情 / 收起',group:'诊断日志',on:1}
   ];
-  const TASK_DEFS=[...new Set(diagSteps.flatMap(s=>s.items.map(i=>i[0])))].map(n=>({key:n,name:n,on:1}));
-  const TASK_GROUPS=diagSteps.map(s=>({path:s.path,defs:TASK_DEFS.filter(d=>s.items.some(i=>i[0]===d.key))}));
+  const TASK_DEFS=[...new Set(diagSteps.flatMap(s=>s.items.map(i=>i[0])))].map(n=>({key:n,name:n}));
   /* ===== 系统管理（RBAC 标准）：账号 —角色—资源 三层关系 =====
-     资源树 = 菜单 / 按钮 / 接口 三类；诊断任务节点作为「诊断任务」菜单下的按钮级资源；
-     permMenus / permButtons / TASK_DEFS 是运行时权限状态，菜单管理页的资源树直接读写它们 */
+     资源树 = 菜单 / 按钮 / 接口 三类；诊断任务节点是业务对象，不是权限资源，不进入资源树；
+     permMenus / permButtons 是运行时权限状态，菜单管理页的资源树直接读写它们 */
   const API_RES_HOTELS=[{name:'查询酒店列表',code:'GET /api/hotels',path:'/api/hotels',on:1},{name:'新增酒店',code:'POST /api/hotels',path:'/api/hotels',on:1},{name:'保存平台授权',code:'POST /api/hotels/auth',path:'/api/hotels/auth',on:1}];
   const API_RES_DIAG=[{name:'发起诊断',code:'POST /api/diag/start',path:'/api/diag/start',on:1},{name:'查询诊断进度',code:'GET /api/diag/steps',path:'/api/diag/steps',on:1},{name:'生成诊断任务',code:'POST /api/diag/tasks',path:'/api/diag/tasks',on:1}];
   const API_RES_TASKS=[{name:'查询任务列表',code:'GET /api/tasks',path:'/api/tasks',on:1},{name:'提交任务修改',code:'POST /api/tasks/submit',path:'/api/tasks/submit',on:1},{name:'忽略任务',code:'POST /api/tasks/ignore',path:'/api/tasks/ignore',on:1}];
@@ -570,8 +569,6 @@
   const isSub=()=>!users[curUser].admin;
   const menuOn=(u,k)=>u.admin||permMenus[k].on===1;
   const btnOn=k=>users[curUser].admin||(permButtons.find(b=>b.key===k)||{on:1}).on===1;
-  const taskOn=(u,node)=>u.admin||(TASK_DEFS.find(d=>d.key===node)||{on:1}).on===1;
-  const taskAllowed=t=>taskOn(users[curUser],t.node);
   const nodeDisplay=node=>{const d=TASK_DEFS.find(d=>d.key===node);return d?d.name:node};
   function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
   function initRediag(){diagT.forEach(clearTimeout);diagT=[];const old=diagRun;diagRun={phase:'idle',focus:0,added:[],failCount:0,hotel:old&&old.hotel,steps:diagSteps.map((s,si)=>({state:'pending',prev:old?old.steps[si].state:null,items:s.items.map((it,ii)=>({state:'pending',prev:old?old.steps[si].items[ii].state:null}))}))}}
@@ -757,10 +754,10 @@
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
   function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];if(!taskAllowed(t)){toast('该任务权限已被关闭，请联系管理员在菜单管理中开启');return}t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   /* 二次确认弹窗：此次忽略 */
   let confirmAsk=null;
-  function askIgnore(i,type){const t0=taskData[i];if(!taskAllowed(t0)){toast('该任务权限已被关闭，请联系管理员在菜单管理中开启');return}confirmAsk={i,type};const t=t0;
+  function askIgnore(i,type){const t0=taskData[i];confirmAsk={i,type};const t=t0;
     const c=type==='skip'
       ?{title:'确认此次忽略？',body:`忽略后本次任务关闭，下次诊断仍会检查「${t.path}」节点。`,btn:'确认忽略'}
       :null;
@@ -1288,7 +1285,6 @@
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
     <div class="page-head"><div><h1>${t.name}</h1><p>${t.path} · 当前酒店：${activeHotel.name}</p></div><i class="tag red">待处理</i></div>
     <main>
-      ${!taskAllowed(t)?`<div class="section"><p class="review-tip" style="color:#b91c1c">「${nodeDisplay(t.node)}」任务权限已被关闭，请联系管理员在菜单管理中重新开启。</p></div>`:''}
       ${main}
       <div class="action-bar">${actions}</div>
     </main>
@@ -1498,8 +1494,7 @@
   const menuKidsText=k=>{const groups=['酒店管理','诊断工作台','诊断任务','诊断日志'];
     const bs=permButtons.filter(b=>b.group===groups[k]).map(b=>b.name);
     const apis=MENU_META[k].api().map(a=>a.name);
-    const tasks=k===2?`；诊断任务节点按钮 ${TASK_DEFS.length} 个`:'';
-    return `按钮：${bs.join('、')}；接口：${apis.join('、')}${tasks}`};
+    return `按钮：${bs.join('、')}；接口：${apis.join('、')}`};
   function openRoleModal(ri){roleNew=ri<0;roleEditFor=ri;const r=roleNew?null:ROLES[ri];
     rtmp={name:r?r.name:'',remark:r?r.remark:'',menus:r&&Array.isArray(r.menus)?[...r.menus]:[],status:r?r.status:1};
     smModal(roleNew?'新增角色':'编辑角色','勾选菜单默认带该菜单下全部按钮与接口子资源',
@@ -1524,15 +1519,13 @@
   /* ----- 菜单管理：资源树（菜单 / 按钮 / 接口），运行时权限状态直接读写 ----- */
   function setMenuPerm(k,on){permMenus[k].on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${permMenus[k].name}」菜单权限`)}
   function setBtnPerm(key,on){const b=permButtons.find(b=>b.key===key);b.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${b.name}」按钮权限`)}
-  function setTaskPerm(key,on){const d=TASK_DEFS.find(d=>d.key===key);d.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${d.name}」任务权限`)}
   function resTree(){
     const groups=['酒店管理','诊断工作台','诊断任务','诊断日志'];
     const withCustom=(id,kids)=>kids.concat(resCustom.filter(c=>c.parent===id).map(c=>({id:'c'+c.cid,type:c.type,name:c.name,code:c.code,path:c.path,sort:c.sort,on:1})));
     const menus=permMenus.map((m,k)=>{
       const bs=permButtons.filter(b=>b.group===groups[k]).map((b,bi)=>({type:'btn',name:b.name,code:'btn:'+b.key,path:'—',sort:bi+1,on:b.on===1,bind:{t:'btn',k:b.key}}));
-      const tks=k===2?TASK_DEFS.map((d,di)=>({type:'btn',name:d.name,code:'task:'+d.key,path:'—',sort:bs.length+di+1,on:d.on===1,bind:{t:'task',k:d.key}})):[];
       const apis=MENU_META[k].api().map((a,ai)=>({type:'api',name:a.name,code:a.code,path:a.path,sort:100+ai,on:a.on===1,apiRef:a}));
-      return {id:'m'+k,type:'menu',name:m.name,code:MENU_META[k].code,path:MENU_META[k].path,comp:MENU_META[k].comp,desc:MENU_META[k].desc,sort:k+1,on:m.on===1,bind:{t:'menu',k},kids:withCustom('m'+k,bs.concat(tks,apis))};
+      return {id:'m'+k,type:'menu',name:m.name,code:MENU_META[k].code,path:MENU_META[k].path,comp:MENU_META[k].comp,desc:MENU_META[k].desc,sort:k+1,on:m.on===1,bind:{t:'menu',k},kids:withCustom('m'+k,bs.concat(apis))};
     });
     menus.push({id:'sys',type:'menu',name:'系统管理',code:'sys',path:'/system',comp:'—',desc:'平台账户、角色与资源管理',sort:5,on:1,fixed:true,kids:withCustom('sys',SYS_MENUS.map((s,si)=>({id:'sys'+si,type:'menu',name:s.name,code:s.code,path:s.path,comp:s.comp,desc:'',sort:si+1,on:1,fixed:true,bind:null,kids:withCustom('sys'+si,s.apis.map((a,ai)=>({type:'api',name:a.name,code:a.code,path:a.path,sort:ai+1,on:a.on===1,apiRef:a,fixed:true})))})))});
     return menus;
@@ -1540,7 +1533,7 @@
   function findRes(rows,id){for(const r of rows){if(r.id===id)return r;if(r.kids){const f=findRes(r.kids,id);if(f)return f}}return null}
   function twRes(id){resOpen[id]=!resOpen[id];render()}
   function setResOn(id,on){const r=findRes(resTree(),id);if(!r)return;
-    if(r.bind){if(r.bind.t==='menu')setMenuPerm(r.bind.k,on?1:0);else if(r.bind.t==='btn')setBtnPerm(r.bind.k,on?1:0);else setTaskPerm(r.bind.k,on?1:0);return}
+    if(r.bind){if(r.bind.t==='menu')setMenuPerm(r.bind.k,on?1:0);else setBtnPerm(r.bind.k,on?1:0);return}
     if(r.apiRef){r.apiRef.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${r.name}」接口权限`);return}}
   function expRes(v){resTree().forEach(m=>{resOpen[m.id]=!!v;(m.kids||[]).forEach(k=>{if(k.kids)resOpen[k.id]=!!v})});render()}
   function setResQ(v){resQ=v;render();const i=$('#resSearch');if(i){i.focus();i.setSelectionRange(v.length,v.length)}}
@@ -1616,7 +1609,6 @@
     if(cust){cust.name=ntmp.name.trim();cust.code=ntmp.code.trim();cust.path=ntmp.path.trim()||'—';cust.sort=s;cust.desc=ntmp.desc.trim()}
     else if(r.bind&&r.bind.t==='menu'){permMenus[r.bind.k].name=ntmp.name.trim();MENU_META[r.bind.k].code=ntmp.code.trim();MENU_META[r.bind.k].path=ntmp.path.trim();MENU_META[r.bind.k].comp=ntmp.comp}
     else if(r.bind&&r.bind.t==='btn'){permButtons.find(b=>b.key===r.bind.k).name=ntmp.name.trim()}
-    else if(r.bind&&r.bind.t==='task'){TASK_DEFS.find(d=>d.key===r.bind.k).name=ntmp.name.trim()}
     else if(r.apiRef){r.apiRef.name=ntmp.name.trim();r.apiRef.code=ntmp.code.trim();r.apiRef.path=ntmp.path.trim()}
     else if(r.id==='sys'){/* 顶层系统管理节点仅展示 */}
     else if(r.id&&r.id.indexOf('sys')===0){const sm=SYS_MENUS[+r.id.slice(3)];if(sm){sm.name=ntmp.name.trim();sm.code=ntmp.code.trim();sm.path=ntmp.path.trim()}}
