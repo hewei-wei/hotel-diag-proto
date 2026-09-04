@@ -56,6 +56,25 @@
   .account-meta b{font-size:13px}
   .account-meta small{font-size:11px;color:var(--ink-3)}
   .account>span:last-child{color:var(--ink-4);font-size:11px}
+  .accwrap{position:relative}
+  .umenu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,.12);padding:6px;min-width:180px;z-index:60}
+  .umenu>p{font-size:11px;color:var(--ink-4);padding:4px 10px;margin:0}
+  .umitem{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:8px 10px;border:0;background:none;border-radius:8px;cursor:pointer;font-size:13px;color:var(--ink)}
+  .umitem:hover{background:var(--bg)}
+  .umitem.cur{background:#eef4ff;color:var(--brand)}
+  .umitem i{font-style:normal;font-size:11px;color:var(--ink-4)}
+  .umitem b{font-weight:500}
+  .perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+  .perm-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff}
+  .perm-row small{display:block;color:var(--ink-4);font-size:11px;font-weight:400}
+  .perm-row.off{background:var(--bg);color:var(--ink-4)}
+  .sw{position:relative;width:34px;height:19px;border-radius:10px;background:var(--line);cursor:pointer;flex:none;transition:background .15s}
+  .sw::after{content:'';position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:left .15s}
+  .sw.on{background:var(--brand)}
+  .sw.on::after{left:17px}
+  .m-sub{font-size:12px;color:var(--ink-4);margin:0 0 14px}
+  .m-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+  .m-sec{font-size:12px;font-weight:600;color:var(--ink-2);margin:14px 0 8px}
 
   /* ===== 内容区 ===== */
   .page{padding:var(--s6) 32px 48px}
@@ -398,7 +417,7 @@
 <div class="main-wrap">
   <header class="topbar">
     <div><small>运营工作台</small><b id="pageTitle">酒店管理</b></div>
-    <div class="account"><span class="avatar">禾</span><div class="account-meta"><b>禾薇运营</b><small>代运营管理员</small></div><span>⌄</span></div>
+    <div id="accbox"></div>
   </header>
   <div id="subnav"></div>
   <main><div id="app"></div></main>
@@ -440,7 +459,6 @@
       ['外显小图','外显小图经图片识别与携程「外观」类别图片比对不一致','fail','外显小图替换建议任务','图片替换'],
       ['头图和相册','门店头图与商家相册均已上传图片','fail','头图相册补充任务','图片替换']]},
     {name:'房型管理',path:'商品与货架 › 房型管理 › 房型管理',items:[
-      ['钟点房','与抖音「钟点房」主体名称一致自动对应；楼层、网络服务、房型设施 3 项与携程不一致，该房型单独形成 1 条核对任务','fail','房型信息核对·钟点房','信息完善'],
       ['亲子家庭房','与「亲子家庭房-赠送小孩早餐·免费携带宠物」主体名称一致自动对应；床型、最大可住人数 2 项不一致','fail','房型信息核对·亲子家庭房','信息完善'],
       ['电竞大床房','携程在售、抖音未创建，按缺失房型单独形成 1 条新增任务','fail','房型新增·电竞大床房','信息完善']]},
     {name:'日历房',path:'商品与货架 › 商品管理 › 日历房',items:[
@@ -468,6 +486,20 @@
   let diagRun=null,diagT=[];
   /* 联合诊断节点：任务名 → 代表检查项（多项不通过合并为一个任务，任务行挂在代表项上） */
   const JOINT_TASK_NODE={'酒店政策联合补充任务':'加床及儿童'};
+  /* ===== 账号与权限：管理员管理子账号；子账号仅见被配置酒店、被授权页面与任务节点 ===== */
+  const MENU_PERMS=['酒店管理','酒店管理-诊断工作台','酒店管理-诊断任务','酒店管理-诊断日志'];
+  const TASK_NODES=diagSteps.flatMap(s=>s.items.map(i=>i[0]));
+  const users=[
+    {name:'禾薇运营',role:'管理员',phone:'138 8888 6620',admin:true},
+    {name:'李春燕',role:'普通员工',phone:'139 0752 3368',admin:false,hotels:[0,1],menus:[1,1,1,1],tasks:{}},
+    {name:'王芷琪',role:'普通员工',phone:'136 2291 7745',admin:false,hotels:[2],menus:[1,1,1,0],tasks:{'待回复中差评':false}}
+  ];
+  let curUser=0,userMenuOpen=false,newAccOpen=false,accHotelsFor=null,accTasksFor=null,permSel=1,newAcc={name:'',phone:''};
+  const isSub=()=>!users[curUser].admin;
+  const subUsers=()=>users.filter(u=>!u.admin);
+  const menuOn=(u,k)=>u.admin||u.menus[k]!==false;
+  const taskOn=(u,node)=>u.admin||u.tasks[node]!==false;
+  const taskAllowed=t=>taskOn(users[curUser],t.node);
   function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
   function initRediag(){diagT.forEach(clearTimeout);diagT=[];const old=diagRun;diagRun={phase:'idle',focus:0,added:[],failCount:0,hotel:old&&old.hotel,steps:diagSteps.map((s,si)=>({state:'pending',prev:old?old.steps[si].state:null,items:s.items.map((it,ii)=>({state:'pending',prev:old?old.steps[si].items[ii].state:null}))}))}}
   const stepFails=si=>diagRun.steps[si].items.filter(it=>it.state==='fail').length;
@@ -488,7 +520,7 @@
         let added=0;
         fails.forEach(f=>{diagRun.failCount++;
           if(taskData.some(t=>t.status==='待处理'&&t.name===f[3]))return;   // 同名待处理任务不重复生成
-          const row={name:f[3],path:diagSteps[si].name+' · '+(JOINT_TASK_NODE[f[3]]||f[0]),rule:f[1],type:f[4],diagTime:'2026-08-28 12:0'+(si<6?0:1)+':'+String(8+si*3).padStart(2,'0'),status:'待处理',submitTime:null,exec:null};
+          const row={name:f[3],path:diagSteps[si].name+' · '+(JOINT_TASK_NODE[f[3]]||f[0]),node:(JOINT_TASK_NODE[f[3]]||f[0]),rule:f[1],type:f[4],diagTime:'2026-08-28 12:0'+(si<6?0:1)+':'+String(8+si*3).padStart(2,'0'),status:'待处理',submitTime:null,exec:null};
           diagRun.added.push(row);taskData.unshift(row);added++});
         if(added)toast(`${diagSteps[si].name}诊断完成：${fails.length} 项不通过，已生成 ${added} 个任务`);
         if(si+1<diagSteps.length)diagT.push(setTimeout(()=>runStep(si+1),500));
@@ -501,10 +533,16 @@
 
   function toast(msg){const el=$('#toast');el.innerHTML=`<i>✓</i>${msg}`;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2300)}
 
-  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',records:'诊断日志',account:'账号管理'};
+  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',records:'诊断日志',account:'账号管理',perms:'权限管理'};
   function nav(){
-    $('#nav').innerHTML=`<button class="${view!=='account'?'active':''}" onclick="go('hotels')"><i>▦</i>酒店管理</button>`
-      +`<p>系统管理</p><button class="${view==='account'?'active':''}" onclick="go('account')"><i>⚙</i>账号管理</button>`;
+    const u=users[curUser];
+    const hotActive=view!=='account'&&view!=='perms';
+    $('#nav').innerHTML=(menuOn(u,0)?`<button class="${hotActive?'active':''}" onclick="go('hotels')"><i>▦</i>酒店管理</button>`:'')
+      +(u.admin?`<p>系统管理</p><button class="${view==='account'?'active':''}" onclick="go('account')"><i>⚙</i>账号管理</button><button class="${view==='perms'?'active':''}" onclick="go('perms')"><i>✦</i>权限管理</button>`:'');
+    $('#accbox').innerHTML=`<div class="accwrap">
+      <div class="account" onclick="toggleUserMenu()"><span class="avatar">${u.name[0]}</span><div class="account-meta"><b>${u.name}</b><small>${u.role}</small></div><span>⌄</span></div>
+      ${userMenuOpen?`<div class="umenu"><p>切换账号</p>${users.map((x,xi)=>`<button class="umitem ${xi===curUser?'cur':''}" onclick="switchUser(${xi})"><b>${x.name}</b><i>${x.role}</i></button>`).join('')}</div>`:''}
+    </div>`;
     $('#pageTitle').textContent=pageTitles[view];
     const hotelViews=['diag','tasks','detail','records'];
     const tabs=[['diag','诊断工作台'],['tasks','诊断任务'],['records','诊断日志']];
@@ -514,8 +552,11 @@
       <nav>${tabs.map(x=>`<button class="${(view===x[0]||(view==='detail'&&x[0]==='tasks'))?'active':''}" onclick="go('${x[0]}')">${x[1]}${x[0]==='tasks'&&todoTasks().length?`<em>${todoTasks().length}</em>`:''}</button>`).join('')}</nav>
     </div>`:'';
   }
-  function go(v){view=v;if(v==='hotels')activeHotel=null;render()}
-  function diagnose(i){if(!both(hotels[i]))return;activeHotel=hotels[i];if(!diagRun||diagRun.hotel!==hotels[i])initDiag();diagRun.hotel=hotels[i];view='diag';render()}
+  function go(v){const vk={hotels:0,diag:1,tasks:2,detail:2,records:3}[v];
+    if((v==='account'||v==='perms')&&!users[curUser].admin){toast('仅管理员可访问系统管理');return}
+    if(vk!=null&&!menuOn(users[curUser],vk)){toast('当前账号未开通该页面权限，请联系管理员');return}
+    view=v;if(v==='hotels')activeHotel=null;render()}
+  function diagnose(i){if(!both(hotels[i]))return;if(isSub()&&!users[curUser].hotels.includes(i)){toast('该酒店未配置给您，请联系管理员');return}activeHotel=hotels[i];if(!diagRun||diagRun.hotel!==hotels[i])initDiag();diagRun.hotel=hotels[i];view='diag';render()}
   function setHotelFilter(next){hotelFilter=next;render()}
   function setHotelQuery(next){hotelQuery=next;render();const input=$('#hotelSearch');input.focus();input.setSelectionRange(next.length,next.length)}
   function authState(v){return `<span class="badge ${v}"><i></i>${v==='ok'?'已授权':v==='expired'?'已失效':'未授权'}</span>`}
@@ -526,14 +567,15 @@
       ['diag7','近 7 天已诊断',h=>{const d=diagDays(h);return d!==null&&d<=7}],
       ['undiag7','近 7 天未诊断',h=>{const d=diagDays(h);return d===null||d>7}]];
     const match=opts.find(o=>o[0]===hotelFilter)[2];
-    const visible=hotels.map((h,i)=>({h,i})).filter(({h})=>match(h)&&h.name.includes(hotelQuery.trim()));
+    const scoped=hotels.map((h,i)=>({h,i})).filter(({i})=>!isSub()||users[curUser].hotels.includes(i));
+    const visible=scoped.filter(({h})=>match(h)&&h.name.includes(hotelQuery.trim()));
     return `<div class="page">
       <div class="page-head"><div><h1>酒店管理</h1></div></div>
       <div class="notice"><span class="notice-icon">ⓘ</span><div><b>抖音来客和携程官网都授权之后才可进行诊断</b></div></div>
       <div class="panel">
         <div class="panel-toolbar">
           <label class="search">⌕<input id="hotelSearch" value="${attr(hotelQuery)}" placeholder="搜索酒店名称" oninput="setHotelQuery(this.value)"></label>
-          <div class="seg">${opts.map(o=>`<button class="${hotelFilter===o[0]?'active':''}" onclick="setHotelFilter('${o[0]}')">${o[1]}<i>${hotels.filter(o[2]).length}</i></button>`).join('')}</div>
+          <div class="seg">${opts.map(o=>`<button class="${hotelFilter===o[0]?'active':''}" onclick="setHotelFilter('${o[0]}')">${o[1]}<i>${scoped.filter(({h})=>o[2](h)).length}</i></button>`).join('')}</div>
         </div>
         <div class="grid-row table-head"><span>酒店名称</span><span>抖音来客授权</span><span>携程官网授权</span><span>最近一次诊断完成时间</span><span style="text-align:right">操作</span></div>
         ${visible.length?visible.map(({h,i})=>`<div class="grid-row hotel-row">
@@ -643,19 +685,24 @@
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
   function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];if(!taskAllowed(t)){toast('该任务权限已被关闭，请联系管理员恢复');return}t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
   let confirmAsk=null;
-  function askIgnore(i,type){confirmAsk={i,type};const t=taskData[i];
+  function askIgnore(i,type){const t0=taskData[i];if(!taskAllowed(t0)){toast('该任务权限已被关闭，请联系管理员恢复');return}confirmAsk={i,type};const t=t0;
     const c=type==='skip'
       ?{title:'确认此次忽略？',body:`忽略后本次任务关闭，下次诊断仍会检查「${t.path}」节点。`,btn:'确认忽略'}
-      :{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，直至主动恢复。`,btn:'确认不再提醒'};
+      :isSub()
+        ?{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，同时您的「${t.node}」任务权限将被关闭；如后续仍需处理该任务，请联系管理员在账号管理中重新开启。`,btn:'确认不再提醒'}
+        :{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，直至主动恢复。`,btn:'确认不再提醒'};
     $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeConfirm(event)"><div class="modal" onclick="event.stopPropagation()" style="width:400px">
       <h2>${c.title}</h2><p class="sub">${c.body}</p>
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';
+    if(a.type!=='skip'&&isSub()){users[curUser].tasks[t.node]=false;toast('已关闭该节点后续提醒，您的「'+t.node+'」任务权限已同步关闭')}
+    else toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');
+    taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
     const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
@@ -708,28 +755,22 @@
   /* 外显小图替换建议：图片识别一致性比对，替换成功即任务完成 */
   const taskDetailCfg={
     '悦享双床房近 7 天价格偏高':{advice:'携程用户端悦享双床房近 7 天均价 ¥428，抖音来客当前卖价 ¥519，价差 21%，价格竞争力不足。建议按携程近 7 天均价同步调整。',src:[['房型','悦享双床房'],['携程近 7 天均价','¥428'],['抖音来客当前卖价','¥519']],fields:[{label:'建议写入价格',input:'¥428',note:'已按携程近 7 天均价预填，可修改'}],ignore:'此次忽略'},
-    '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式，缺少地标简称。',src:[['当前名称','尚宽酒店'],['建议名称','重庆西站华岩寺尚宽酒店店']],fields:[{label:'建议名称',input:'重庆西站华岩寺尚宽酒店店'}],ignore:'此次忽略'},
+    '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式，缺少地标简称。',fields:[{label:'建议名称',input:'重庆西站华岩寺尚宽酒店店'}],ignore:'此次忽略'},
     /* 基本信息 3 任务：与抖音来客「门店管理」修改弹窗同构，现状→修改为，全部可修改 */
-    '营业状态修正任务':{advice:'当前门店营业状态为「暂停营业」，已预填修改为「正常营业」，可在下方弹窗中改选，确认后 AI 进入抖音来客「门店管理 › 更改营业状态」写入并校验，成功后任务完成。',src:[['门店','尚宽酒店(重庆西站华岩寺店) · 门店ID 7424745436033845260'],['现状 · 抖音当前营业状态','暂停营业'],['修改为','正常营业'],['修改入口','门店管理 › 门店当前营业状态 › 更改营业状态']],ignore:'此次忽略',
+    '营业状态修正任务':{advice:'当前门店营业状态为「暂停营业」，已预填修改为「正常营业」，可在下方弹窗中改选，确认后 AI 进入抖音来客「门店管理 › 更改营业状态」写入并校验，成功后任务完成。',ignore:'此次忽略',
       bt:{modal:'变更营业状态',where:'门店管理 › 门店当前营业状态',cur:'暂停营业',to:'正常营业',
         curNote:'读取自抖音来客门店管理',toNote:'已预填，可改选',
         opts:['即将开业','正常营业','暂停营业'],optsNote:'与抖音来客「变更营业状态」弹窗选项一致，可改选'}},
-    '房间总数修正任务':{advice:'当前抖音来客房间总数未填写，已按携程 PC 端采集值预填 97 间，可修改，确认后 AI 进入抖音来客「门店管理 › 修改房间总数」写入并校验，成功后任务完成。',src:[['门店','尚宽酒店(重庆西站华岩寺店) · 门店ID 7424745436033845260'],['现状 · 抖音房间总数','未填写 · 未填写不在抖音展示房间总数'],['携程 PC 端房间总数','97 间'],['修改为','97 间'],['修改入口','门店管理 › 房间总数 › 修改房间总数']],ignore:'此次忽略',
+    '房间总数修正任务':{advice:'当前抖音来客房间总数未填写，已按携程 PC 端采集值预填 97 间，可修改，确认后 AI 进入抖音来客「门店管理 › 修改房间总数」写入并校验，成功后任务完成。',ignore:'此次忽略',
       bt:{modal:'修改房间总数',where:'门店管理 › 房间总数',cur:'未填写',to:'97 间',
         curNote:'读取自抖音来客门店管理',toNote:'已按携程 PC 端采集值预填，可修改',
         num:'97',numUnit:'间',numNote:'已按携程 PC 端房间总数预填，可修改',hint:'未填写不在抖音展示房间总数'}},
-    '联系电话修正任务':{advice:'当前抖音来客仅配置座机 023-61557388，与携程 PC 端（023-61557388；13640576689）不一致，已按携程电话预填座机＋手机 2 个（最多 3 个），可修改，确认后 AI 进入抖音来客「门店管理 › 修改联系电话」写入并校验，成功后任务完成。',src:[['门店','尚宽酒店(重庆西站华岩寺店) · 门店ID 7424745436033845260'],['现状 · 抖音联系电话','023-61557388（仅座机 1 个）'],['携程 PC 端联系电话','023-61557388；13640576689'],['修改为','座机 023-61557388 ＋ 手机 13640576689'],['修改入口','门店管理 › 联系电话 › 修改联系电话']],ignore:'此次忽略',
+    '联系电话修正任务':{advice:'当前抖音来客仅配置座机 023-61557388，与携程 PC 端（023-61557388；13640576689）不一致，已按携程电话预填座机＋手机 2 个（最多 3 个），可修改，确认后 AI 进入抖音来客「门店管理 › 修改联系电话」写入并校验，成功后任务完成。',ignore:'此次忽略',
       bt:{modal:'修改联系电话',where:'门店管理 › 联系电话',cur:'023-61557388（仅座机 1 个）',to:'座机 023-61557388 ＋ 手机 13640576689',
         curNote:'读取自抖音来客门店管理',toNote:'已按携程 PC 端电话预填，可修改',
         phones:[['座机','023','61557388'],['手机','','13640576689']],addTel:'＋ 添加电话（2/3）',telNote:'与抖音来客「修改联系电话」弹窗一致，已按携程预填，可修改；最多 3 个'}},
-    '酒店政策联合补充任务':{advice:'已按《抖音来客诊断规则表》对五组政策做联合对比：现状读取自抖音来客「酒店信息管理 › 酒店政策」，携程值采集自携程PC端，共检出 4 处需修改（最晚离店时间、儿童使用现有床收费标准与加床政策、宠物免费、早餐时间）；办理入住年龄与携程一致。',src:[['采集来源','携程PC端 · 酒店政策（诊断时采集）'],['对比对象','抖音来客「酒店信息管理 › 酒店政策」五组'],['对比结果','4 处需修改 · 办理入住年龄一致']],ignore:'此次忽略',
-      pol:{items:[
-        {name:'入离政策',cur:'最早入住 其他时间 10:30 · 最晚入住 不限 · 最早离店 不限 · 最晚离店 其他时间 15:00',ctrip:'10:30后入住 · 13:00前退房',to:'最晚离店时间 15:00 → 13:00，其余保持不变',chg:1},
-        {name:'办理入住年龄',cur:'最小年龄 18 · 最大年龄 不限制',ctrip:'接待提示：仅限 18 岁以上成人办理入住',to:'最小年龄 18 · 最大年龄 不限制（与现状一致，核对通过）',chg:0},
-        {name:'加床及儿童',cur:'可携带儿童 是 · 现有床 0-12 岁免费 · 加床 不提供 · 婴儿床 不提供',ctrip:'17 岁及以下儿童使用现有床铺免费 · 收费加床 · 不提供婴儿床',to:'现有床 0-17 岁免费 · 额外收费提供加床（成人 ¥100/晚 · 儿童 ¥80/晚）· 婴儿床不提供',chg:1},
-        {name:'宠物政策',cur:'允许宠物 是 · 允许带宠物免费 是',ctrip:'允许携带宠物 · 收费标签',to:'允许宠物 是 · 允许带宠物免费 否',chg:1},
-        {name:'早餐政策',cur:'提供早餐 · 自助餐 · 中式 · 谷物/鸡蛋/当地特色/蔬菜热菜 · 每日开放 08:00~10:00',ctrip:'提供早餐：自助餐 · 中式 · 谷物/鸡蛋/当地特色/蔬菜热菜 · 07:00~10:00',to:'早餐时间 08:00~10:00 → 07:00~10:00，其余保持不变',chg:1}
-      ]}},
+    /* 酒店政策联合补充：不单独展示来源数据与五组对比，对比结论并入「按抖音来客表单修改」单板块 */
+    '酒店政策联合补充任务':{advice:'已将抖音来客「酒店信息管理 › 酒店政策」五组政策与携程 PC 端逐一比对：检出 4 处需修改（最晚离店时间、儿童使用现有床收费标准与加床政策、宠物免费、早餐时间），办理入住年龄一致。下方表单与抖音来客「酒店政策」页面字段一致，差异处已按携程预填并标注修改说明，全部可修改，确认后 AI 统一写入并校验。',ignore:'此次忽略',pol:{}},
     /* 酒店设施信息核对：停车场/充电车位/餐厅/接机服务/接站服务合并为一条核对任务 */
     '酒店设施信息核对任务':{advice:'对照携程用户端“服务及设施”逐设施核对抖音来客「酒店信息管理 › 酒店设施」：检出 5 个设施不通过——充电车位、接机服务、接站服务为“携程有、抖音无”，建议改为“有”并补充详情；停车场、餐厅已为“有”但部分字段与携程不一致，按携程修正。以下修改内容已按携程映射预填，全部可修改，确认后提交，AI 将全部数据一并写入抖音来客。',src:[['采集来源','携程用户端“服务及设施”'],['抖音当前值','抖音来客 · 酒店信息管理 › 酒店设施'],['诊断不通过','5 个设施：缺失补充 3 · 字段修正 2']],ignore:'此次忽略',
       fac:{list:[
@@ -841,10 +882,6 @@
       {roomName:'巨幕投影大床房-重庆西站免费接送站2选1',roomId:'7659677410023846218',spec:'20-25㎡ · 1张1.8m大床 · 有窗 · 可住2人',calName:'巨幕投影大床房-重庆西站免费接送站2选1-0份早餐-限时免费退',calId:'18700426338190247',cur:'0',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
     '早餐份数修正·景观双床房':calTask('抖音来客「日历房」已覆盖“房型管理”全部 6 个房型；集合一致后逐房型比较早餐份数，一致的房型通过（不在任务内展示），检出 2 个房型不一致（巨幕投影大床房、景观双床房），已按房型分别生成独立任务，互不合并。本任务仅处理「景观双床房」：早餐份数 1 份 → 携程当前 2 份，修改内容支持灵活修改。',
       {roomName:'景观双床房-观龙门公园景观·免费早餐',roomId:'7659677622001534882',spec:'25-30㎡ · 2张1.35m单人床 · 有窗 · 可住2人',calName:'景观双床房-观龙门公园景观·免费早餐-1份早餐-阶梯退',calId:'18700427100226851',cur:'1',ctrip:'2',ctripNote:'携程用户端当前早餐份数 · 含双早',to:'2'}),
-    '房型信息核对·钟点房':rtTask('携程「钟点房」与抖音「钟点房」房型主体名称一致，判定为同一房型，诊断通过并自动对应；继续比对该房型字段，检出 3 项不一致（楼层、网络服务、房型设施），修改内容已按抖音来客字段生成，全部可修改，确认后 AI 仅修改本房型中用户确认的字段并写入抖音来客。',
-      [{field:'楼层',cur:'区间 5 ~ 10 层',ctrip:'区间 3 ~ 6 层',ctl:'range',from:'3',to:'6',unit:'层'},
-       {field:'网络服务',cur:'可上网 · WiFi 免费＋有线网络免费',ctrip:'仅无线 WiFi（免费）',ctl:'net',opts:[['可上网',1],['WiFi 免费',1],['有线网络',0]]},
-       {field:'房型设施',cur:'一次性洗漱用品 6 项、毛巾、浴巾、24 小时热水、淋浴、卫生间、电视机、空调、书桌、衣柜、瓶装水、唤醒服务',ctrip:'另含「电热水壶」，抖音未勾选',to:'电热水壶',ctl:'check'}]),
     '房型信息核对·亲子家庭房':rtTask('携程「亲子家庭房」与抖音「亲子家庭房-赠送小孩早餐·免费携带宠物」房型主体名称一致，判定为同一房型，诊断通过并自动对应；继续比对该房型字段，检出 2 项不一致（床型、最大可住人数），修改内容已按抖音来客字段生成，全部可修改，确认后 AI 仅修改本房型中用户确认的字段并写入抖音来客。',
       [{field:'床型',cur:'单人床 1.35m × 1张＋大床 1.8m × 1张',ctrip:'双人床 1.35m × 2张',ctl:'beds',beds:['2张床','双人床','1.35米']},
        {field:'最大可住人数',cur:'3 人',ctrip:'4 人',to:'4 人'}]),
@@ -866,7 +903,7 @@
         ]
       }},
     /* 酒店设施审核整改：被驳回设施合并为一条任务，仅替换该设施审核不通过的图片，独立于酒店设施详情补充任务（与《抖音来客诊断规则表A》「酒店设施审核不通过标签」一致） */
-    '酒店设施审核整改任务':{advice:'酒店设施顶部存在“审核不通过”标签：餐厅、健身室 2 个设施的图片审核未通过，合并为一条整改任务。如某一项设施图片审核不通过，仅替换该设施的图片；多个设施被驳回合并为同一条任务，逐设施独立确认：重新上传图片提交审核，或确认暂无此设施（AI 将该设施从“有”改为“无”）。',src:[['审核不通过标签','酒店设施顶部 · 读取自抖音来客'],['被驳回设施','2 个：餐厅、健身室'],['处理方式','仅替换被驳回图片 · 多项合并本任务'],['替换图来源','携程「服务及设施」图片 / 用户上传']],ignore:'此次忽略',
+    '酒店设施审核整改任务':{advice:'酒店设施顶部存在“审核不通过”标签：餐厅、健身室 2 个设施的图片审核未通过，合并为一条整改任务。如某一项设施图片审核不通过，仅替换该设施的图片；多个设施被驳回合并为同一条任务，逐设施独立确认：重新上传图片提交审核，或确认暂无此设施（AI 将该设施从“有”改为“无”）。',ignore:'此次忽略',
       faudit:{list:[
         {name:'餐厅',reason:'图片与设施不相关：当前图片为客房照片，与餐厅场景无关，审核未通过',
          cur:'客房照片',curNote:'2026-08-20 上传 · 抖音来客「酒店设施 › 餐厅」',
@@ -1055,7 +1092,7 @@
           ${(auAct[i]||'replace')==='replace'?gbRow('重新上传',`<span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片直接上传')">＋ 上传替换图</span><span class="gb-unit">建议比例 4:3，PNG / JPG / JPEG / GIF，不超过 20M；图片清晰，禁止水印、边框、二维码、图片拼接及大量文字</span>`,true):''}
         </div>`).join('')}
       </div>`
-      :c.faudit?`<div class="section"><h3>2　被驳回设施与图片替换（${c.faudit.list.length} 个设施 · 合并一条任务）</h3>
+      :c.faudit?`<div class="section"><h3>1　被驳回设施与图片替换（${c.faudit.list.length} 个设施 · 合并一条任务）</h3>
         <p class="review-tip">上传设施图片需平台审核通过后才可生效，请选择与该设施相关的图片以便于审核通过，建议分辨率 750×562 或比例 4:3、大小不超过 5MB。</p>
         ${c.faudit.list.map((f,fi)=>`<div class="gb-card">
           <div class="gb-head"><b>${f.name}<small>店铺管理 › 酒店信息管理 › 酒店设施 › ${f.name}</small></b><i class="tag red">图片审核未通过</i>
@@ -1099,7 +1136,7 @@
           ${gbRow('房型设施',`<div class="gb-hol">${c.rtNew.facs.map(f=>`<label class="gb-hol-it"><input type="checkbox" checked>${f}</label>`).join('')}</div><span class="gb-unit">仅展示需勾选写入的设施，可增删</span>`)}
         </div>
       </div>`
-      :c.bt?`<div class="section"><h3>2　差异与修改内容（${c.bt.cur} → ${c.bt.to}）</h3>
+      :c.bt?`<div class="section"><h3>1　差异与修改内容（${c.bt.cur} → ${c.bt.to}）</h3>
         <p class="review-tip">下方弹窗与抖音来客「${c.bt.modal}」一致，修改内容已预填、可修改，确认后 AI 写入抖音来客并校验。</p>
         <div class="gb-card">
           <div class="gb-head"><b>${c.bt.modal}<small>店铺管理 › 门店管理 · ${c.bt.where}</small></b></div>
@@ -1129,16 +1166,8 @@
           ${gbRow('早餐份数（修改后）',`<input class="gb-in gb-num" type="text" value="${calEff(c)}" oninput="setCalTo(this.value)"><span class="gb-unit">份 · 已按携程份数预填，可灵活修改；只能填入正整数（最小 0 份）</span>`,true)}
         </div>
       </div>`
-      :c.pol?`<div class="section"><h3>2　五组政策对比（现状 → 携程 → 修改为）</h3>
-        <p class="review-tip">现状读取自抖音来客「酒店信息管理 › 酒店政策」当前配置；携程值采集自携程PC端；「修改为」已预填，全部可修改。</p>
-        ${c.pol.items.map((g,i)=>`<div class="gb-card">
-          <div class="gb-head"><b>${i+2}.${i+1}　${g.name}</b><i class="tag ${g.chg?'red':'green'}">${g.chg?'有差异 · 需修改':'一致 · 核对通过'}</i></div>
-          ${gbRow('现状（抖音来客）',`<span class="gb-unit">${g.cur}</span>`)}
-          ${gbRow('携程',`<span class="gb-unit">${g.ctrip}</span>`)}
-          ${gbRow('修改为',`<b>${g.to}</b>`,true)}
-        </div>`).join('')}
-      </div>
-      <div class="section"><h3>3　按抖音来客表单修改（可编辑，与「酒店政策」页面字段一致）</h3>
+      :c.pol?`<div class="section"><h3>1　按抖音来客表单修改（与「酒店政策」页面字段一致，可编辑）</h3>
+        <p class="review-tip">已将抖音来客「酒店信息管理 › 酒店政策」五组政策与携程 PC 端逐一比对：检出 4 处需修改（最晚离店时间、儿童使用现有床收费标准与加床政策、宠物免费、早餐时间），办理入住年龄一致。差异处已在下方对应字段标注「由 xx 改为 xx」并按携程预填，全部可修改。</p>
         <div class="gb-card">
           <div class="gb-head"><b>入离政策<small>入住时间 / 离店时间 / 入住方式</small></b></div>
           ${gbRow('最早入住',`<label class="gb-radio"><input type="radio" name="pol-ei">不限</label><label class="gb-radio"><input type="radio" name="pol-ei" checked>其他时间</label><input class="gb-in" type="time" value="10:30">`)}
@@ -1176,7 +1205,7 @@
           ${gbRow('早餐时间',`<label class="gb-radio"><input type="radio" name="pol-bt" checked>每日开放</label><label class="gb-radio"><input type="radio" name="pol-bt">指定时间</label><input class="gb-in" type="time" value="07:00"><span class="gb-unit">~</span><input class="gb-in" type="time" value="10:00"><span class="gb-unit">按携程由 08:00~10:00 改为 07:00~10:00，可修改</span>`,true)}
         </div>
       </div>`
-      :(c.fields||[]).length?`<div class="section"><h3>2　建议写入抖音来客</h3>
+      :(c.fields||[]).length?`<div class="section"><h3>${c.src?2:1}　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
       actions=`${c.ignore==='暂无此设施'?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
@@ -1192,6 +1221,7 @@
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
     <div class="page-head"><div><h1>${t.name}</h1><p>${t.path} · 当前酒店：${activeHotel.name}</p></div><i class="tag red">待处理</i></div>
     <main>
+      ${!taskAllowed(t)?`<div class="section"><p class="review-tip" style="color:#b91c1c">「${t.node}」任务权限已被关闭（处理为"以后不再提醒"后自动关闭），请联系管理员在账号管理中重新开启。</p></div>`:''}
       ${main}
       <div class="action-bar">${actions}</div>
     </main>
@@ -1210,7 +1240,6 @@
     '早餐份数修正·巨幕投影大床房':['日历房 · 巨幕投影大床房'],
     '房型新增·电竞大床房':['房型管理 · 电竞大床房'],
     '房型信息核对·亲子家庭房':['房型管理 · 亲子家庭房'],
-    '房型信息核对·钟点房':['房型管理 · 钟点房'],
     '头图相册补充任务':['门店装修 · 头图和相册'],
     '外显小图替换建议任务':['门店装修 · 外显小图'],
     '门店装修审核整改任务':['门店装修 · 装修审核不通过'],
@@ -1224,7 +1253,7 @@
     '门店名称修改建议任务':['基本信息 · 门店名称']
   };
   const LOG_ST={done:['已完成','green'],fail:['执行失败','red'],wait:['待处理','gray']};
-  const DIAG_LOG=[ // 时间正序；ts: [任务名, 状态, 失败原因?]；最新一次与「诊断任务」页当前 21 条待处理任务一致
+  const DIAG_LOG=[ // 时间正序；ts: [任务名, 状态, 失败原因?]；最新一次与「诊断任务」页当前 22 条待处理任务一致
     {time:'2026-08-08 16:40',ts:[
       ['营业状态修正任务','done'],['房间总数修正任务','done'],['联系电话修正任务','done'],
       ['团购商品核对任务','done'],['预售房型补充任务','done'],['早餐份数修正·景观双床房','done'],
@@ -1232,7 +1261,7 @@
       ['悦享双床房近 7 天价格偏高','fail','价格护栏校验未通过：调整后价格超出近 30 天成交价波动范围'],['中差评回复','done'],
       ['商家经营分-评价分提升','done']]},
     {time:'2026-08-13 14:02',ts:[
-      ['房型信息核对·钟点房','done'],['悦享双床房近 7 天价格偏高','done'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],
+      ['悦享双床房近 7 天价格偏高','done'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],
       ['头图相册补充任务','done'],['中差评回复','done']]},
     {time:'2026-08-15 09:18',ts:[
       ['门店名称修改建议任务','done'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],['房型新增·电竞大床房','done']]},
@@ -1277,19 +1306,75 @@
   </div>`}
 
   /* ===== 账号管理 ===== */
-  function accountPage(){return `<div class="page">
-    <div class="page-head"><div><h1>账号管理</h1><p>管理当前登录账号的基础信息与安全设置</p></div></div>
-    <div class="card narrow">
-      <h3>账号信息</h3>
-      <div class="profile"><span class="avatar">禾</span><div><b>禾薇运营</b><small>代运营管理员</small></div><span class="badge ok"><i></i>正常</span></div>
-      <div class="info-row"><small>登录手机号</small><b>138 8888 6620</b></div>
-      <div class="info-row"><small>账号角色</small><b>代运营管理员</b></div>
-      <div class="info-row"><small>所属组织</small><b>禾薇代运营</b></div>
+  /* ===== 账号管理：管理员管理名下子账号（新增 / 配置酒店 / 任务权限恢复） ===== */
+  const hotelName=i=>hotels[i].name;
+  const accHotelTags=u=>u.hotels.length?u.hotels.map(hotelName).join('、'):'未配置酒店';
+  const accTaskStat=u=>{const closed=Object.keys(u.tasks).filter(k=>u.tasks[k]===false).length;return closed?`${closed} 项已关闭`:'全部开启'};
+  function accountPage(){
+    if(!users[curUser].admin)return `<div class="page"><div class="page-head"><div><h1>账号管理</h1></div></div><div class="empty-state"><i>🔒</i>仅管理员可访问账号管理</div></div>`;
+    return `<div class="page">
+    <div class="page-head"><div><h1>账号管理</h1><p>管理您名下的子账号：新增子账号、配置可查看的酒店、恢复被关闭的任务权限</p></div><button class="btn btn-primary" onclick="openNewAcc()">+ 新增子账号</button></div>
+    <div class="notice"><span class="notice-icon">ⓘ</span><div><b>子账号登录后仅可查看和诊断被配置的酒店；子账号将任务处理为「以后不再提醒」后，该任务权限自动关闭，可在此恢复</b></div></div>
+    <div class="panel">
+      <div class="grid-row table-head"><span>子账号</span><span>手机号</span><span>配置酒店</span><span>任务权限</span><span style="text-align:right">操作</span></div>
+      ${subUsers().map(u=>{const ui=users.indexOf(u);return `<div class="grid-row hotel-row">
+        <span class="hotel-name">${u.name}</span>
+        <span class="time">${u.phone}</span>
+        <span class="time ${u.hotels.length?'':'empty'}">${accHotelTags(u)}</span>
+        <span class="time">${accTaskStat(u)}</span>
+        <span class="row-actions"><button class="btn btn-outline" onclick="openAccHotels(${ui})">配置酒店</button><button class="btn btn-outline" onclick="openAccTasks(${ui})">任务权限</button></span>
+      </div>`}).join('')}
     </div>
-    <div class="card narrow" style="margin-top:16px">
-      <h3>安全设置</h3>
-      <p>修改登录密码或退出当前账号</p>
-      <div style="display:flex;gap:10px"><button class="btn btn-outline" onclick="toast('修改密码功能预留')">修改登录密码</button><button class="btn btn-outline" style="color:#dc2626;border-color:#fecaca" onclick="toast('已退出登录（演示）')">退出登录</button></div>
+  </div>`}
+  /* ----- 子账号相关弹窗与操作 ----- */
+  function toggleUserMenu(){userMenuOpen=!userMenuOpen;render()}
+  function switchUser(xi){curUser=xi;userMenuOpen=false;view='hotels';activeHotel=null;render();toast('已切换为 '+users[xi].name)}
+  function closeAccModal(){$('#modalRoot').innerHTML='';newAccOpen=false;accHotelsFor=null;accTasksFor=null}
+  function openNewAcc(){newAccOpen=true;$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
+    <h3>新增子账号</h3><p class="m-sub">创建后默认开通全部菜单权限，可再按需调整</p>
+    <div class="field"><label>员工姓名</label><input id="accName" value="${attr(newAcc.name)}" placeholder="请输入员工姓名" oninput="newAcc.name=this.value"></div>
+    <div class="field"><label>登录手机号</label><input id="accPhone" value="${attr(newAcc.phone)}" placeholder="请输入手机号" oninput="newAcc.phone=this.value"></div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="applyNewAcc()">确认新增</button></div>
+  </div></div>`}
+  function applyNewAcc(){if(!newAcc.name.trim()||!newAcc.phone.trim()){toast('请填写姓名和手机号');return}
+    users.push({name:newAcc.name.trim(),role:'普通员工',phone:newAcc.phone.trim(),admin:false,hotels:[],menus:[1,1,1,1],tasks:{}});
+    newAcc={name:'',phone:''};closeAccModal();render();toast('子账号已创建，已默认开通全部菜单权限')}
+  function openAccHotels(ui){accHotelsFor=ui;renderAccHotels()}
+  function renderAccHotels(){const u=users[accHotelsFor];$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
+    <h3>配置酒店 · ${u.name}</h3><p class="m-sub">勾选后该酒店将出现在子账号的酒店管理页面，可查看和诊断</p>
+    ${hotels.map((h,i)=>`<label class="perm-row ${u.hotels.includes(i)?'':'off'}"><span><b>${h.name}</b><small>${h.sub}</small></span><input type="checkbox" ${u.hotels.includes(i)?'checked':''} onchange="toggleAccHotel(${i},this.checked)"></label>`).join('')}
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="saveAccHotels()">保存配置</button></div>
+  </div></div>`}
+  function toggleAccHotel(i,on){const u=users[accHotelsFor];if(on&&!u.hotels.includes(i))u.hotels.push(i);if(!on)u.hotels=u.hotels.filter(x=>x!==i);renderAccHotels()}
+  function saveAccHotels(){const u=users[accHotelsFor];closeAccModal();render();toast(`已保存 ${u.name} 的酒店配置（${u.hotels.length} 家）`)}
+  function openAccTasks(ui){accTasksFor=ui;renderAccTasks()}
+  function renderAccTasks(){const u=users[accTasksFor];const closed=TASK_NODES.filter(n=>u.tasks[n]===false).length;$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
+    <h3>任务权限 · ${u.name}</h3><p class="m-sub">按诊断任务节点逐一开通（平铺展示），当前已关闭 ${closed} 项</p>
+    <div class="perm-grid">${TASK_NODES.map(n=>`<div class="perm-row ${u.tasks[n]===false?'off':''}"><span>${n}</span><span class="sw ${u.tasks[n]===false?'':'on'}" onclick="setAccTask('${n}',${u.tasks[n]===false})"></span></div>`).join('')}</div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="saveAccTasks()">保存配置</button></div>
+  </div></div>`}
+  function setAccTask(node,on){const u=users[accTasksFor];if(on)delete u.tasks[node];else u.tasks[node]=false;renderAccTasks()}
+  function saveAccTasks(){const u=users[accTasksFor];closeAccModal();render();toast(`已保存 ${u.name} 的任务权限`)}
+  /* ===== 权限管理：菜单权限 + 任务权限（按子账号配置） ===== */
+  function setPermSel(ui){permSel=ui;render()}
+  function setMenuPerm(k,on){const u=users[permSel];u.menus[k]=on?1:0;render();toast(`已${on?'开通':'关闭'} ${u.name} 的「${MENU_PERMS[k]}」菜单权限`)}
+  function setTaskPerm(node,on){const u=users[permSel];if(on)delete u.tasks[node];else u.tasks[node]=false;render();toast(`已${on?'开通':'关闭'} ${u.name} 的「${node}」任务权限`)}
+  function permsPage(){
+    if(!users[curUser].admin)return `<div class="page"><div class="page-head"><div><h1>权限管理</h1></div></div><div class="empty-state"><i>🔒</i>仅管理员可访问权限管理</div></div>`;
+    if(!subUsers().some(u=>users.indexOf(u)===permSel))permSel=users.indexOf(subUsers()[0]);
+    const u=users[permSel];
+    return `<div class="page">
+    <div class="page-head"><div><h1>权限管理</h1><p>为子账号配置菜单权限与任务权限，管理员自身不受权限限制</p></div>
+      <div class="seg">${subUsers().map(x=>{const xi=users.indexOf(x);return `<button class="${permSel===xi?'active':''}" onclick="setPermSel(${xi})">${x.name}</button>`}).join('')}</div></div>
+    <div class="card">
+      <h3>菜单权限 · ${u.name}</h3>
+      <p>控制子账号可访问的菜单页面</p>
+      <div class="perm-grid" style="margin-top:10px">${MENU_PERMS.map((m,k)=>`<div class="perm-row ${u.menus[k]===false?'off':''}"><span>${m}</span><span class="sw ${u.menus[k]===false?'':'on'}" onclick="setMenuPerm(${k},${u.menus[k]===false})"></span></div>`).join('')}</div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>任务权限 · ${u.name}</h3>
+      <p>按诊断任务节点逐一开通（平铺展示）；子账号将任务处理为「以后不再提醒」后对应权限自动关闭</p>
+      <div class="perm-grid" style="margin-top:10px">${TASK_NODES.map(n=>`<div class="perm-row ${u.tasks[n]===false?'off':''}"><span>${n}</span><span class="sw ${u.tasks[n]===false?'':'on'}" onclick="setTaskPerm('${n}',${u.tasks[n]===false})"></span></div>`).join('')}</div>
     </div>
   </div>`}
 
@@ -1314,7 +1399,7 @@
   function authorize(){hotels[authIndex][platform]='ok';reauth=false;toast(`${platform==='douyin'?'抖音来客':'携程官网'}授权成功`);modal();render()}
   function closeModal(e){if(e&&e.target!==e.currentTarget)return;$('#modalRoot').innerHTML='';authIndex=null}
 
-  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,records,account:accountPage};$('#app').innerHTML=pages[view]()}
+  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,records,account:accountPage,perms:permsPage};$('#app').innerHTML=pages[view]()}
   render();
 </script>
 </body>
