@@ -56,14 +56,6 @@
   .account-meta b{font-size:13px}
   .account-meta small{font-size:11px;color:var(--ink-3)}
   .account>span:last-child{color:var(--ink-4);font-size:11px}
-  .accwrap{position:relative}
-  .umenu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,.12);padding:6px;min-width:180px;z-index:60}
-  .umenu>p{font-size:11px;color:var(--ink-4);padding:4px 10px;margin:0}
-  .umitem{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:8px 10px;border:0;background:none;border-radius:8px;cursor:pointer;font-size:13px;color:var(--ink)}
-  .umitem:hover{background:var(--bg)}
-  .umitem.cur{background:#eef4ff;color:var(--brand)}
-  .umitem i{font-style:normal;font-size:11px;color:var(--ink-4)}
-  .umitem b{font-weight:500}
   .perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
   .perm-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff}
   .perm-row small{display:block;color:var(--ink-4);font-size:11px;font-weight:400}
@@ -167,7 +159,6 @@
   .pager button{min-width:28px;height:28px;padding:0 7px;border:1px solid #d1d5db;border-radius:6px;font-size:12.5px;color:var(--ink-2);background:var(--surface)}
   .pager button.cur{background:var(--primary);border-color:var(--primary);color:#fff}
   .pager button:disabled{color:var(--ink-4);cursor:not-allowed;background:var(--surface)}
-  .umenu .udiv{height:1px;background:var(--line);margin:5px 4px}
 
   /* 二级导航（右侧内容区顶部，进入酒店后展示） */
   .subnav{position:sticky;top:60px;z-index:15;display:flex;align-items:center;gap:16px;height:52px;padding:0 32px;background:var(--surface);border-bottom:1px solid var(--line)}
@@ -576,7 +567,7 @@
     {name:'李春燕',account:'lichunyan',roles:['运营管理员'],phone:'139 0752 3368',admin:false,status:1,hotels:[0,1],tasks:{},created:'2026-06-18 10:24',updated:'2026-08-30 11:47'},
     {name:'王芷琪',account:'wangzhiqi',roles:['酒店店长'],phone:'136 2291 7745',admin:false,status:1,hotels:[2],tasks:{'待回复中差评':false},created:'2026-07-02 16:05',updated:'2026-09-01 09:33'}
   ];
-  let curUser=0,userMenuOpen=false,newAccOpen=false,accHotelsFor=null,accTasksFor=null,editUserFor=null,delUserFor=null,resetFor=null,roleEditFor=null,resEditFor=null,resDelFor=null,roleNew=false,
+  let curUser=0,newAccOpen=false,accHotelsFor=null,accTasksFor=null,editUserFor=null,delUserFor=null,resetFor=null,roleEditFor=null,resEditFor=null,resDelFor=null,roleNew=false,
       newAcc={account:'',pwd:'',pwd2:'',name:'',roles:[],status:1},utmp={name:'',roles:[]},rtmp={name:'',remark:'',menus:[],status:1},ntmp=null,pwdForm={p1:'',p2:''},
       userQ='',userStatus='all',resQ='',resType='all',resOpen={m0:true},resCustom=[],newHotel={name:''};
   const isSub=()=>!users[curUser].admin;
@@ -624,11 +615,9 @@
     const u=users[curUser];
     const hotActive=!isSysView(view)&&view!=='profile';
     $('#nav').innerHTML=(menuOn(u,0)?`<button class="${hotActive?'active':''}" onclick="go('hotels')"><i>▦</i>酒店管理</button>`:'')
-      +(u.admin?`<p>系统管理</p><button class="${view==='users'?'active':''}" onclick="go('users')"><i>☰</i>用户管理</button><button class="${view==='roles'?'active':''}" onclick="go('roles')"><i>✦</i>角色管理</button><button class="${view==='res'?'active':''}" onclick="go('res')"><i>⑃</i>菜单管理</button>`:'');
-    $('#accbox').innerHTML=`<div class="accwrap">
-      <div class="account" onclick="toggleUserMenu()"><span class="avatar">${u.name[0]}</span><div class="account-meta"><b>${u.name}</b><small>${u.roles.join('、')}</small></div><span>⌄</span></div>
-      ${userMenuOpen?`<div class="umenu"><p>切换账号</p>${users.map((x,xi)=>`<button class="umitem ${xi===curUser?'cur':''}" onclick="switchUser(${xi})"><b>${x.name}</b><i>${x.roles.join('、')}${x.status===0?' · 已禁用':''}</i></button>`).join('')}<div class="udiv"></div><button class="umitem" onclick="go('profile')"><b>我的信息</b><i>账户与密码</i></button></div>`:''}
-    </div>`;
+      +(u.admin?`<p>系统管理</p><button class="${view==='users'?'active':''}" onclick="go('users')"><i>☰</i>用户管理</button><button class="${view==='roles'?'active':''}" onclick="go('roles')"><i>✦</i>角色管理</button><button class="${view==='res'?'active':''}" onclick="go('res')"><i>⑃</i>菜单管理</button>`:'')
+      +`<button class="${view==='profile'?'active':''}" onclick="go('profile')"><i>☺</i>我的信息</button>`;
+    $('#accbox').innerHTML=`<div class="account"><span class="avatar">${u.name[0]}</span><div class="account-meta"><b>${u.name}</b><small>${u.roles.join('、')}</small></div></div>`;
     $('#pageTitle').textContent=pageTitles[view];
     const hotelViews=['diag','tasks','detail','records'];
     const tabs=[['diag','诊断工作台'],['tasks','诊断任务'],['records','诊断日志']];
@@ -1401,8 +1390,6 @@
   const pwdError=p=>!p?'请输入你的密码!':/\s/.test(p)?'密码不能包含空格':p.length<8||p.length>16?'密码长度必须在8-16位之间':!(/[0-9]/.test(p)&&/[A-Z]/.test(p)&&/[a-z]/.test(p)&&/[^0-9a-zA-Z]/.test(p))?'密码必须包含数字、大写字母、小写字母和特殊符号':null;
 
   /* ----- 通用：用户菜单 / 弹窗关闭 / 切换账号 ----- */
-  function toggleUserMenu(){userMenuOpen=!userMenuOpen;render()}
-  function switchUser(xi){const x=users[xi];if(x.status===0){userMenuOpen=false;render();toast('该账户已禁用，无法登录');return}curUser=xi;userMenuOpen=false;view='hotels';activeHotel=null;render();toast('已切换为 '+x.name)}
   function closeAccModal(){$('#modalRoot').innerHTML='';newAccOpen=false;accHotelsFor=null;accTasksFor=null;editUserFor=null;delUserFor=null;resetFor=null;roleEditFor=null;resEditFor=null;resDelFor=null;roleNew=false}
 
   /* ----- 用户管理：账户名 / 用户名称 / 角色 / 状态 / 创建 / 更新 ----- */
