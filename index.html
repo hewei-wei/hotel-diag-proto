@@ -488,7 +488,7 @@
   const JOINT_TASK_NODE={'酒店政策联合补充任务':'加床及儿童'};
   /* ===== 账号与权限：管理员管理子账号；子账号仅见被配置酒店、被授权页面与任务节点 ===== */
   const MENU_PERMS=['酒店管理','酒店管理-诊断工作台','酒店管理-诊断任务','酒店管理-诊断日志'];
-  const TASK_NODES=diagSteps.flatMap(s=>s.items.map(i=>i[0]));
+  const TASK_NODES=[...new Set(diagSteps.flatMap(s=>s.items.map(i=>i[0])))];
   const users=[
     {name:'禾薇运营',role:'管理员',phone:'138 8888 6620',admin:true},
     {name:'李春燕',role:'普通员工',phone:'139 0752 3368',admin:false,hotels:[0,1],menus:[1,1,1,1],tasks:{}},
@@ -497,7 +497,7 @@
   let curUser=0,userMenuOpen=false,newAccOpen=false,accHotelsFor=null,accTasksFor=null,permSel=1,newAcc={name:'',phone:''};
   const isSub=()=>!users[curUser].admin;
   const subUsers=()=>users.filter(u=>!u.admin);
-  const menuOn=(u,k)=>u.admin||u.menus[k]!==false;
+  const menuOn=(u,k)=>u.admin||u.menus[k]!==0;
   const taskOn=(u,node)=>u.admin||u.tasks[node]!==false;
   const taskAllowed=t=>taskOn(users[curUser],t.node);
   function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
