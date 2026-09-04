@@ -67,6 +67,8 @@
   .perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
   .perm-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff}
   .perm-row small{display:block;color:var(--ink-4);font-size:11px;font-weight:400}
+  .perm-row input{flex:1;min-width:0;height:28px;border:1px solid var(--primary);border-radius:6px;padding:0 8px;font-size:13px}
+  .perm-row input:focus{outline:none;box-shadow:0 0 0 3px var(--primary-soft)}
   .perm-row.off{background:var(--bg);color:var(--ink-4)}
   .sw{position:relative;width:34px;height:19px;border-radius:10px;background:var(--line);cursor:pointer;flex:none;transition:background .15s}
   .sw::after{content:'';position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:left .15s}
@@ -486,20 +488,42 @@
   let diagRun=null,diagT=[];
   /* 联合诊断节点：任务名 → 代表检查项（多项不通过合并为一个任务，任务行挂在代表项上） */
   const JOINT_TASK_NODE={'酒店政策联合补充任务':'加床及儿童'};
-  /* ===== 账号与权限：管理员管理子账号；子账号仅见被配置酒店、被授权页面与任务节点 ===== */
-  const MENU_PERMS=['酒店管理','酒店管理-诊断工作台','酒店管理-诊断任务','酒店管理-诊断日志'];
-  const TASK_NODES=[...new Set(diagSteps.flatMap(s=>s.items.map(i=>i[0])))];
+  /* ===== 账号与权限：管理员管理子账号；权限管理维护通用权限（名称可编辑），子账号仅见被配置酒店、被授权页面与任务节点 ===== */
+  const permMenus=[
+    {name:'酒店管理',on:1},
+    {name:'酒店管理-诊断工作台',on:1},
+    {name:'酒店管理-诊断任务',on:1},
+    {name:'酒店管理-诊断日志',on:1}
+  ];
+  const permButtons=[
+    {key:'addHotel',name:'新增酒店',group:'酒店管理',on:1},
+    {key:'auth',name:'去授权 / 更新授权',group:'酒店管理',on:1},
+    {key:'diag',name:'诊断',group:'酒店管理',on:1},
+    {key:'startDiag',name:'开始诊断',group:'诊断工作台',on:1},
+    {key:'viewTasks',name:'查看任务',group:'诊断工作台',on:1},
+    {key:'reDiag',name:'重新诊断',group:'诊断工作台',on:1},
+    {key:'handle',name:'去处理',group:'诊断任务',on:1},
+    {key:'ignoreNow',name:'此次忽略',group:'诊断任务 / 任务详情',on:1},
+    {key:'ignoreForever',name:'以后不再提醒',group:'诊断任务 / 任务详情',on:1},
+    {key:'submit',name:'提交 / 已完成 / 暂无此设施',group:'任务详情',on:1},
+    {key:'logDetail',name:'详情 / 收起',group:'诊断日志',on:1}
+  ];
+  const TASK_DEFS=[...new Set(diagSteps.flatMap(s=>s.items.map(i=>i[0])))].map(n=>({key:n,name:n,on:1}));
+  const TASK_NODES=TASK_DEFS.map(d=>d.key);
+  const TASK_GROUPS=diagSteps.map(s=>({path:s.path,defs:TASK_DEFS.filter(d=>s.items.some(i=>i[0]===d.key))}));
   const users=[
     {name:'禾薇运营',role:'管理员',phone:'138 8888 6620',admin:true},
-    {name:'李春燕',role:'普通员工',phone:'139 0752 3368',admin:false,hotels:[0,1],menus:[1,1,1,1],tasks:{}},
-    {name:'王芷琪',role:'普通员工',phone:'136 2291 7745',admin:false,hotels:[2],menus:[1,1,1,0],tasks:{'待回复中差评':false}}
+    {name:'李春燕',role:'普通员工',phone:'139 0752 3368',admin:false,hotels:[0,1],tasks:{}},
+    {name:'王芷琪',role:'普通员工',phone:'136 2291 7745',admin:false,hotels:[2],tasks:{'待回复中差评':false}}
   ];
-  let curUser=0,userMenuOpen=false,newAccOpen=false,accHotelsFor=null,accTasksFor=null,permSel=1,newAcc={name:'',phone:''};
+  let curUser=0,userMenuOpen=false,newAccOpen=false,accHotelsFor=null,accTasksFor=null,newAcc={name:'',phone:''},newHotel={name:''},renaming=null;
   const isSub=()=>!users[curUser].admin;
   const subUsers=()=>users.filter(u=>!u.admin);
-  const menuOn=(u,k)=>u.admin||u.menus[k]!==0;
-  const taskOn=(u,node)=>u.admin||u.tasks[node]!==false;
+  const menuOn=(u,k)=>u.admin||permMenus[k].on===1;
+  const btnOn=k=>users[curUser].admin||(permButtons.find(b=>b.key===k)||{on:1}).on===1;
+  const taskOn=(u,node)=>u.admin||((TASK_DEFS.find(d=>d.key===node)||{on:1}).on===1&&u.tasks[node]!==false);
   const taskAllowed=t=>taskOn(users[curUser],t.node);
+  const nodeDisplay=node=>{const d=TASK_DEFS.find(d=>d.key===node);return d?d.name:node};
   function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
   function initRediag(){diagT.forEach(clearTimeout);diagT=[];const old=diagRun;diagRun={phase:'idle',focus:0,added:[],failCount:0,hotel:old&&old.hotel,steps:diagSteps.map((s,si)=>({state:'pending',prev:old?old.steps[si].state:null,items:s.items.map((it,ii)=>({state:'pending',prev:old?old.steps[si].items[ii].state:null}))}))}}
   const stepFails=si=>diagRun.steps[si].items.filter(it=>it.state==='fail').length;
@@ -570,7 +594,7 @@
     const scoped=hotels.map((h,i)=>({h,i})).filter(({i})=>!isSub()||users[curUser].hotels.includes(i));
     const visible=scoped.filter(({h})=>match(h)&&h.name.includes(hotelQuery.trim()));
     return `<div class="page">
-      <div class="page-head"><div><h1>酒店管理</h1></div></div>
+      <div class="page-head"><div><h1>酒店管理</h1></div>${btnOn('addHotel')?`<button class="btn btn-primary" onclick="openAddHotel()">+ 新增酒店</button>`:''}</div>
       <div class="notice"><span class="notice-icon">ⓘ</span><div><b>抖音来客和携程官网都授权之后才可进行诊断</b></div></div>
       <div class="panel">
         <div class="panel-toolbar">
@@ -582,7 +606,7 @@
           <span class="hotel-name">${h.name}</span>
           ${authState(h.douyin)}${authState(h.ctrip)}
           <span class="time ${h.lastDiagnosis?'':'empty'}">${h.lastDiagnosis||'暂无诊断记录'}</span>
-          <span class="row-actions"><button class="btn btn-outline" onclick="openAuth(${i})">${both(h)?'更新授权':'去授权'}</button><button class="btn btn-primary" onclick="diagnose(${i})" ${both(h)?'':'disabled'}>诊断</button></span>
+          <span class="row-actions">${btnOn('auth')?`<button class="btn btn-outline" onclick="openAuth(${i})">${both(h)?'更新授权':'去授权'}</button>`:''}${btnOn('diag')?`<button class="btn btn-primary" onclick="diagnose(${i})" ${both(h)?'':'disabled'}>诊断</button>`:''}</span>
         </div>`).join(''):`<div class="empty-state"><i>⌕</i>未找到匹配的酒店，请调整搜索内容或筛选条件</div>`}
       </div>
     </div>`}
@@ -615,9 +639,9 @@
         </div>
         <div class="hero-cta">
           ${diagRun.phase==='idle'?(limited?`<button class="btn btn-primary btn-start" disabled>▶　开始诊断</button>${note}`
-          :'<button class="btn btn-primary btn-start" onclick="startDiag()">▶　开始诊断</button>')
+          :(btnOn('startDiag')?'<button class="btn btn-primary btn-start" onclick="startDiag()">▶　开始诊断</button>':''))
           :diagRun.phase==='running'?'<button class="btn btn-primary btn-start" disabled><span class="spinner" style="margin:0"></span>　诊断中，请稍候</button>'
-          :`<button class="btn btn-primary btn-start" onclick="go('tasks')">查看任务（${diagRun.added.length}）</button><button class="btn btn-outline" style="height:46px;padding:0 24px" onclick="resetDiag()" ${limited?'disabled':''}>重新诊断</button>${note}`}
+          :`${btnOn('viewTasks')?`<button class="btn btn-primary btn-start" onclick="go('tasks')">查看任务（${diagRun.added.length}）</button>`:''}${btnOn('reDiag')?`<button class="btn btn-outline" style="height:46px;padding:0 24px" onclick="resetDiag()" ${limited?'disabled':''}>重新诊断</button>`:''}${note}`}
         </div>
       </div>
       <div class="hero-progress"><div class="pbar"><i style="width:${pct}%"></i></div><b class="hero-pct">${pct}%</b></div>
@@ -692,7 +716,7 @@
     const c=type==='skip'
       ?{title:'确认此次忽略？',body:`忽略后本次任务关闭，下次诊断仍会检查「${t.path}」节点。`,btn:'确认忽略'}
       :isSub()
-        ?{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，同时您的「${t.node}」任务权限将被关闭；如后续仍需处理该任务，请联系管理员在账号管理中重新开启。`,btn:'确认不再提醒'}
+        ?{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，同时您的「${nodeDisplay(t.node)}」任务权限将被关闭；如后续仍需处理该任务，请联系管理员在账号管理中重新开启。`,btn:'确认不再提醒'}
         :{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，直至主动恢复。`,btn:'确认不再提醒'};
     $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeConfirm(event)"><div class="modal" onclick="event.stopPropagation()" style="width:400px">
       <h2>${c.title}</h2><p class="sub">${c.body}</p>
@@ -700,7 +724,7 @@
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
   function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';
-    if(a.type!=='skip'&&isSub()){users[curUser].tasks[t.node]=false;toast('已关闭该节点后续提醒，您的「'+t.node+'」任务权限已同步关闭')}
+    if(a.type!=='skip'&&isSub()){users[curUser].tasks[t.node]=false;toast('已关闭该节点后续提醒，您的「'+nodeDisplay(t.node)+'」任务权限已同步关闭')}
     else toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');
     taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   function tasks(){
@@ -718,7 +742,7 @@
         ${todo.length?todo.map((x,i)=>{const di=taskData.indexOf(x);return `<div class="tgrid trow" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr">
           <div class="tcell-title"><b>${x.name}</b><small>已完成数据比对，等待人工确认</small></div>
           <span>${x.path}</span><span>${x.diagTime}</span>
-          <span style="text-align:right;white-space:nowrap"><button class="btn btn-primary btn-sm" onclick="openTask(${i})">去处理</button><button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'skip')">此次忽略</button><button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'mute')">以后不再提醒</button></span>
+          <span style="text-align:right;white-space:nowrap">${btnOn('handle')?`<button class="btn btn-primary btn-sm" onclick="openTask(${i})">去处理</button>`:''}${btnOn('ignoreNow')?`<button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'skip')">此次忽略</button>`:''}${btnOn('ignoreForever')?`<button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'mute')">以后不再提醒</button>`:''}</span>
         </div>`}).join(''):'<div class="empty-state"><i>✓</i>暂无待处理任务</div>'}`
         :`<div class="panel-toolbar">
           <label class="search">⌕<input id="taskSearch" value="${attr(taskQuery)}" placeholder="搜索任务名称" oninput="setTaskQuery(this.value)"></label>
@@ -975,10 +999,10 @@
           <p class="route-tips">视频时长建议控制在 90 秒以内；分辨率需清晰呈现关键信息（避免画面模糊）；画面建议减少晃动、保持稳定；内容禁止包含营销推广信息；拍摄过程中不得出现未成年人肖像。</p>
           <div class="upload-box video" onclick="toast('演示原型：请在抖音来客上传指引视频')"><i>📷</i><span>上传指引视频</span></div>`}
       </div>`;
-      actions=`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
-        <button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>
+      actions=`${btnOn('ignoreNow')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>`:''}
+        ${btnOn('ignoreForever')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`:''}
         ${guideMode!=null?'<button class="btn btn-outline" onclick="setGuideMode(null)">上一步</button>':''}
-        <button class="btn btn-primary" onclick="finishTask('执行中','找店指引已提交，AI 正在同步至抖音来客')" ${guideMode==null?'disabled':''}>提交</button>`;
+        ${btnOn('submit')?`<button class="btn btn-primary" onclick="finishTask('执行中','找店指引已提交，AI 正在同步至抖音来客')" ${guideMode==null?'disabled':''}>提交</button>`:''}`;
     }else{
       const c=taskDetailCfg[t.name]||{advice:`「${t.path}」检查不通过，已生成处理建议。请确认以下建议内容，提交后写入抖音来客。`,src:[['检查项',t.path],...(t.type?[['任务类型',t.type]]:[]),['诊断时间',t.diagTime]],fields:[]};
       main=`${c.src?`<div class="section"><h3>1　来源数据与差异</h3>
@@ -1208,20 +1232,20 @@
       :(c.fields||[]).length?`<div class="section"><h3>${c.src?2:1}　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
-      actions=`${c.ignore==='暂无此设施'?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
-        <button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>
-        ${c.rtNew?'':`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`}
-        ${c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
+      actions=`${c.ignore==='暂无此设施'&&btnOn('submit')?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
+        ${btnOn('ignoreNow')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>`:''}
+        ${c.rtNew?'':btnOn('ignoreForever')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`:''}
+        ${btnOn('submit')?(c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
           :c.pol?`<button class="btn btn-primary" ${polSel.bf?'':'disabled'} onclick="finishTask('执行中','酒店政策已提交，AI 正在统一填写抖音来客五组政策并校验')">提交</button>`
           :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
           :c.faudit?'<button class="btn btn-primary" onclick="finishTask(\'执行中\',\'已提交审核，AI 正在使用替换图片在抖音来客重新提交设施审核，提交成功并完成结果校验后任务标记为已完成；暂无此设施将改为「无」\')">提交审核</button>'
-          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.presale?'预售方案已提交，AI 正在写入抖音来客并校验':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图，替换成功即完成任务':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':c.bt?'修改已提交，AI 正在写入抖音来客并校验结果':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`}`;
+          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.presale?'预售方案已提交，AI 正在写入抖音来客并校验':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图，替换成功即完成任务':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':c.bt?'修改已提交，AI 正在写入抖音来客并校验结果':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`):''}`;
     }
     return `<div class="page">
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
     <div class="page-head"><div><h1>${t.name}</h1><p>${t.path} · 当前酒店：${activeHotel.name}</p></div><i class="tag red">待处理</i></div>
     <main>
-      ${!taskAllowed(t)?`<div class="section"><p class="review-tip" style="color:#b91c1c">「${t.node}」任务权限已被关闭（处理为"以后不再提醒"后自动关闭），请联系管理员在账号管理中重新开启。</p></div>`:''}
+      ${!taskAllowed(t)?`<div class="section"><p class="review-tip" style="color:#b91c1c">「${nodeDisplay(t.node)}」任务权限已被关闭（处理为"以后不再提醒"后自动关闭），请联系管理员在账号管理中重新开启。</p></div>`:''}
       ${main}
       <div class="action-bar">${actions}</div>
     </main>
@@ -1290,7 +1314,7 @@
         <span class="lnum"><b>${o.task}</b><small>个任务</small></span>
         <span class="lnum"><b style="color:#15803d">${o.ok}</b><small>个已完成</small></span>
         <span class="lnum"><b style="color:${o.bad?'#b91c1c':'var(--ink-4)'}">${o.bad}</b><small>个失败</small></span>
-        <span><button class="lbtn" onclick="toggleLog(${o.n-1})">${logOpen===o.n-1?'收起':'详情'}</button></span>
+        <span>${btnOn('logDetail')?`<button class="lbtn" onclick="toggleLog(${o.n-1})">${logOpen===o.n-1?'收起':'详情'}</button>`:''}</span>
       </div>
       ${logOpen===o.n-1?`<div class="lpanel">
         <div class="lt-cap">第 ${o.n} 次诊断 · ${o.r.time} · 共 ${o.task} 条任务详情</div>
@@ -1339,6 +1363,15 @@
   function applyNewAcc(){if(!newAcc.name.trim()||!newAcc.phone.trim()){toast('请填写姓名和手机号');return}
     users.push({name:newAcc.name.trim(),role:'普通员工',phone:newAcc.phone.trim(),admin:false,hotels:[],menus:[1,1,1,1],tasks:{}});
     newAcc={name:'',phone:''};closeAccModal();render();toast('子账号已创建，已默认开通全部菜单权限')}
+  /* ----- 新增酒店弹窗 ----- */
+  function openAddHotel(){newHotel={name:''};$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
+    <h3>新增酒店</h3><p class="m-sub">输入酒店名称即可新增；新增后抖音来客与携程官网默认未授权，需完成授权后才可诊断</p>
+    <div class="field"><label>酒店名称</label><input id="newHotelName" value="${attr(newHotel.name)}" placeholder="请输入酒店名称" oninput="newHotel.name=this.value"></div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="applyAddHotel()">确认新增</button></div>
+  </div></div>`}
+  function applyAddHotel(){if(!newHotel.name.trim()){toast('请输入酒店名称');return}
+    hotels.push({name:newHotel.name.trim(),sub:'待补充门店信息',douyin:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]});
+    newHotel={name:''};closeAccModal();render();toast('酒店已新增，抖音来客与携程官网默认未授权')}
   function openAccHotels(ui){accHotelsFor=ui;renderAccHotels()}
   function renderAccHotels(){const u=users[accHotelsFor];$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
     <h3>配置酒店 · ${u.name}</h3><p class="m-sub">勾选后该酒店将出现在子账号的酒店管理页面，可查看和诊断</p>
@@ -1350,31 +1383,41 @@
   function openAccTasks(ui){accTasksFor=ui;renderAccTasks()}
   function renderAccTasks(){const u=users[accTasksFor];const closed=TASK_NODES.filter(n=>u.tasks[n]===false).length;$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
     <h3>任务权限 · ${u.name}</h3><p class="m-sub">按诊断任务节点逐一开通（平铺展示），当前已关闭 ${closed} 项</p>
-    <div class="perm-grid">${TASK_NODES.map(n=>`<div class="perm-row ${u.tasks[n]===false?'off':''}"><span>${n}</span><span class="sw ${u.tasks[n]===false?'':'on'}" onclick="setAccTask('${n}',${u.tasks[n]===false})"></span></div>`).join('')}</div>
+    <div class="perm-grid">${TASK_NODES.map(n=>`<div class="perm-row ${u.tasks[n]===false?'off':''}"><span>${nodeDisplay(n)}</span><span class="sw ${u.tasks[n]===false?'':'on'}" onclick="setAccTask('${n}',${u.tasks[n]===false})"></span></div>`).join('')}</div>
     <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="saveAccTasks()">保存配置</button></div>
   </div></div>`}
   function setAccTask(node,on){const u=users[accTasksFor];if(on)delete u.tasks[node];else u.tasks[node]=false;renderAccTasks()}
   function saveAccTasks(){const u=users[accTasksFor];closeAccModal();render();toast(`已保存 ${u.name} 的任务权限`)}
   /* ===== 权限管理：菜单权限 + 任务权限（按子账号配置） ===== */
-  function setPermSel(ui){permSel=ui;render()}
-  function setMenuPerm(k,on){const u=users[permSel];u.menus[k]=on?1:0;render();toast(`已${on?'开通':'关闭'} ${u.name} 的「${MENU_PERMS[k]}」菜单权限`)}
-  function setTaskPerm(node,on){const u=users[permSel];if(on)delete u.tasks[node];else u.tasks[node]=false;render();toast(`已${on?'开通':'关闭'} ${u.name} 的「${node}」任务权限`)}
+  function setMenuPerm(k,on){permMenus[k].on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${permMenus[k].name}」菜单权限`)}
+  function setBtnPerm(key,on){const b=permButtons.find(b=>b.key===key);b.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${b.name}」按钮权限`)}
+  function setTaskPerm(key,on){const d=TASK_DEFS.find(d=>d.key===key);d.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${d.name}」任务权限`)}
+  function renameStart(t,k){renaming={t,k};render();setTimeout(()=>{const i=document.getElementById('rnInput');if(i){i.focus();i.select()}},0)}
+  function renameCommit(t,k,v){v=(v||'').trim();renaming=null;
+    if(v){let d=null;
+      if(t==='menu')d=permMenus[k];
+      else if(t==='btn')d=permButtons.find(b=>b.key===k);
+      else if(t==='task')d=TASK_DEFS.find(d=>d.key===k);
+      if(d&&d.name!==v){d.name=v;render();toast('权限名称已更新');return}}
+    render()}
+  const nameCell=(t,k,name)=>renaming&&renaming.t===t&&renaming.k===k
+    ?`<input id="rnInput" value="${attr(name)}" onblur="renameCommit('${t}','${k}',this.value)" onkeydown="if(event.key==='Enter')this.blur()">`
+    :`<span>${name}　<a class="exlink" style="font-size:11px" onclick="renameStart('${t}','${k}')">✎</a></span>`;
   function permsPage(){
     if(!users[curUser].admin)return `<div class="page"><div class="page-head"><div><h1>权限管理</h1></div></div><div class="empty-state"><i>🔒</i>仅管理员可访问权限管理</div></div>`;
-    if(!subUsers().some(u=>users.indexOf(u)===permSel))permSel=users.indexOf(subUsers()[0]);
-    const u=users[permSel];
     return `<div class="page">
-    <div class="page-head"><div><h1>权限管理</h1><p>为子账号配置菜单权限与任务权限，管理员自身不受权限限制</p></div>
-      <div class="seg">${subUsers().map(x=>{const xi=users.indexOf(x);return `<button class="${permSel===xi?'active':''}" onclick="setPermSel(${xi})">${x.name}</button>`}).join('')}</div></div>
+    <div class="page-head"><div><h1>权限管理</h1><p>通用权限配置，对所有子账号生效；点击 ✎ 可编辑权限名称，管理员自身不受权限限制</p></div></div>
     <div class="card">
-      <h3>菜单权限 · ${u.name}</h3>
-      <p>控制子账号可访问的菜单页面</p>
-      <div class="perm-grid" style="margin-top:10px">${MENU_PERMS.map((m,k)=>`<div class="perm-row ${u.menus[k]===false?'off':''}"><span>${m}</span><span class="sw ${u.menus[k]===false?'':'on'}" onclick="setMenuPerm(${k},${u.menus[k]===false})"></span></div>`).join('')}</div>
+      <h3>菜单权限</h3><p>控制子账号可访问的菜单页面</p>
+      <div class="perm-grid" style="margin-top:10px">${permMenus.map((m,k)=>`<div class="perm-row ${m.on?'':'off'}">${nameCell('menu',k,m.name)}<span class="sw ${m.on?'on':''}" onclick="setMenuPerm(${k},${m.on?0:1})"></span></div>`).join('')}</div>
     </div>
     <div class="card" style="margin-top:16px">
-      <h3>任务权限 · ${u.name}</h3>
-      <p>按诊断任务节点逐一开通（平铺展示）；子账号将任务处理为「以后不再提醒」后对应权限自动关闭</p>
-      <div class="perm-grid" style="margin-top:10px">${TASK_NODES.map(n=>`<div class="perm-row ${u.tasks[n]===false?'off':''}"><span>${n}</span><span class="sw ${u.tasks[n]===false?'':'on'}" onclick="setTaskPerm('${n}',${u.tasks[n]===false})"></span></div>`).join('')}</div>
+      <h3>按钮权限</h3><p>酒店管理及二级页面所有按钮的权限</p>
+      ${['酒店管理','诊断工作台','诊断任务','任务详情','诊断日志'].map(g=>{const bs=permButtons.filter(b=>b.group===g);return bs.length?`<div class="m-sec">${g}</div><div class="perm-grid">${bs.map(b=>`<div class="perm-row ${b.on?'':'off'}">${nameCell('btn',b.key,b.name)}<span class="sw ${b.on?'on':''}" onclick="setBtnPerm('${b.key}',${b.on?0:1})"></span></div>`).join('')}</div>`:''}).join('')}
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>任务权限</h3><p>按抖音来客诊断路径展示诊断任务节点；子账号将任务处理为「以后不再提醒」后对应权限自动关闭，可在账号管理中为单个子账号恢复</p>
+      ${TASK_GROUPS.map(g=>`<div class="m-sec">${g.path}</div><div class="perm-grid">${g.defs.map(d=>`<div class="perm-row ${d.on?'':'off'}">${nameCell('task',d.key,d.name)}<span class="sw ${d.on?'on':''}" onclick="setTaskPerm('${d.key}',${d.on?0:1})"></span></div>`).join('')}</div>`).join('')}
     </div>
   </div>`}
 
