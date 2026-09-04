@@ -529,12 +529,10 @@
     {key:'reDiag',name:'重新诊断',group:'诊断工作台',on:1},
     {key:'handle',name:'去处理',group:'诊断任务',on:1},
     {key:'ignoreNow',name:'此次忽略',group:'诊断任务 / 任务详情',on:1},
-    {key:'ignoreForever',name:'以后不再提醒',group:'诊断任务 / 任务详情',on:1},
     {key:'submit',name:'提交 / 已完成 / 暂无此设施',group:'任务详情',on:1},
     {key:'logDetail',name:'详情 / 收起',group:'诊断日志',on:1}
   ];
   const TASK_DEFS=[...new Set(diagSteps.flatMap(s=>s.items.map(i=>i[0])))].map(n=>({key:n,name:n,on:1}));
-  const TASK_NODES=TASK_DEFS.map(d=>d.key);
   const TASK_GROUPS=diagSteps.map(s=>({path:s.path,defs:TASK_DEFS.filter(d=>s.items.some(i=>i[0]===d.key))}));
   /* ===== 系统管理（RBAC 标准）：账号 —角色—资源 三层关系 =====
      资源树 = 菜单 / 按钮 / 接口 三类；诊断任务节点作为「诊断任务」菜单下的按钮级资源；
@@ -563,16 +561,16 @@
   const NEW_TS='2026-09-04 15:20';
   const users=[
     {name:'禾薇运营',account:'admin',roles:['超级管理员'],phone:'138 8888 6620',admin:true,status:1,created:'2026-05-12 09:20',updated:'2026-08-26 14:02'},
-    {name:'李春燕',account:'lichunyan',roles:['运营管理员'],phone:'139 0752 3368',admin:false,status:1,hotels:[0,1],tasks:{},created:'2026-06-18 10:24',updated:'2026-08-30 11:47'},
-    {name:'王芷琪',account:'wangzhiqi',roles:['酒店店长'],phone:'136 2291 7745',admin:false,status:1,hotels:[2],tasks:{'待回复中差评':false},created:'2026-07-02 16:05',updated:'2026-09-01 09:33'}
+    {name:'李春燕',account:'lichunyan',roles:['运营管理员'],phone:'139 0752 3368',admin:false,status:1,hotels:[0,1],created:'2026-06-18 10:24',updated:'2026-08-30 11:47'},
+    {name:'王芷琪',account:'wangzhiqi',roles:['酒店店长'],phone:'136 2291 7745',admin:false,status:1,hotels:[2],created:'2026-07-02 16:05',updated:'2026-09-01 09:33'}
   ];
-  let curUser=0,newAccOpen=false,accHotelsFor=null,accTasksFor=null,editUserFor=null,delUserFor=null,resetFor=null,roleEditFor=null,resEditFor=null,resDelFor=null,roleNew=false,
+  let curUser=0,newAccOpen=false,accHotelsFor=null,editUserFor=null,delUserFor=null,resetFor=null,roleEditFor=null,resEditFor=null,resDelFor=null,roleNew=false,
       newAcc={account:'',pwd:'',pwd2:'',name:'',roles:[],status:1},utmp={name:'',roles:[]},rtmp={name:'',remark:'',menus:[],status:1},ntmp=null,pwdForm={p1:'',p2:''},
       userQ='',userStatus='all',resQ='',resType='all',resOpen={m0:true},resCustom=[],newHotel={name:''};
   const isSub=()=>!users[curUser].admin;
   const menuOn=(u,k)=>u.admin||permMenus[k].on===1;
   const btnOn=k=>users[curUser].admin||(permButtons.find(b=>b.key===k)||{on:1}).on===1;
-  const taskOn=(u,node)=>u.admin||((TASK_DEFS.find(d=>d.key===node)||{on:1}).on===1&&u.tasks[node]!==false);
+  const taskOn=(u,node)=>u.admin||(TASK_DEFS.find(d=>d.key===node)||{on:1}).on===1;
   const taskAllowed=t=>taskOn(users[curUser],t.node);
   const nodeDisplay=node=>{const d=TASK_DEFS.find(d=>d.key===node);return d?d.name:node};
   function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
@@ -753,33 +751,30 @@
   let taskTab='todo',taskIdx=0,taskQuery='',taskExec='全部';
   const todoTasks=()=>taskData.filter(t=>t.status==='待处理'),doneTasks=()=>taskData.filter(t=>t.status==='已处理');
   const doneShown=()=>doneTasks().filter(t=>(taskExec==='全部'||t.exec===taskExec)&&t.name.includes(taskQuery.trim()));
-  const execTag=e=>e==='执行完成'?'green':e==='执行失败'?'red':(e==='已忽略'||e==='已忽略（此次）')?'gray':'';
+  const execTag=e=>e==='执行完成'?'green':e==='执行失败'?'red':e==='已忽略（此次）'?'gray':'';
   const TS_FULL=/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
   function setTaskTab(t){taskTab=t;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
   function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];if(!taskAllowed(t)){toast('该任务权限已被关闭，请联系管理员恢复');return}t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
-  /* 二次确认弹窗：此次忽略 / 以后不再提醒 */
+  function finishTask(exec,msg){const t=taskData[taskIdx];if(!taskAllowed(t)){toast('该任务权限已被关闭，请联系管理员在菜单管理中开启');return}t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
+  /* 二次确认弹窗：此次忽略 */
   let confirmAsk=null;
-  function askIgnore(i,type){const t0=taskData[i];if(!taskAllowed(t0)){toast('该任务权限已被关闭，请联系管理员恢复');return}confirmAsk={i,type};const t=t0;
+  function askIgnore(i,type){const t0=taskData[i];if(!taskAllowed(t0)){toast('该任务权限已被关闭，请联系管理员在菜单管理中开启');return}confirmAsk={i,type};const t=t0;
     const c=type==='skip'
       ?{title:'确认此次忽略？',body:`忽略后本次任务关闭，下次诊断仍会检查「${t.path}」节点。`,btn:'确认忽略'}
-      :isSub()
-        ?{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，同时您的「${nodeDisplay(t.node)}」任务权限将被关闭；如后续仍需处理该任务，请联系管理员在账号管理中重新开启。`,btn:'确认不再提醒'}
-        :{title:'确认以后不再提醒？',body:`确认后关闭该酒店「${t.path}」节点的后续自动提醒，直至主动恢复。`,btn:'确认不再提醒'};
+      :null;
     $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeConfirm(event)"><div class="modal" onclick="event.stopPropagation()" style="width:400px">
       <h2>${c.title}</h2><p class="sub">${c.body}</p>
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=a.type==='skip'?'已忽略（此次）':'已忽略';
-    if(a.type!=='skip'&&isSub()){users[curUser].tasks[t.node]=false;toast('已关闭该节点后续提醒，您的「'+nodeDisplay(t.node)+'」任务权限已同步关闭')}
-    else toast(a.type==='skip'?'已忽略本次任务，下次诊断仍会检查':'已关闭该节点后续提醒，直至主动恢复');
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec='已忽略（此次）';
+    toast('已忽略本次任务，下次诊断仍会检查');
     taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks(),shown=doneShown();
-    const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）','已忽略'];
+    const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）'];
     return `<div class="page">
     <div class="page-head"><div><h1>诊断任务</h1><p>本次诊断生成的任务，逐项确认后 AI 才会进入抖音来客执行修改</p></div></div>
     <div class="tabs">
@@ -792,7 +787,7 @@
         ${todo.length?todo.map((x,i)=>{const di=taskData.indexOf(x);return `<div class="tgrid trow" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr">
           <div class="tcell-title"><b>${x.name}</b><small>已完成数据比对，等待人工确认</small></div>
           <span>${x.path}</span><span>${x.diagTime}</span>
-          <span style="text-align:right;white-space:nowrap">${btnOn('handle')?`<button class="btn btn-primary btn-sm" onclick="openTask(${i})">去处理</button>`:''}${btnOn('ignoreNow')?`<button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'skip')">此次忽略</button>`:''}${btnOn('ignoreForever')?`<button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'mute')">以后不再提醒</button>`:''}</span>
+          <span style="text-align:right;white-space:nowrap">${btnOn('handle')?`<button class="btn btn-primary btn-sm" onclick="openTask(${i})">去处理</button>`:''}${btnOn('ignoreNow')?`<button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'skip')">此次忽略</button>`:''}</span>
         </div>`}).join(''):'<div class="empty-state"><i>✓</i>暂无待处理任务</div>'}`
         :`<div class="panel-toolbar">
           <label class="search">⌕<input id="taskSearch" value="${attr(taskQuery)}" placeholder="搜索任务名称" oninput="setTaskQuery(this.value)"></label>
@@ -1050,7 +1045,6 @@
           <div class="upload-box video" onclick="toast('演示原型：请在抖音来客上传指引视频')"><i>📷</i><span>上传指引视频</span></div>`}
       </div>`;
       actions=`${btnOn('ignoreNow')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>`:''}
-        ${btnOn('ignoreForever')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`:''}
         ${guideMode!=null?'<button class="btn btn-outline" onclick="setGuideMode(null)">上一步</button>':''}
         ${btnOn('submit')?`<button class="btn btn-primary" onclick="finishTask('执行中','找店指引已提交，AI 正在同步至抖音来客')" ${guideMode==null?'disabled':''}>提交</button>`:''}`;
     }else{
@@ -1284,7 +1278,6 @@
       </div>`:''}`;
       actions=`${c.ignore==='暂无此设施'&&btnOn('submit')?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
         ${btnOn('ignoreNow')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>`:''}
-        ${c.rtNew?'':btnOn('ignoreForever')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'mute')">以后不再提醒</button>`:''}
         ${btnOn('submit')?(c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
           :c.pol?`<button class="btn btn-primary" ${polSel.bf?'':'disabled'} onclick="finishTask('执行中','酒店政策已提交，AI 正在统一填写抖音来客五组政策并校验')">提交</button>`
           :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
@@ -1295,7 +1288,7 @@
     <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
     <div class="page-head"><div><h1>${t.name}</h1><p>${t.path} · 当前酒店：${activeHotel.name}</p></div><i class="tag red">待处理</i></div>
     <main>
-      ${!taskAllowed(t)?`<div class="section"><p class="review-tip" style="color:#b91c1c">「${nodeDisplay(t.node)}」任务权限已被关闭（处理为"以后不再提醒"后自动关闭），请联系管理员在账号管理中重新开启。</p></div>`:''}
+      ${!taskAllowed(t)?`<div class="section"><p class="review-tip" style="color:#b91c1c">「${nodeDisplay(t.node)}」任务权限已被关闭，请联系管理员在菜单管理中重新开启。</p></div>`:''}
       ${main}
       <div class="action-bar">${actions}</div>
     </main>
@@ -1389,7 +1382,7 @@
   const pwdError=p=>!p?'请输入你的密码!':/\s/.test(p)?'密码不能包含空格':p.length<8||p.length>16?'密码长度必须在8-16位之间':!(/[0-9]/.test(p)&&/[A-Z]/.test(p)&&/[a-z]/.test(p))?'密码必须包含数字、大写字母和小写字母':null;
 
   /* ----- 通用：用户菜单 / 弹窗关闭 / 切换账号 ----- */
-  function closeAccModal(){$('#modalRoot').innerHTML='';newAccOpen=false;accHotelsFor=null;accTasksFor=null;editUserFor=null;delUserFor=null;resetFor=null;roleEditFor=null;resEditFor=null;resDelFor=null;roleNew=false}
+  function closeAccModal(){$('#modalRoot').innerHTML='';newAccOpen=false;accHotelsFor=null;editUserFor=null;delUserFor=null;resetFor=null;roleEditFor=null;resEditFor=null;resDelFor=null;roleNew=false}
 
   /* ----- 用户管理：账户名 / 用户名称 / 角色 / 状态 / 创建 / 更新 ----- */
   function setUserQ(v){userQ=v;render();const i=$('#userSearch');if(i){i.focus();i.setSelectionRange(v.length,v.length)}}
@@ -1401,7 +1394,7 @@
     const list=users.filter(u=>(userStatus==='all'||String(u.status)===userStatus)&&(!q||u.name.includes(q)||u.account.includes(q)));
     return `<div class="page">
     <div class="page-head"><div><h1>用户管理</h1><p>管理平台登录账户：新增账户、绑定角色、启用禁用与密码重置</p></div><button class="btn btn-primary" onclick="openNewAcc()">+ 新增账户</button></div>
-    <div class="notice"><span class="notice-icon">ⓘ</span><div><b>子账户登录后仅可查看被配置的酒店；任务处理为「以后不再提醒」后对应任务权限自动关闭，可在「任务权限」中恢复</b></div></div>
+    <div class="notice"><span class="notice-icon">ⓘ</span><div><b>子账户登录后仅可查看被配置的酒店；任务节点权限由管理员在菜单管理中统一开启或关闭</b></div></div>
     <div class="qbar">
       <div class="qfield"><label>账户名 / 用户名称</label><input id="userSearch" value="${attr(userQ)}" placeholder="请输入账户名或用户名称" oninput="setUserQ(this.value)"></div>
       <div class="qfield"><label>账户状态</label><select onchange="userStatus=this.value;render()"><option value="all" ${userStatus==='all'?'selected':''}>全部</option><option value="1" ${userStatus==='1'?'selected':''}>启用</option><option value="0" ${userStatus==='0'?'selected':''}>禁用</option></select></div>
@@ -1418,7 +1411,7 @@
         <span style="display:flex;align-items:center;gap:8px"><span class="sw ${u.status?'on':''}" onclick="toggleUserStatus(${ui},${u.status?0:1})"></span><small class="time">${u.status?'启用':'禁用'}</small></span>
         <span class="time">${u.created}</span>
         <span class="time">${u.updated}</span>
-        <span class="row-actions">${u.account==='admin'?'<span class="linkbtn dim">内置账户</span>':`<button class="linkbtn" onclick="openEditUser(${ui})">编辑</button><button class="linkbtn" onclick="openAccHotels(${ui})">配置酒店</button><button class="linkbtn" onclick="openAccTasks(${ui})">任务权限</button><button class="linkbtn" onclick="openResetPwd(${ui})">重置密码</button><button class="linkbtn danger" onclick="openDelUser(${ui})">删除</button>`}</span>
+        <span class="row-actions">${u.account==='admin'?'<span class="linkbtn dim">内置账户</span>':`<button class="linkbtn" onclick="openEditUser(${ui})">编辑</button><button class="linkbtn" onclick="openAccHotels(${ui})">配置酒店</button><button class="linkbtn" onclick="openResetPwd(${ui})">重置密码</button><button class="linkbtn danger" onclick="openDelUser(${ui})">删除</button>`}</span>
       </div>`}).join('')}
       <div class="tbl-foot"><small>共 ${list.length} 条</small><div class="pager"><button disabled>‹</button><button class="cur">1</button><button disabled>›</button></div></div>
     </div>
@@ -1441,7 +1434,7 @@
     if(newAcc.pwd!==newAcc.pwd2){toast('二次密码不一致');return}
     if(!newAcc.name.trim()){toast('请输入你的用户名称!');return}
     if(!newAcc.roles.length){toast('请至少选择一个角色');return}
-    users.push({name:newAcc.name.trim(),account:newAcc.account.trim(),roles:[...newAcc.roles],phone:'',admin:false,status:newAcc.status,hotels:[],tasks:{},created:NEW_TS,updated:NEW_TS});
+    users.push({name:newAcc.name.trim(),account:newAcc.account.trim(),roles:[...newAcc.roles],phone:'',admin:false,status:newAcc.status,hotels:[],created:NEW_TS,updated:NEW_TS});
     closeAccModal();render();toast('操作成功')}
   function openEditUser(ui){const u=users[ui];editUserFor=ui;utmp={name:u.name,roles:[...u.roles],status:u.status};
     smModal('编辑账户','账户名为登录凭证，创建后不可修改',
@@ -1456,8 +1449,8 @@
     if(!utmp.roles.length){toast('请至少选择一个角色');return}
     u.name=utmp.name.trim();u.roles=[...utmp.roles];u.status=utmp.status;u.updated=NEW_TS;
     closeAccModal();render();toast('操作成功')}
-  function openResetPwd(ui){const u=users[ui];resetFor=ui;confirmModal('重置密码',`确认重置「${u.name}」的登录密码吗？重置成功后请通知该用户尽快登录并修改密码。`,'applyResetPwd()')}
-  function applyResetPwd(){closeAccModal();render();toast('重置成功')}
+  function openResetPwd(ui){const u=users[ui];resetFor=ui;confirmModal('重置密码',`确认重置「${u.name}」的登录密码吗？重置后初始密码为 A1234567，请通知该用户尽快登录并修改密码。`,'applyResetPwd()')}
+  function applyResetPwd(){closeAccModal();render();toast('重置成功，初始密码为 A1234567')}
   function openDelUser(ui){const u=users[ui];
     if(ui===curUser){toast('不能删除当前登录账户');return}
     delUserFor=ui;confirmModal('删除提示',`确认删除该条数据吗?（账户「${u.account} · ${u.name}」）`,'applyDelUser()')}
@@ -1481,14 +1474,6 @@
   </div></div>`}
   function toggleAccHotel(i,on){const u=users[accHotelsFor];if(on&&!u.hotels.includes(i))u.hotels.push(i);if(!on)u.hotels=u.hotels.filter(x=>x!==i);renderAccHotels()}
   function saveAccHotels(){const u=users[accHotelsFor];closeAccModal();render();toast(`已保存 ${u.name} 的酒店配置（${u.hotels.length} 家）`)}
-  function openAccTasks(ui){accTasksFor=ui;renderAccTasks()}
-  function renderAccTasks(){const u=users[accTasksFor];const closed=TASK_NODES.filter(n=>u.tasks[n]===false).length;$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
-    <h3>任务权限 · ${u.name}</h3><p class="m-sub">按诊断任务节点逐一开通（平铺展示），当前已关闭 ${closed} 项</p>
-    <div class="perm-grid">${TASK_NODES.map(n=>`<div class="perm-row ${u.tasks[n]===false?'off':''}"><span>${nodeDisplay(n)}</span><span class="sw ${u.tasks[n]===false?'':'on'}" onclick="setAccTask('${n}',${u.tasks[n]===false})"></span></div>`).join('')}</div>
-    <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="saveAccTasks()">保存配置</button></div>
-  </div></div>`}
-  function setAccTask(node,on){const u=users[accTasksFor];if(on)delete u.tasks[node];else u.tasks[node]=false;renderAccTasks()}
-  function saveAccTasks(){const u=users[accTasksFor];closeAccModal();render();toast(`已保存 ${u.name} 的任务权限`)}
 
   /* ----- 角色管理：角色绑定菜单/按钮/接口三类资源 ----- */
   const roleResSummary=r=>r.builtin?'全部资源':`${r.menus.length} 个菜单（按钮 / 接口随菜单继承）`;
