@@ -60,6 +60,8 @@
   .perm-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff}
   .perm-row small{display:block;color:var(--ink-4);font-size:11px;font-weight:400}
   .perm-row input{flex:1;min-width:0;height:28px;border:1px solid var(--primary);border-radius:6px;padding:0 8px;font-size:13px}
+  .rtree-kids{margin:6px 0 10px 18px;display:grid;gap:6px}
+  .rtree-kids .perm-row span{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .perm-row input:focus{outline:none;box-shadow:0 0 0 3px var(--primary-soft)}
   .perm-row.off{background:var(--bg);color:var(--ink-4)}
   .sw{position:relative;width:34px;height:19px;border-radius:10px;background:var(--line);cursor:pointer;flex:none;transition:background .15s}
@@ -454,10 +456,10 @@
 
 <script>
   const hotels=[
-    {name:'尚宽酒店',sub:'重庆西站华岩寺店',douyin:'ok',ctrip:'ok',lastDiagnosis:'2026-08-20 15:18',diagHistory:['2026-08-20 15:18']},
-    {name:'全亚酒店',sub:'重庆光环爱琴海店',douyin:'ok',ctrip:'expired',lastDiagnosis:'2026-08-27 18:06',diagHistory:['2026-08-27 18:06']},
-    {name:'云栖酒店',sub:'重庆解放碑洪崖洞店',douyin:'ok',ctrip:'off',lastDiagnosis:null,diagHistory:[]},
-    {name:'山屿酒店',sub:'重庆北站店',douyin:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]}
+    {name:'尚宽酒店',sub:'重庆西站华岩寺店',douyin:'ok',dy:'ok',ctrip:'ok',lastDiagnosis:'2026-08-20 15:18',diagHistory:['2026-08-20 15:18']},
+    {name:'全亚酒店',sub:'重庆光环爱琴海店',douyin:'ok',dy:'expired',ctrip:'expired',lastDiagnosis:'2026-08-27 18:06',diagHistory:['2026-08-27 18:06']},
+    {name:'云栖酒店',sub:'重庆解放碑洪崖洞店',douyin:'ok',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]},
+    {name:'山屿酒店',sub:'重庆北站店',douyin:'off',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]}
   ];
   const NOW=new Date('2026-08-28T12:00:00'),diagDays=h=>h.lastDiagnosis?Math.floor((NOW-new Date(h.lastDiagnosis.replace(' ','T')))/864e5):null;
   const DIAG_LIMIT=7*864e5,diagUsed=h=>h.diagHistory.filter(t=>NOW-new Date(t.replace(' ','T'))<DIAG_LIMIT).length,diagLeft=h=>Math.max(0,2-diagUsed(h));
@@ -552,10 +554,10 @@
     {name:'菜单管理',code:'sys:menu',path:'/system/menus',comp:'system/menu/index',apis:[{name:'查询资源树',code:'GET /api/sys/resources',path:'/api/sys/resources',on:1},{name:'保存资源',code:'POST /api/sys/resources',path:'/api/sys/resources',on:1}]}
   ];
   const ROLES=[
-    {name:'超级管理员',status:1,builtin:1,remark:'系统内置角色，拥有全部菜单、按钮、接口权限；不可编辑与删除',menus:'all'},
-    {name:'运营管理员',status:1,remark:'负责酒店接入、平台授权与诊断全流程管理',menus:[0,1,2,3]},
-    {name:'酒店店长',status:1,remark:'查看本店诊断结果并处理诊断任务',menus:[0,1,2]},
-    {name:'质检专员',status:1,remark:'只读查看诊断任务与诊断日志',menus:[2,3]}
+    {name:'超级管理员',status:1,builtin:1,remark:'系统内置角色，拥有全部菜单、按钮、接口权限；不可编辑与删除',resKeys:'all'},
+    {name:'运营管理员',status:1,remark:'负责酒店接入、平台授权与诊断全流程管理',resKeys:['m0','m1','m2','m3','btn:addHotel','btn:auth','btn:diag','btn:startDiag','btn:viewTasks','btn:reDiag','btn:handle','btn:ignoreNow','btn:submit','btn:logDetail','api:GET /api/hotels','api:POST /api/hotels','api:POST /api/hotels/auth','api:POST /api/diag/start','api:GET /api/diag/steps','api:POST /api/diag/tasks','api:GET /api/tasks','api:POST /api/tasks/submit','api:POST /api/tasks/ignore','api:GET /api/diag/records']},
+    {name:'酒店店长',status:1,remark:'查看本店诊断结果并处理诊断任务，不含新增酒店',resKeys:['m0','btn:auth','btn:diag','api:GET /api/hotels','api:POST /api/hotels/auth','m1','btn:startDiag','btn:viewTasks','btn:reDiag','api:POST /api/diag/start','api:GET /api/diag/steps','api:POST /api/diag/tasks','m2','btn:handle','btn:ignoreNow','btn:submit','api:GET /api/tasks','api:POST /api/tasks/submit','api:POST /api/tasks/ignore']},
+    {name:'质检专员',status:1,remark:'只读查看诊断任务与诊断日志，不可处理任务',resKeys:['m2','api:GET /api/tasks','m3','btn:logDetail','api:GET /api/diag/records']}
   ];
   const NEW_TS='2026-09-04 15:20';
   const users=[
@@ -564,11 +566,14 @@
     {name:'王芷琪',account:'wangzhiqi',roles:['酒店店长'],phone:'136 2291 7745',admin:false,status:1,hotels:[2],created:'2026-07-02 16:05',updated:'2026-09-01 09:33'}
   ];
   let curUser=0,newAccOpen=false,accHotelsFor=null,editUserFor=null,delUserFor=null,resetFor=null,roleEditFor=null,resEditFor=null,resDelFor=null,roleNew=false,
-      newAcc={account:'',pwd:'',pwd2:'',name:'',roles:[],status:1},utmp={name:'',roles:[]},rtmp={name:'',remark:'',menus:[],status:1},ntmp=null,pwdForm={p1:'',p2:''},
+      newAcc={account:'',pwd:'',pwd2:'',name:'',roles:[],status:1},utmp={name:'',roles:[]},rtmp={name:'',remark:'',status:1,resKeys:[]},ntmp=null,pwdForm={p1:'',p2:''},
       userQ='',userStatus='all',resQ='',resType='all',resOpen={m0:true},resCustom=[],newHotel={name:''};
   const isSub=()=>!users[curUser].admin;
-  const menuOn=(u,k)=>u.admin||permMenus[k].on===1;
-  const btnOn=k=>users[curUser].admin||(permButtons.find(b=>b.key===k)||{on:1}).on===1;
+  /* 权限判定：资源需同时满足「角色勾选（账户全部启用角色资源并集）」与「菜单管理全局开启」 */
+  const userRes=u=>new Set((u.roles||[]).flatMap(rn=>{const r=ROLES.find(x=>x.name===rn);return r&&Array.isArray(r.resKeys)?r.resKeys:[]}));
+  const hasRes=(u,key)=>u.admin||userRes(u).has(key);
+  const menuOn=(u,k)=>permMenus[k].on===1&&hasRes(u,'m'+k);
+  const btnOn=k=>{const b=permButtons.find(b=>b.key===k)||{on:1};return b.on===1&&hasRes(users[curUser],'btn:'+k)};
   const nodeDisplay=node=>{const d=TASK_DEFS.find(d=>d.key===node);return d?d.name:node};
   function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
   function initRediag(){diagT.forEach(clearTimeout);diagT=[];const old=diagRun;diagRun={phase:'idle',focus:0,added:[],failCount:0,hotel:old&&old.hotel,steps:diagSteps.map((s,si)=>({state:'pending',prev:old?old.steps[si].state:null,items:s.items.map((it,ii)=>({state:'pending',prev:old?old.steps[si].items[ii].state:null}))}))}}
@@ -646,10 +651,10 @@
           <label class="search">⌕<input id="hotelSearch" value="${attr(hotelQuery)}" placeholder="搜索酒店名称" oninput="setHotelQuery(this.value)"></label>
           <div class="seg">${opts.map(o=>`<button class="${hotelFilter===o[0]?'active':''}" onclick="setHotelFilter('${o[0]}')">${o[1]}<i>${scoped.filter(({h})=>o[2](h)).length}</i></button>`).join('')}</div>
         </div>
-        <div class="grid-row table-head"><span>酒店名称</span><span>抖音来客授权</span><span>携程官网授权</span><span>最近一次诊断完成时间</span><span style="text-align:right">操作</span></div>
+        <div class="grid-row table-head"><span>酒店名称</span><span>抖音来客授权</span><span>抖音授权</span><span>携程官网授权</span><span>最近一次诊断完成时间</span><span style="text-align:right">操作</span></div>
         ${visible.length?visible.map(({h,i})=>`<div class="grid-row hotel-row">
           <span class="hotel-name">${h.name}</span>
-          ${authState(h.douyin)}${authState(h.ctrip)}
+          ${authState(h.douyin)}${authState(h.dy)}${authState(h.ctrip)}
           <span class="time ${h.lastDiagnosis?'':'empty'}">${h.lastDiagnosis||'暂无诊断记录'}</span>
           <span class="row-actions">${btnOn('auth')?`<button class="btn btn-outline" onclick="openAuth(${i})">${both(h)?'更新授权':'去授权'}</button>`:''}${btnOn('diag')?`<button class="btn btn-primary" onclick="diagnose(${i})" ${both(h)?'':'disabled'}>诊断</button>`:''}</span>
         </div>`).join(''):`<div class="empty-state"><i>⌕</i>未找到匹配的酒店，请调整搜索内容或筛选条件</div>`}
@@ -1459,8 +1464,8 @@
     <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="applyAddHotel()">确认新增</button></div>
   </div></div>`}
   function applyAddHotel(){if(!newHotel.name.trim()){toast('请输入酒店名称');return}
-    hotels.push({name:newHotel.name.trim(),sub:'待补充门店信息',douyin:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]});
-    newHotel={name:''};closeAccModal();render();toast('酒店已新增，抖音来客与携程官网默认未授权')}
+    hotels.push({name:newHotel.name.trim(),sub:'待补充门店信息',douyin:'off',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]});
+    newHotel={name:''};closeAccModal();render();toast('酒店已新增，抖音来客、抖音授权与携程官网默认未授权')}
   /* ----- 配置酒店 / 任务权限（业务数据权限，按账户维度） ----- */
   function openAccHotels(ui){accHotelsFor=ui;renderAccHotels()}
   function renderAccHotels(){const u=users[accHotelsFor];$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
@@ -1472,7 +1477,6 @@
   function saveAccHotels(){const u=users[accHotelsFor];closeAccModal();render();toast(`已保存 ${u.name} 的酒店配置（${u.hotels.length} 家）`)}
 
   /* ----- 角色管理：角色绑定菜单/按钮/接口三类资源 ----- */
-  const roleResSummary=r=>r.builtin?'全部资源':`${r.menus.length} 个菜单（按钮 / 接口随菜单继承）`;
   function toggleRoleStatus(ri,on){const r=ROLES[ri];if(r.builtin){toast('内置角色不可停用');return}r.status=on?1:0;render();toast(`已${on?'启用':'停用'}角色「${r.name}」`)}
   function rolesPage(){
     if(!users[curUser].admin)return denyPage('角色管理');
@@ -1480,7 +1484,7 @@
     <div class="page-head"><div><h1>角色管理</h1><p>角色向下绑定菜单、按钮、接口三类资源；账户与角色多对多，权限取各角色并集</p></div><button class="btn btn-primary" onclick="openRoleModal(-1)">+ 新增角色</button></div>
     <div class="panel">
       <div class="tbl-cap"><h3>数据列表</h3></div>
-      <div class="rgrid table-head"><span>角色名称</span><span>状态</span><span>备注</span><span>菜单权限</span><span style="text-align:right">操作</span></div>
+      <div class="rgrid table-head"><span>角色名称</span><span>状态</span><span>备注</span><span>资源权限</span><span style="text-align:right">操作</span></div>
       ${ROLES.map((r,ri)=>`<div class="rgrid srow">
         <span class="hotel-name">${r.name}${r.builtin?'　<small class="time">内置</small>':''}</span>
         <span><span class="sw ${r.status?'on':''}" onclick="toggleRoleStatus(${ri},${r.status?0:1})"></span></span>
@@ -1491,24 +1495,45 @@
       <div class="tbl-foot"><small>共 ${ROLES.length} 条</small><div class="pager"><button disabled>‹</button><button class="cur">1</button><button disabled>›</button></div></div>
     </div>
   </div>`}
-  const menuKidsText=k=>{const groups=['酒店管理','诊断工作台','诊断任务','诊断日志'];
-    const bs=permButtons.filter(b=>b.group===groups[k]).map(b=>b.name);
-    const apis=MENU_META[k].api().map(a=>a.name);
-    return `按钮：${bs.join('、')}；接口：${apis.join('、')}`};
+  const roleResSummary=r=>{if(r.builtin)return '全部资源';const k=r.resKeys||[];
+    const mn=k.filter(x=>x.indexOf('m')===0&&x.indexOf(':')<0).length;
+    const bt=k.filter(x=>x.indexOf('btn:')===0).length;
+    const ap=k.filter(x=>x.indexOf('api:')===0).length;
+    return `${mn} 个菜单 · ${bt} 个按钮 · ${ap} 个接口`};
+  const roleTreeData=()=>{const groups=['酒店管理','诊断工作台','诊断任务','诊断日志'];
+    return permMenus.map((m,k)=>({mk:k,name:m.name,
+      btns:permButtons.filter(b=>b.group===groups[k]).map(b=>({key:b.key,name:b.name})),
+      apis:MENU_META[k].api().map(a=>({code:a.code,name:a.name}))}))};
   function openRoleModal(ri){roleNew=ri<0;roleEditFor=ri;const r=roleNew?null:ROLES[ri];
-    rtmp={name:r?r.name:'',remark:r?r.remark:'',menus:r&&Array.isArray(r.menus)?[...r.menus]:[],status:r?r.status:1};
-    smModal(roleNew?'新增角色':'编辑角色','勾选菜单默认带该菜单下全部按钮与接口子资源',
+    if(r&&r.builtin){toast('系统内置角色不可编辑');return}
+    rtmp={name:r?r.name:'',remark:r?r.remark:'',status:r?r.status:1,resKeys:r&&Array.isArray(r.resKeys)?[...r.resKeys]:[]};
+    const chk=key=>rtmp.resKeys.includes(key)?'checked':'';
+    smModal(roleNew?'新增角色':'编辑角色','与菜单管理一致，逐项勾选菜单、按钮、接口；勾选菜单默认同时勾选其下全部子资源，可单独调整',
     `<div class="field"><label>角色名称</label><input value="${attr(rtmp.name)}" placeholder="请输入角色名称" oninput="rtmp.name=this.value"></div>
     <div class="field"><label>状态</label><div class="perm-row"><span>${rtmp.status?'启用':'停用'}</span><span class="sw ${rtmp.status?'on':''}" onclick="rtmp.status=rtmp.status?0:1;this.classList.toggle('on',!!rtmp.status);this.previousElementSibling.textContent=rtmp.status?'启用':'停用'"></span></div></div>
     <div class="field"><label>备注</label><input value="${attr(rtmp.remark)}" placeholder="请输入角色备注" oninput="rtmp.remark=this.value"></div>
-    <div class="field"><label>菜单权限</label><div class="perm-grid">${permMenus.map((m,k)=>`<div class="perm-row"><span><b>${m.name}</b><small>${menuKidsText(k)}</small></span><input type="checkbox" ${rtmp.menus.includes(k)?'checked':''} onchange="rtmpMenuChk(${k},this.checked)"></div>`).join('')}</div></div>`,
+    <div class="field"><label>资源权限</label>
+    ${roleTreeData().map(b=>`<div class="rtree">
+      <div class="perm-row"><span><b>${b.name}</b><small>菜单</small></span><input type="checkbox" ${chk('m'+b.mk)} onchange="toggleRoleMenu(${b.mk},this.checked)"></div>
+      <div class="rtree-kids">
+        ${b.btns.map(x=>`<div class="perm-row"><span><span class="typechip tbtn">按钮</span>${x.name}</span><input type="checkbox" ${chk('btn:'+x.key)} onchange="rtmpResChk('btn:${x.key}',this.checked)"></div>`).join('')}
+        ${b.apis.map(x=>`<div class="perm-row"><span><span class="typechip tapi">接口</span>${x.name}<small>${x.code}</small></span><input type="checkbox" ${chk('api:'+x.code)} onchange="rtmpResChk('api:${x.code}',this.checked)"></div>`).join('')}
+      </div>
+    </div>`).join('')}
+    </div>`,
     '保存','applyRoleModal()')}
-  function rtmpMenuChk(k,on){if(on&&!rtmp.menus.includes(k))rtmp.menus.push(k);if(!on)rtmp.menus=rtmp.menus.filter(x=>x!==k)}
+  const ROLE_MENU_API=[['api:GET /api/hotels','api:POST /api/hotels','api:POST /api/hotels/auth'],['api:POST /api/diag/start','api:GET /api/diag/steps','api:POST /api/diag/tasks'],['api:GET /api/tasks','api:POST /api/tasks/submit','api:POST /api/tasks/ignore'],['api:GET /api/diag/records']];
+  function toggleRoleMenu(k,on){const mid='m'+k;
+    const kids=permButtons.filter(b=>['酒店管理','诊断工作台','诊断任务','诊断日志'][k]===b.group).map(b=>'btn:'+b.key).concat(ROLE_MENU_API[k]);
+    if(on){if(!rtmp.resKeys.includes(mid))rtmp.resKeys.push(mid);kids.forEach(x=>{if(!rtmp.resKeys.includes(x))rtmp.resKeys.push(x)})}
+    else rtmp.resKeys=rtmp.resKeys.filter(x=>x!==mid&&!kids.includes(x))}
+  function rtmpResChk(key,on){if(on&&!rtmp.resKeys.includes(key))rtmp.resKeys.push(key);if(!on)rtmp.resKeys=rtmp.resKeys.filter(x=>x!==key)}
   function applyRoleModal(){
     if(!rtmp.name.trim()){toast('请输入角色名称');return}
     if(ROLES.some((r,i)=>i!==roleEditFor&&r.name===rtmp.name.trim())){toast('角色名称已存在');return}
-    if(roleNew)ROLES.push({name:rtmp.name.trim(),status:rtmp.status,remark:rtmp.remark.trim()||'—',menus:[...rtmp.menus]});
-    else{const r=ROLES[roleEditFor];r.name=rtmp.name.trim();r.status=rtmp.status;r.remark=rtmp.remark.trim()||'—';r.menus=[...rtmp.menus]}
+    if(!rtmp.resKeys.length){toast('请至少勾选一项资源权限');return}
+    if(roleNew)ROLES.push({name:rtmp.name.trim(),status:rtmp.status,remark:rtmp.remark.trim()||'—',resKeys:[...rtmp.resKeys]});
+    else{const r=ROLES[roleEditFor];r.name=rtmp.name.trim();r.status=rtmp.status;r.remark=rtmp.remark.trim()||'—';r.resKeys=[...rtmp.resKeys]}
     closeAccModal();render();toast('操作成功')}
   function openDelRole(ri){const r=ROLES[ri];
     if(r.builtin){toast('系统内置角色不可删除');return}
