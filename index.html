@@ -100,7 +100,7 @@
   .seg button.active i{background:var(--primary-soft);color:var(--primary)}
 
   /* 酒店表格 */
-  .grid-row{display:grid;grid-template-columns:minmax(180px,1.35fr) .95fr .95fr 1.2fr 1fr;align-items:center;gap:12px;padding:0 18px}
+  .grid-row{display:grid;grid-template-columns:minmax(170px,1.2fr) .9fr .9fr .9fr 1.15fr 1fr;align-items:center;gap:12px;padding:0 18px}
   .table-head{height:44px;background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-3)}
   .hotel-row{min-height:64px;border-bottom:1px solid var(--line-soft);transition:background .15s}
   .hotel-row:last-child{border-bottom:0}
@@ -1453,7 +1453,7 @@
 
   /* ----- 新增酒店弹窗 ----- */
   function openAddHotel(){newHotel={name:''};$('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()">
-    <h3>新增酒店</h3><p class="m-sub">输入酒店名称即可新增；新增后抖音来客与携程官网默认未授权，需完成授权后才可诊断</p>
+    <h3>新增酒店</h3><p class="m-sub">输入酒店名称即可新增；新增后抖音来客、抖音授权与携程官网默认未授权，需完成授权后才可诊断</p>
     <div class="field"><label>酒店名称</label><input id="newHotelName" value="${attr(newHotel.name)}" placeholder="请输入酒店名称" oninput="newHotel.name=this.value"></div>
     <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="applyAddHotel()">确认新增</button></div>
   </div></div>`}
