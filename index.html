@@ -385,7 +385,7 @@
 
   /* ===== 诊断日志表格 ===== */
   .lcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);overflow:hidden}
-  .lgrid{display:grid;grid-template-columns:150px 1fr 100px 110px 110px 90px;align-items:center;gap:12px;padding:0 18px}
+  .lgrid{display:grid;grid-template-columns:150px 1fr 110px 110px 90px;align-items:center;gap:12px;padding:0 18px}
   .lhead{height:44px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-3)}
   .lrow{min-height:60px;border-bottom:1px solid var(--line-soft);font-size:13px}
   .lrow:hover{background:#fafbfc}
@@ -1296,7 +1296,7 @@
     </main>
   </div>`}
 
-  /* ===== 诊断日志（每次诊断一行：诊断次数 / 累计诊断项目数 / 任务数 / 执行成功数 / 执行失败数 / 详情） ===== */
+  /* ===== 诊断日志（每次诊断一行：诊断次数 / 任务数 / 执行成功数 / 执行失败数 / 详情） ===== */
   const LOG_TASKS={ // 任务名 → [检查路径]
     '中差评回复':['评价回复 · 待回复中差评'],
     '商家经营分-评价分提升':['评价 · 评价评分'],
@@ -1345,17 +1345,15 @@
   let logOpen=null;
   function toggleLog(i){logOpen=logOpen===i?null:i;render()}
   function records(){
-    const per=diagSteps.reduce((a,s)=>a+s.items.length,0); // 每次诊断的检查项目数
     const runs=DIAG_LOG.map((r,n)=>({r,n:n+1}))
       .map(o=>({...o,task:o.r.ts.length,ok:o.r.ts.filter(t=>t[1]==='done').length,bad:o.r.ts.filter(t=>t[1]==='fail').length}))
       .reverse();
     return `<div class="page">
     <div class="page-head"><div><h1>诊断日志</h1><p>每次诊断一行，点击「详情」展开该次诊断的任务列表与每一条执行详情</p></div></div>
     <div class="lcard">
-      <div class="lgrid lhead"><span>诊断次数</span><span>累计诊断项目数</span><span>任务数</span><span>执行成功数</span><span>执行失败数</span><span>详情</span></div>
+      <div class="lgrid lhead"><span>诊断次数</span><span>任务数</span><span>执行成功数</span><span>执行失败数</span><span>详情</span></div>
       ${runs.map(o=>{return `<div class="lgrid lrow">
         <span class="lmain"><b>第 ${o.n} 次诊断</b><small>${o.r.time}</small></span>
-        <span class="lnum"><b>${o.n*per}</b><small>每次诊断 ${per} 项</small></span>
         <span class="lnum"><b>${o.task}</b><small>个任务</small></span>
         <span class="lnum"><b style="color:#15803d">${o.ok}</b><small>个已完成</small></span>
         <span class="lnum"><b style="color:${o.bad?'#b91c1c':'var(--ink-4)'}">${o.bad}</b><small>个失败</small></span>
