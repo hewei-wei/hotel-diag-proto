@@ -100,7 +100,7 @@
   .seg button.active i{background:var(--primary-soft);color:var(--primary)}
 
   /* 酒店表格 */
-  .grid-row{display:grid;grid-template-columns:minmax(170px,1.2fr) .9fr .9fr .9fr 1.15fr 1fr;align-items:center;gap:12px;padding:0 18px}
+  .grid-row{display:grid;grid-template-columns:minmax(150px,1.2fr) 90px .9fr .9fr .9fr 1.15fr 1fr;align-items:center;gap:12px;padding:0 18px}
   .table-head{height:44px;background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-3)}
   .hotel-row{min-height:64px;border-bottom:1px solid var(--line-soft);transition:background .15s}
   .hotel-row:last-child{border-bottom:0}
@@ -346,6 +346,9 @@
   .hero-stats{display:flex;gap:52px;margin-top:24px;flex-wrap:wrap}
   .hstat small{display:block;font-size:12.5px;color:var(--ink-3);margin-bottom:5px}
   .hstat b{font-size:26px;font-variant-numeric:tabular-nums;line-height:1.2}
+  .hstat.clickable{cursor:pointer}
+  .hstat.clickable:hover b{opacity:.75}
+  .cf-hint{margin-left:10px;font-size:12px;color:var(--ink-3)}
   .dlist{position:relative}
   .drow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 10px;border-radius:var(--r-md)}
   .drow:hover{background:var(--surface-2)}
@@ -383,25 +386,30 @@
   .pbar{height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden}
   .pbar i{display:block;height:100%;background:var(--primary);border-radius:999px;transition:width .4s}
 
-  /* ===== 诊断日志表格 ===== */
+  /* ===== 诊断任务·已处理：按次诊断分组表 ===== */
   .lcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);overflow:hidden}
-  .lgrid{display:grid;grid-template-columns:150px 1fr 110px 110px 90px;align-items:center;gap:12px;padding:0 18px}
-  .lhead{height:44px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-3)}
-  .lrow{min-height:60px;border-bottom:1px solid var(--line-soft);font-size:13px}
-  .lrow:hover{background:#fafbfc}
-  .lrow:last-child{border-bottom:0}
-  .lmain b{font-size:13.5px}
-  .lmain small{display:block;font-size:12px;color:var(--ink-4);margin-top:2px}
-  .lnum b{font-size:15px}
-  .lnum small{display:block;font-size:11px;color:var(--ink-4);margin-top:2px}
+  .rgrid{display:grid;grid-template-columns:1.1fr 1.3fr .6fr .6fr .6fr .6fr .6fr 1.05fr 76px;align-items:center;gap:10px;padding:0 18px}
+  .rhead{height:44px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-3)}
+  .rrow{min-height:58px;border-bottom:1px solid var(--line-soft);font-size:13px;cursor:pointer}
+  .rrow:hover{background:#fafbfc}
+  .rrow:last-child{border-bottom:0}
+  .rname b{font-size:13.5px}
+  .rname small{display:block;font-size:11.5px;color:var(--ink-4);margin-top:2px}
+  .rnum{text-align:center}
+  .rnum b{font-size:15px}
   .lbtn{border:1px solid var(--primary-line);background:var(--primary-soft);color:var(--primary);border-radius:var(--r-sm);padding:5px 12px;font-size:12px;font-weight:600}
   .lbtn:hover{filter:brightness(.97)}
   .lpanel{border-bottom:1px solid var(--line);background:var(--surface-2);padding:4px 18px 10px}
-  .lt-line{display:grid;grid-template-columns:1.2fr 1.3fr 90px 1.6fr;gap:12px;align-items:start;padding:9px 0;border-bottom:1px dashed var(--line-soft);font-size:12.5px;color:var(--ink-2)}
+  .lt-line{display:grid;grid-template-columns:1.6fr 1.5fr 110px 84px;gap:12px;align-items:start;padding:9px 0;border-bottom:1px dashed var(--line-soft);font-size:12.5px;color:var(--ink-2)}
   .lt-line:last-child{border-bottom:0}
   .lt-line b{font-size:12.5px;color:var(--ink)}
   .lt-line small{display:block;color:var(--ink-4);font-size:11.5px;margin-top:1px}
+  .lt-line .fail-reason{color:#b91c1c}
   .lt-cap{font-size:11.5px;color:var(--ink-4);padding:8px 0 4px}
+  /* 处理详情只读态：数据快照纯展示，控件不可编辑 */
+  .ro input,.ro select,.ro textarea{pointer-events:none;background:var(--surface-2);color:var(--ink-2)}
+  .ro button,.ro a.exlink,.ro label.gb-radio{pointer-events:none}
+  .ro a.exlink{color:var(--ink-4)}
 
   /* 弹窗 */
   .modal-mask{position:fixed;inset:0;background:rgba(17,24,39,.45);backdrop-filter:blur(2px);display:grid;place-items:center;z-index:30}
@@ -457,13 +465,14 @@
 
 <script>
   const hotels=[
-    {name:'尚宽酒店',sub:'重庆西站华岩寺店',douyin:'ok',dy:'ok',ctrip:'ok',lastDiagnosis:'2026-08-20 15:18',diagHistory:['2026-08-20 15:18']},
-    {name:'全亚酒店',sub:'重庆光环爱琴海店',douyin:'ok',dy:'expired',ctrip:'expired',lastDiagnosis:'2026-08-27 18:06',diagHistory:['2026-08-27 18:06']},
-    {name:'云栖酒店',sub:'重庆解放碑洪崖洞店',douyin:'ok',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]},
-    {name:'山屿酒店',sub:'重庆北站店',douyin:'off',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]}
+    {id:'620011',name:'尚宽酒店',sub:'重庆西站华岩寺店',douyin:'ok',dy:'ok',ctrip:'ok',lastDiagnosis:'2026-08-20 15:18',diagHistory:['2026-08-20 15:18']},
+    {id:'620012',name:'全亚酒店',sub:'重庆光环爱琴海店',douyin:'ok',dy:'expired',ctrip:'expired',lastDiagnosis:'2026-08-27 18:06',diagHistory:['2026-08-27 18:06']},
+    {id:'620013',name:'云栖酒店',sub:'重庆解放碑洪崖洞店',douyin:'ok',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]},
+    {id:'620014',name:'山屿酒店',sub:'重庆北站店',douyin:'off',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]}
   ];
   const NOW=new Date('2026-08-28T12:00:00'),diagDays=h=>h.lastDiagnosis?Math.floor((NOW-new Date(h.lastDiagnosis.replace(' ','T')))/864e5):null;
-  const DIAG_LIMIT=7*864e5,diagUsed=h=>h.diagHistory.filter(t=>NOW-new Date(t.replace(' ','T'))<DIAG_LIMIT).length,diagLeft=h=>Math.max(0,2-diagUsed(h));
+  /* 诊断频率：每 24 小时内最多 1 次 */
+  const DIAG_LIMIT=864e5,diagUsed=h=>h.diagHistory.filter(t=>NOW-new Date(t.replace(' ','T'))<DIAG_LIMIT).length,diagLeft=h=>Math.max(0,1-diagUsed(h));
   let activeHotel=null,view='hotels',authIndex=null,platform='douyin',method='sms',reauth=false,hotelFilter='all',hotelQuery='';
   const $=s=>document.querySelector(s), both=h=>h.douyin==='ok'&&h.ctrip==='ok', attr=s=>s.replace(/[&"<]/g,c=>({'&':'&amp;','"':'&quot;','<':'&lt;'}[c]));
 
@@ -477,7 +486,7 @@
       ['找店指引','找店指引不为空，含起点、途经点、终点的路线内容与素材','fail','找店指引素材补充','信息完善']]},
     {name:'酒店政策',path:'店铺管理 › 酒店信息管理 › 酒店政策（联合诊断节点）',items:[
       ['入离政策','五组联合对比：最晚离店 15:00 与携程「10:30后入住、13:00前退房」不一致','fail','酒店政策联合补充任务','信息完善'],
-      ['办理入住年龄','已配置 最小 18 / 最大不限制，与携程接待提示一致','pass','',''],
+      ['办理入住年龄','已配置 最小 18 / 最大不限制，与携程接待提示一致','pass','','','ctrip'],
       ['加床及儿童','五组联合对比：现有床 0-12 岁与携程「17 岁及以下免费」不一致、加床「不提供」与携程收费加床不一致、儿童早餐未选择','fail','酒店政策联合补充任务','信息完善'],
       ['宠物政策','五组联合对比：宠物免费「是」与携程「收费」标签不一致','fail','酒店政策联合补充任务','信息完善'],
       ['早餐政策','五组联合对比：早餐时间 08:00~10:00 与携程 07:00~10:00 不一致','fail','酒店政策联合补充任务','信息完善']]},
@@ -493,10 +502,10 @@
       ['电竞大床房','携程在售、抖音未创建，按缺失房型单独形成 1 条新增任务','fail','房型新增·电竞大床房','信息完善']]},
     {name:'日历房',path:'商品与货架 › 商品管理 › 日历房',items:[
       ['日历房房型集合','日历房已上架 10 个，覆盖“房型管理”全部 6 个房型，集合一致后逐房型比较早餐份数','pass','',''],
-      ['景观棋牌娱乐房','早餐份数与携程一致：抖音 2 份＝携程 2 份','pass','',''],
+      ['景观棋牌娱乐房','早餐份数与携程一致：抖音 2 份＝携程 2 份','pass','','','both'],
       ['巨幕投影大床房','抖音日历房早餐 0 份，携程当前 2 份；不一致，该房型单独形成 1 条早餐份数修改任务','fail','早餐份数修正·巨幕投影大床房','信息完善'],
-      ['三床家庭房','早餐份数与携程一致：抖音 3 份＝携程 3 份','pass','',''],
-      ['景观大床房','早餐份数与携程一致：抖音 1 份＝携程 1 份','pass','',''],
+      ['三床家庭房','早餐份数与携程一致：抖音 3 份＝携程 3 份','pass','','','douyin'],
+      ['景观大床房','早餐份数与携程一致：抖音 1 份＝携程 1 份','pass','','','ctrip',1],
       ['亲子家庭房','早餐份数与携程一致：抖音 2 份＝携程 2 份','pass','',''],
       ['景观双床房','抖音日历房早餐 1 份，携程当前 2 份；不一致，该房型单独形成 1 条早餐份数修改任务','fail','早餐份数修正·景观双床房','信息完善']]},
     {name:'房价房态管理',path:'商品与货架 › 房价房态管理 › 房价房态管理',items:[
@@ -520,8 +529,7 @@
   const permMenus=[
     {name:'酒店管理',on:1},
     {name:'酒店管理-诊断工作台',on:1},
-    {name:'酒店管理-诊断任务',on:1},
-    {name:'酒店管理-诊断日志',on:1}
+    {name:'酒店管理-诊断任务',on:1}
   ];
   const permButtons=[
     {key:'addHotel',name:'新增酒店',group:'酒店管理',on:1},
@@ -533,7 +541,7 @@
     {key:'handle',name:'去处理',group:'诊断任务',on:1},
     {key:'ignoreNow',name:'此次忽略',group:'诊断任务 / 任务详情',on:1},
     {key:'submit',name:'提交 / 已完成 / 暂无此设施',group:'任务详情',on:1},
-    {key:'logDetail',name:'详情 / 收起',group:'诊断日志',on:1}
+    {key:'runDetail',name:'诊断记录详情',group:'诊断任务',on:1}
   ];
   const TASK_DEFS=[...new Set(diagSteps.flatMap(s=>s.items.map(i=>i[0])))].map(n=>({key:n,name:n}));
   /* ===== 系统管理（RBAC 标准）：账号 —角色—资源 三层关系 =====
@@ -541,13 +549,11 @@
      permMenus / permButtons 是运行时权限状态，菜单管理页的资源树直接读写它们 */
   const API_RES_HOTELS=[{name:'查询酒店列表',code:'GET /api/hotels',path:'/api/hotels',on:1},{name:'新增酒店',code:'POST /api/hotels',path:'/api/hotels',on:1},{name:'保存平台授权',code:'POST /api/hotels/auth',path:'/api/hotels/auth',on:1}];
   const API_RES_DIAG=[{name:'发起诊断',code:'POST /api/diag/start',path:'/api/diag/start',on:1},{name:'查询诊断进度',code:'GET /api/diag/steps',path:'/api/diag/steps',on:1},{name:'生成诊断任务',code:'POST /api/diag/tasks',path:'/api/diag/tasks',on:1}];
-  const API_RES_TASKS=[{name:'查询任务列表',code:'GET /api/tasks',path:'/api/tasks',on:1},{name:'提交任务修改',code:'POST /api/tasks/submit',path:'/api/tasks/submit',on:1},{name:'忽略任务',code:'POST /api/tasks/ignore',path:'/api/tasks/ignore',on:1}];
-  const API_RES_RECORDS=[{name:'查询诊断日志',code:'GET /api/diag/records',path:'/api/diag/records',on:1}];
+  const API_RES_TASKS=[{name:'查询任务列表',code:'GET /api/tasks',path:'/api/tasks',on:1},{name:'提交任务修改',code:'POST /api/tasks/submit',path:'/api/tasks/submit',on:1},{name:'忽略任务',code:'POST /api/tasks/ignore',path:'/api/tasks/ignore',on:1},{name:'查询诊断记录',code:'GET /api/diag/records',path:'/api/diag/records',on:1}];
   const MENU_META=[
     {code:'hotel',path:'/hotels',comp:'hotels/index',desc:'酒店接入、平台授权与诊断入口',api:()=>API_RES_HOTELS},
     {code:'hotel:diag',path:'/diag',comp:'diag/index',desc:'连接抖音来客与携程执行联合诊断',api:()=>API_RES_DIAG},
     {code:'hotel:tasks',path:'/tasks',comp:'tasks/index',desc:'诊断任务处理与跟踪',api:()=>API_RES_TASKS},
-    {code:'hotel:records',path:'/records',comp:'records/index',desc:'历史诊断记录查看',api:()=>API_RES_RECORDS}
   ];
   const SYS_MENUS=[
     {name:'用户管理',code:'sys:user',path:'/system/users',comp:'system/user/index',apis:[{name:'查询账户列表',code:'GET /api/sys/users',path:'/api/sys/users',on:1},{name:'保存账户',code:'POST /api/sys/users',path:'/api/sys/users',on:1},{name:'重置密码',code:'POST /api/sys/users/reset-pwd',path:'/api/sys/users/reset-pwd',on:1}]},
@@ -556,9 +562,9 @@
   ];
   const ROLES=[
     {name:'超级管理员',status:1,builtin:1,remark:'系统内置角色，拥有全部菜单、按钮、接口权限；不可编辑与删除',resKeys:'all'},
-    {name:'运营管理员',status:1,remark:'负责酒店接入、平台授权与诊断全流程管理',resKeys:['m0','m1','m2','m3','btn:addHotel','btn:auth','btn:diag','btn:startDiag','btn:viewTasks','btn:reDiag','btn:handle','btn:ignoreNow','btn:submit','btn:logDetail','api:GET /api/hotels','api:POST /api/hotels','api:POST /api/hotels/auth','api:POST /api/diag/start','api:GET /api/diag/steps','api:POST /api/diag/tasks','api:GET /api/tasks','api:POST /api/tasks/submit','api:POST /api/tasks/ignore','api:GET /api/diag/records']},
+    {name:'运营管理员',status:1,remark:'负责酒店接入、平台授权与诊断全流程管理',resKeys:['m0','m1','m2','btn:addHotel','btn:auth','btn:diag','btn:startDiag','btn:viewTasks','btn:reDiag','btn:handle','btn:ignoreNow','btn:submit','api:GET /api/hotels','api:POST /api/hotels','api:POST /api/hotels/auth','api:POST /api/diag/start','api:GET /api/diag/steps','api:POST /api/diag/tasks','api:GET /api/tasks','api:POST /api/tasks/submit','api:POST /api/tasks/ignore','api:GET /api/diag/records']},
     {name:'酒店店长',status:1,remark:'查看本店诊断结果并处理诊断任务，不含新增酒店',resKeys:['m0','btn:auth','btn:diag','api:GET /api/hotels','api:POST /api/hotels/auth','m1','btn:startDiag','btn:viewTasks','btn:reDiag','api:POST /api/diag/start','api:GET /api/diag/steps','api:POST /api/diag/tasks','m2','btn:handle','btn:ignoreNow','btn:submit','api:GET /api/tasks','api:POST /api/tasks/submit','api:POST /api/tasks/ignore']},
-    {name:'质检专员',status:1,remark:'只读查看诊断任务与诊断日志，不可处理任务',resKeys:['m2','api:GET /api/tasks','m3','btn:logDetail','api:GET /api/diag/records']}
+    {name:'质检专员',status:1,remark:'只读查看诊断任务与已处理诊断记录，不可处理任务',resKeys:['m2','api:GET /api/tasks','btn:runDetail','api:GET /api/diag/records']}
   ];
   const NEW_TS='2026-09-04 15:20';
   const users=[
@@ -579,26 +585,52 @@
   function initDiag(){diagT.forEach(clearTimeout);diagT=[];diagRun={phase:'idle',focus:0,added:[],failCount:0,steps:diagSteps.map(s=>({state:'pending',items:s.items.map(()=>({state:'pending'}))}))}}
   function initRediag(){diagT.forEach(clearTimeout);diagT=[];const old=diagRun;diagRun={phase:'idle',focus:0,added:[],failCount:0,hotel:old&&old.hotel,steps:diagSteps.map((s,si)=>({state:'pending',prev:old?old.steps[si].state:null,items:s.items.map((it,ii)=>({state:'pending',prev:old?old.steps[si].items[ii].state:null}))}))}}
   const stepFails=si=>diagRun.steps[si].items.filter(it=>it.state==='fail').length;
-  function startDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('7天内只能诊断两次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));runStep(0)}
-  function resetDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('7天内只能诊断两次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));initRediag();toast('已开始重新诊断');runStep(0)}
+  /* 检查项状态标签（采集失败（抖音来客/携程/双方）、采集成功＋通过/不通过） */
+  const ST_LABEL={pass:'<span style="color:var(--ink-3)">采集成功</span><span style="color:var(--ok);font-weight:600"> ＋ 通过</span>',
+    fail:'<span style="color:var(--ink-3)">采集成功</span><span style="color:#b91c1c;font-weight:600"> ＋ 不通过</span>',
+    cfail_douyin:'<span style="color:#b45309;font-weight:600">采集失败（抖音来客）</span>',
+    cfail_ctrip:'<span style="color:#b45309;font-weight:600">采集失败（携程）</span>',
+    cfail_both:'<span style="color:#b45309;font-weight:600">采集失败（抖音来客、携程）</span>'};
+  const isCfail=s=>!!s&&String(s).indexOf('cfail_')===0;
+  function retryCollect(si,ii){const it=diagRun.steps[si].items[ii];if(it.retryDead||it.state==='retry'||(it.retryN||0)>=5)return;it.state='retry';render();
+    diagT.push(setTimeout(()=>{it.retryN=(it.retryN||0)+1;const seed=diagSteps[si].items[ii];
+      if(!seed[6]){it.state='pass';toast('重新采集成功：'+seed[0])}
+      else if(it.retryN>=5){it.state='cfail_ctrip';it.retryDead=1;toast('采集异常，请联系技术管理员')}
+      else{it.state='cfail_ctrip';toast('采集失败（携程），已重试 '+it.retryN+'/5 次')}
+      render()},400))}
+  /* 点击进度统计查看检查项详情 */
+  function statRows(k){const m={all:()=>true,cfail:isCfail,pass:s=>s==='pass',fail:s=>s==='fail'}[k];
+    return diagSteps.flatMap((s,si)=>s.items.map((it,ii)=>({s,it,st:diagRun.steps[si].items[ii].state})).filter(r=>m(r.st)))}
+  function openStat(k){if(k==='tasks'){go('tasks');return}
+    const title={all:'检查项详情',cfail:'采集失败检查项',pass:'通过检查项',fail:'不通过检查项'}[k];
+    const rows=statRows(k);
+    $('#modalRoot').innerHTML=`<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()" style="width:560px">
+      <h3>${title}（${rows.length}）</h3>
+      <div style="max-height:60vh;overflow:auto;margin-top:6px">${rows.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${r.s.name} · ${r.it[0]}</span><span style="font-size:12px;white-space:nowrap">${isCfail(r.st)?ST_LABEL[r.st]:ST_LABEL[r.st]||'<span style="color:var(--ink-4)">'+(r.st==='running'?'诊断中':r.st==='retry'?'重新采集中':'未诊断')+'</span>'}</span></div>`).join('')||'<p style="color:var(--ink-3);font-size:13px">暂无</p>'}</div>
+      <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">关闭</button></div>
+    </div></div>`}
+  function startDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('每 24 小时只能诊断 1 次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));runStep(0)}
+  function resetDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('每 24 小时只能诊断 1 次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));initRediag();toast('已开始重新诊断');runStep(0)}
   function scrollStep(){const el=document.querySelector('.drow.running')||(document.querySelectorAll('.drow')||[])[diagRun.focus];if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'})}
   function runStep(si){diagRun.phase='running';diagRun.focus=si;diagRun.steps[si].state='running';runItem(si,0);render();scrollStep()}
   function runItem(si,ii){
     if(!activeHotel)return;
     const run=diagRun.steps[si];run.items[ii].state='running';diagRun.focus=si;render();scrollStep();
     diagT.push(setTimeout(()=>{
-      run.items[ii].state=diagSteps[si].items[ii][2]==='pass'?'pass':'fail';
+      const seed=diagSteps[si].items[ii];
+      run.items[ii].state=seed[5]?('cfail_'+seed[5]):(seed[2]==='pass'?'pass':'fail');
       if(ii+1<run.items.length){runItem(si,ii+1)}
       else{
         run.state='done';
-        const fails=diagSteps[si].items.filter(x=>x[2]!=='pass');
+        const fails=diagSteps[si].items.filter((x,xi)=>run.items[xi].state==='fail');
+        const cfails=run.items.filter(x=>isCfail(x.state)).length;
         /* 联合诊断节点：多项不通过合并为一个任务，路径取联合代表节点 */
         let added=0;
         fails.forEach(f=>{diagRun.failCount++;
           if(taskData.some(t=>t.status==='待处理'&&t.name===f[3]))return;   // 同名待处理任务不重复生成
           const row={name:f[3],path:diagSteps[si].name+' · '+(JOINT_TASK_NODE[f[3]]||f[0]),node:(JOINT_TASK_NODE[f[3]]||f[0]),rule:f[1],type:f[4],diagTime:'2026-08-28 12:0'+(si<6?0:1)+':'+String(8+si*3).padStart(2,'0'),status:'待处理',submitTime:null,exec:null};
           diagRun.added.push(row);taskData.unshift(row);added++});
-        if(added)toast(`${diagSteps[si].name}诊断完成：${fails.length} 项不通过，已生成 ${added} 个任务`);
+        if(added)toast(`${diagSteps[si].name}诊断完成：${fails.length} 项不通过${cfails?` · ${cfails} 项采集失败`:''}，已生成 ${added} 个任务`);
         if(si+1<diagSteps.length)diagT.push(setTimeout(()=>runStep(si+1),500));
         else{diagRun.phase='done';activeHotel.lastDiagnosis='2026-08-28 12:06';activeHotel.diagHistory.push('2026-08-28 12:06');toast(`诊断完成：不通过 ${diagRun.failCount} 项，已生成 ${diagRun.added.length} 个任务`)}
         render();
@@ -609,7 +641,7 @@
 
   function toast(msg){const el=$('#toast');el.innerHTML=`<i>✓</i>${msg}`;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2300)}
 
-  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',records:'诊断日志',users:'用户管理',roles:'角色管理',res:'菜单管理',profile:'我的信息'};
+  const pageTitles={hotels:'酒店管理',diag:'诊断工作台',tasks:'诊断任务',detail:'任务详情',users:'用户管理',roles:'角色管理',res:'菜单管理',profile:'我的信息'};
   const isSysView=v=>v==='users'||v==='roles'||v==='res';
   function nav(){
     const u=users[curUser];
@@ -619,15 +651,15 @@
       +`<button class="${view==='profile'?'active':''}" onclick="go('profile')"><i>☺</i>我的信息</button>`;
     $('#accbox').innerHTML=`<div class="account"><span class="avatar">${u.phone.slice(0,3)}</span><div class="account-meta"><b>${u.phone}</b><small>${u.roles.join('、')}</small></div></div>`;
     $('#pageTitle').textContent=pageTitles[view];
-    const hotelViews=['diag','tasks','detail','records'];
-    const tabs=[['diag','诊断工作台'],['tasks','诊断任务'],['records','诊断日志']];
+    const hotelViews=['diag','tasks','detail'];
+    const tabs=[['diag','诊断工作台'],['tasks','诊断任务']];
     $('#subnav').innerHTML=activeHotel&&hotelViews.includes(view)?`<div class="subnav">
       <button class="sub-back" onclick="go('hotels')">‹ 返回酒店管理</button>
       <div class="sub-hotel"><b>${activeHotel.name}</b><small>${activeHotel.sub}</small></div>
       <nav>${tabs.map(x=>`<button class="${(view===x[0]||(view==='detail'&&x[0]==='tasks'))?'active':''}" onclick="go('${x[0]}')">${x[1]}${x[0]==='tasks'&&todoTasks().length?`<em>${todoTasks().length}</em>`:''}</button>`).join('')}</nav>
     </div>`:'';
   }
-  function go(v){const vk={hotels:0,diag:1,tasks:2,detail:2,records:3}[v];
+  function go(v){const vk={hotels:0,diag:1,tasks:2,detail:2}[v];
     if(isSysView(v)&&!users[curUser].admin){toast('仅管理员可访问系统管理');return}
     if(vk!=null&&!menuOn(users[curUser],vk)){toast('当前账号未开通该页面权限，请联系管理员');return}
     view=v;if(v==='hotels')activeHotel=null;render()}
@@ -643,18 +675,20 @@
       ['undiag7','近 7 天未诊断',h=>{const d=diagDays(h);return d===null||d>7}]];
     const match=opts.find(o=>o[0]===hotelFilter)[2];
     const scoped=hotels.map((h,i)=>({h,i})).filter(({i})=>!isSub()||users[curUser].hotels.includes(i));
-    const visible=scoped.filter(({h})=>match(h)&&h.name.includes(hotelQuery.trim()));
+    const q=hotelQuery.trim();
+    const visible=scoped.filter(({h})=>match(h)&&(h.name.includes(q)||String(h.id).includes(q)));
     return `<div class="page">
       <div class="page-head"><div><h1>酒店管理</h1></div>${btnOn('addHotel')?`<button class="btn btn-primary" onclick="openAddHotel()">+ 新增酒店</button>`:''}</div>
       <div class="notice"><span class="notice-icon">ⓘ</span><div><b>抖音来客和携程官网都授权之后才可进行诊断</b></div></div>
       <div class="panel">
         <div class="panel-toolbar">
-          <label class="search">⌕<input id="hotelSearch" value="${attr(hotelQuery)}" placeholder="搜索酒店名称" oninput="setHotelQuery(this.value)"></label>
+          <label class="search">⌕<input id="hotelSearch" value="${attr(hotelQuery)}" placeholder="搜索酒店名称 / 酒店ID" oninput="setHotelQuery(this.value)"></label>
           <div class="seg">${opts.map(o=>`<button class="${hotelFilter===o[0]?'active':''}" onclick="setHotelFilter('${o[0]}')">${o[1]}<i>${scoped.filter(({h})=>o[2](h)).length}</i></button>`).join('')}</div>
         </div>
-        <div class="grid-row table-head"><span>酒店名称</span><span>抖音来客授权</span><span>抖音授权</span><span>携程官网授权</span><span>最近一次诊断完成时间</span><span style="text-align:right">操作</span></div>
+        <div class="grid-row table-head"><span>酒店名称</span><span>酒店ID</span><span>抖音来客授权</span><span>抖音授权</span><span>携程官网授权</span><span>最近一次诊断完成时间</span><span style="text-align:right">操作</span></div>
         ${visible.length?visible.map(({h,i})=>`<div class="grid-row hotel-row">
           <span class="hotel-name">${h.name}</span>
+          <span style="font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12.5px;color:var(--ink-3)">${h.id}</span>
           ${authState(h.douyin)}${authState(h.dy)}${authState(h.ctrip)}
           <span class="time ${h.lastDiagnosis?'':'empty'}">${h.lastDiagnosis||'暂无诊断记录'}</span>
           <span class="row-actions">${btnOn('auth')?`<button class="btn btn-outline" onclick="openAuth(${i})">${both(h)?'更新授权':'去授权'}</button>`:''}${btnOn('diag')?`<button class="btn btn-primary" onclick="diagnose(${i})" ${both(h)?'':'disabled'}>诊断</button>`:''}</span>
@@ -672,10 +706,10 @@
     const failed=allItems.filter(it=>it.state==='fail').length;
     const runningIdx=diagRun.steps.findIndex(s=>s.state==='running');
     const curIdx=runningIdx<0?diagRun.focus:runningIdx;
-    const left=activeHotel?diagLeft(activeHotel):2,limited=left<1;
-    const note='<small class="hero-note">7天内只能诊断两次，请合理使用</small>';
-    const heroSub=diagRun.phase==='idle'?(limited?'近 7 天内已诊断 2 次，达到诊断上限'
-      :`共 ${diagSteps.length} 个步骤、${total} 项检查，点击“开始诊断”逐项执行 · 近 7 天还可诊断 ${left} 次`)
+    const left=activeHotel?diagLeft(activeHotel):1,limited=left<1;
+    const note='<small class="hero-note">每 24 小时只能诊断 1 次，请合理使用</small>';
+    const heroSub=diagRun.phase==='idle'?(limited?'24 小时内已诊断 1 次，达到诊断上限'
+      :`共 ${diagSteps.length} 个步骤、${total} 项检查，点击“开始诊断”逐项执行 · 24 小时内还可诊断 ${left} 次`)
       :diagRun.phase==='running'?`诊断中 · 第 ${curIdx+1}/${diagSteps.length} 步 ${diagSteps[curIdx].name}`
       :`诊断完成：不通过 ${failed} 项，已生成 ${diagRun.added.length} 个任务`;
     const f=diagRun.focus,step=diagSteps[f],rs=diagRun.steps[f];
@@ -697,11 +731,11 @@
       </div>
       <div class="hero-progress"><div class="pbar"><i style="width:${pct}%"></i></div><b class="hero-pct">${pct}%</b></div>
       <div class="hero-stats">
-        <div class="hstat"><small>检查项</small><b>${total}</b></div>
-        <div class="hstat"><small>已完成</small><b>${resolved}</b></div>
-        <div class="hstat"><small>通过</small><b style="color:var(--ok)">${passed}</b></div>
-        <div class="hstat"><small>不通过</small><b style="color:#b91c1c">${failed}</b></div>
-        <div class="hstat"><small>已生成任务</small><b style="color:#b91c1c">${diagRun.added.length}</b></div>
+        <div class="hstat clickable" onclick="openStat('all')"><small>检查数</small><b>${total}</b></div>
+        <div class="hstat clickable" onclick="openStat('cfail')"><small>采集失败数</small><b style="color:#b45309">${allItems.filter(it=>isCfail(it.state)).length}</b></div>
+        <div class="hstat clickable" onclick="openStat('pass')"><small>通过数</small><b style="color:var(--ok)">${passed}</b></div>
+        <div class="hstat clickable" onclick="openStat('fail')"><small>不通过数</small><b style="color:#b91c1c">${failed}</b></div>
+        <div class="hstat clickable" onclick="openStat('tasks')"><small>生成任务数</small><b style="color:#b91c1c">${diagRun.added.length}</b></div>
       </div>
     </div>
 
@@ -711,14 +745,15 @@
           <h3 style="margin:0 0 6px">诊断步骤</h3>
           <p class="dfoot">步骤按检查路径顺序执行，当前步骤完成后自动进入下一步；点击步骤可在右侧查看检查项备注</p>
           <div class="dlist">
-            ${diagSteps.map((s,i)=>{const st=diagRun.steps[i],n=s.items.length,fl=stepFails(i),pfl=st.items.filter(x=>x.prev==='fail').length,add=diagRun.added.filter(t=>t.path.startsWith(s.name+' ·')).length;
+            ${diagSteps.map((s,i)=>{const st=diagRun.steps[i],n=s.items.length,fl=stepFails(i),nc=st.items.filter(x=>isCfail(x.state)).length,add=diagRun.added.filter(t=>t.path.startsWith(s.name+' ·')).length;
               const tag=st.state==='running'?'<i class="tag" style="background:var(--primary-soft);color:var(--primary)">诊断中</i>'
-                :st.state==='done'?(fl?`<i class="tag red">不通过 ${fl}</i>`:'<i class="tag green">全部通过</i>')
-                :st.prev==='done'?(pfl?`<i class="tag red">上次不通过 ${pfl}</i>`:'<i class="tag green">上次通过</i>')
+                :st.state==='done'?(fl?`<i class="tag red">不通过 ${fl}</i>`:nc?`<i class="tag" style="background:#fef3c7;color:#b45309">采集失败 ${nc}</i>`:'<i class="tag green">全部通过</i>')
+                :st.prev==='done'?'<i class="tag gray">上次已诊断</i>'
                 :'<i class="tag gray">未诊断</i>';
-              const cnt=st.state==='running'?`已检 ${st.items.filter(x=>x.state==='pass'||x.state==='fail').length}/${n} 项`
-                :st.state==='done'?(fl?`通过 ${n-fl} · 不通过 ${fl} · 生成任务 ${add}`:`通过 ${n} 项`)
-                :st.prev==='done'?(pfl?`上次：通过 ${n-pfl} · 不通过 ${pfl}`:`上次：通过 ${n} 项`)
+              const dn=st.items.filter(x=>x.state==='pass'||x.state==='fail'||isCfail(x.state)).length;
+              const cnt=st.state==='running'?`已检 ${dn}/${n} 项`
+                :st.state==='done'?(fl?`通过 ${n-fl-nc} · 不通过 ${fl}${nc?` · 采集失败 ${nc}`:''} · 生成任务 ${add}`:`通过 ${n-nc} 项${nc?` · 采集失败 ${nc}`:''}`)
+                :st.prev==='done'?'上次结果已保留，可重新诊断'
                 :`检查 ${n} 项`;
               const doneCls=st.state==='done'||st.state==='pending'&&st.prev==='done';
               return `<button class="drow ${st.state}${doneCls?' done':''}${diagRun.focus===i?' focus':''}" onclick="focusStep(${i})">
@@ -733,13 +768,15 @@
         <div class="section" style="margin-bottom:0;position:sticky;top:126px">
           <div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0">步骤备注 · 第 ${f+1} 步</h3>${stepState}</div>
           <p style="margin:8px 0 2px;font-size:12.5px;color:var(--ink-3)">${step.name} · 检查路径：${step.path} · 共 ${step.items.length} 项</p>
-          ${step.items.map((it,ii)=>{const st=rs.items[ii].state,pv=rs.items[ii].prev;
-            const right=st==='pass'?'<span style="color:var(--ok);font-weight:600">✓ 通过</span>'
-              :st==='fail'?'<span style="color:#b91c1c;font-weight:600">✕ 不通过</span>'
-              :st==='running'?'<span class="spinner"></span><span style="color:var(--primary)">诊断中</span>'
-              :pv==='pass'?'<span style="color:var(--ok)">✓ 上次通过</span>'
-              :pv==='fail'?'<span style="color:#b91c1c">✕ 上次不通过</span>'
-              :'<span style="color:var(--ink-4)">未诊断</span>';
+          ${step.items.map((it,ii)=>{const run=rs.items[ii],st=run.state,pv=run.prev;
+            let right;
+            if(st==='running')right='<span class="spinner"></span><span style="color:var(--primary)">诊断中</span>';
+            else if(st==='retry')right='<span class="spinner"></span><span style="color:var(--primary)">重新采集中</span>';
+            else if(ST_LABEL[st]){right=ST_LABEL[st];
+              if(st==='cfail_douyin'||st==='cfail_both')right+='<span class="cf-hint">请前往抖音来客检查此项是否符合标准</span>';
+              if(st==='cfail_ctrip')right+=run.retryDead?'<span class="cf-hint">采集异常，请联系技术管理员</span>':` <button class="btn btn-outline" style="height:24px;padding:0 10px;font-size:12px;margin-left:8px" onclick="retryCollect(${f},${ii})">重试${run.retryN?`（${run.retryN}/5）`:''}</button>`;
+            }
+            else right=pv?(pv==='pass'?'<span style="color:var(--ok)">✓ 上次通过</span>':pv==='fail'?'<span style="color:#b91c1c">✕ 上次不通过</span>':'<span style="color:var(--ink-4)">上次：</span>'+ST_LABEL[pv]):'<span style="color:var(--ink-4)">未诊断</span>';
             return `<div class="ditem col"><span class="dn">${it[0]}</span><span class="dr">${it[1]}</span><span class="ds">${right}</span></div>`}).join('')}
           ${(()=>{const stasks=taskData.filter(t=>t.status==='待处理'&&t.path.startsWith(step.name+' · '));
             return stasks.length?`<div class="step-tasks"><div class="st-head">本步骤已生成任务 <b>${stasks.length}</b></div>
@@ -753,14 +790,13 @@
   let taskData=[];
   let taskTab='todo',taskIdx=0,taskQuery='',taskExec='全部';
   const todoTasks=()=>taskData.filter(t=>t.status==='待处理'),doneTasks=()=>taskData.filter(t=>t.status==='已处理');
-  const doneShown=()=>doneTasks().filter(t=>(taskExec==='全部'||t.exec===taskExec)&&t.name.includes(taskQuery.trim()));
-  const execTag=e=>e==='执行完成'?'green':e==='执行失败'?'red':e==='已忽略（此次）'?'gray':'';
+  const execTag=e=>e==='执行成功'?'green':e==='执行失败'?'red':e==='已忽略'?'gray':'';
   const TS_FULL=/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
-  function setTaskTab(t){taskTab=t;render()}
+  function setTaskTab(t){taskTab=t;roTask=null;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';guideMode=null;guideVia=1;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';roTask=null;guideMode=null;guideVia=1;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';roTask=null;taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   /* 二次确认弹窗：此次忽略 */
   let confirmAsk=null;
   function askIgnore(i,type){const t0=taskData[i];confirmAsk={i,type};const t=t0;
@@ -772,12 +808,12 @@
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn btn-outline" onclick="closeConfirm()">取消</button><button class="btn btn-primary" onclick="doIgnore()">${c.btn}</button></div>
     </div></div>`}
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
-  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec='已忽略（此次）';
+  function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec='已忽略';
     toast('已忽略本次任务，下次诊断仍会检查');
-    taskTab='done';taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
+    taskTab='done';roTask=null;taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;go('tasks')}
   function tasks(){
-    const todo=todoTasks(),done=doneTasks(),shown=doneShown();
-    const execOpts=['全部','执行中','执行完成','执行失败','已忽略（此次）'];
+    const todo=todoTasks(),done=doneTasks();
+    const execOpts=['全部','执行中','执行成功','执行失败','已忽略'];
     return `<div class="page">
     <div class="page-head"><div><h1>诊断任务</h1><p>本次诊断生成的任务，逐项确认后 AI 才会进入抖音来客执行修改</p></div></div>
     <div class="tabs">
@@ -794,14 +830,33 @@
         </div>`}).join(''):'<div class="empty-state"><i>✓</i>暂无待处理任务</div>'}`
         :`<div class="panel-toolbar">
           <label class="search">⌕<input id="taskSearch" value="${attr(taskQuery)}" placeholder="搜索任务名称" oninput="setTaskQuery(this.value)"></label>
-          <div class="seg">${execOpts.map(s=>`<button class="${taskExec===s?'active':''}" onclick="setTaskExec('${s}')">${s}<i>${done.filter(t=>s==='全部'||t.exec===s).length}</i></button>`).join('')}</div>
+          <div class="seg">${execOpts.map(s=>`<button class="${taskExec===s?'active':''}" onclick="setTaskExec('${s}')">${s}</button>`).join('')}</div>
         </div>
-        <div class="tgrid thead" style="grid-template-columns:2fr 1.2fr .9fr .9fr"><span>任务名称</span><span>任务路径</span><span>任务提交时间</span><span>任务状态</span></div>
-        ${shown.length?shown.map(x=>`<div class="tgrid trow" style="grid-template-columns:2fr 1.2fr .9fr .9fr">
-          <div class="tcell-title"><b>${x.name}</b><small>已提交处理</small></div>
-          <span>${x.path}</span><span>${x.submitTime}</span>
-          <span><i class="tag ${execTag(x.exec)}" ${x.exec==='执行中'?'style="background:var(--primary-soft);color:var(--primary)"':''}>${x.exec}</i></span>
-        </div>`).join(''):(done.length===0?'<div class="empty-state"><i>✓</i>暂无已处理任务，提交或忽略的任务会展示在这里</div>':'<div class="empty-state"><i>⌕</i>未找到匹配的任务，请调整搜索内容或筛选条件</div>')}`}
+        ${(()=>{const filtering=taskExec!=='全部'||taskQuery.trim()!=='';
+          const list=diagRuns().map((r,ri)=>({r,ri,rows:r.tasks.map((t,ti)=>({...t,ti})).filter(t=>(taskExec==='全部'||t.exec===taskExec)&&t.name.includes(taskQuery.trim()))})).filter(v=>!filtering||v.rows.length);
+          return list.length?`<div class="lcard">
+        <div class="rgrid rhead"><span>任务ID</span><span>诊断名称</span><span class="rnum">生成任务数</span><span class="rnum">执行中数量</span><span class="rnum">执行成功数</span><span class="rnum">执行失败数</span><span class="rnum">已忽略数</span><span>诊断时间</span><span style="text-align:right">操作</span></div>
+        ${list.map(({r,ri,rows})=>{const open=filtering||runOpen===ri;return `<div class="rgrid rrow" onclick="toggleRun(${ri})">
+          <span class="rname"><b>${r.id}</b><small>后端生成 · 全局唯一</small></span>
+          <span class="rname"><b>${r.name}</b></span>
+          <span class="rnum"><b>${r.total}</b></span>
+          <span class="rnum"><b style="color:${r.runn?'var(--primary)':'var(--ink-4)'}">${r.runn}</b></span>
+          <span class="rnum"><b style="color:${r.ok?'#15803d':'var(--ink-4)'}">${r.ok}</b></span>
+          <span class="rnum"><b style="color:${r.fail?'#b91c1c':'var(--ink-4)'}">${r.fail}</b></span>
+          <span class="rnum"><b style="color:${r.ign?'var(--ink)':'var(--ink-4)'}">${r.ign}</b></span>
+          <span>${r.time}</span>
+          <span style="text-align:right"><button class="lbtn">${open?'收起':'展开'}</button></span>
+        </div>
+        ${open?`<div class="lpanel">
+          <div class="lt-cap">${r.name} · 诊断时间 ${r.time} · 共 ${rows.length} 条任务明细</div>
+          ${rows.map(t=>`<div class="lt-line">
+            <span><b>${t.name}</b>${t.reason?`<small class="fail-reason">失败原因：${t.reason}</small>`:''}</span>
+            <span>${t.path}</span>
+            <span><i class="tag ${t.cls}"${t.exec==='执行中'?' style="background:var(--primary-soft);color:var(--primary)"':''}>${t.exec}</i></span>
+            <span style="text-align:right">${btnOn('runDetail')?`<button class="lbtn" onclick="event.stopPropagation();viewTask(${ri},${t.ti})">详情</button>`:''}</span>
+          </div>`).join('')}
+        </div>`:''}`}).join('')}
+      </div>`:(done.length===0?'<div class="empty-state"><i>✓</i>暂无已处理诊断，提交或忽略任务后该次诊断会展示在这里</div>':'<div class="empty-state"><i>⌕</i>未找到匹配的任务，请调整搜索内容或筛选条件</div>')})()}`}
     </div>
   </div>`}
 
@@ -1029,7 +1084,7 @@
     else if(r.t==='img')ctl=`<span class="gb-thumb">设施实拍</span><a class="exlink" onclick="toast('演示原型：可替换设施图片，重新提交审核')">替换</a>`;
     return gbRow(r.label,ctl+(r.note?`<span class="gb-unit">${r.note}</span>`:''),r.hl);
   };
-  function detail(){const t=taskData[taskIdx]||taskData[0];
+  function detail(){const t=roTask?{status:'已处理',...roTask}:(taskData[taskIdx]||taskData[0]);
     let main='',actions='';
     if(t.kind==='route'||t.name==='找店指引素材补充'){
       main=`<div class="section"><h3>设置找店指引</h3>
@@ -1279,24 +1334,26 @@
       :(c.fields||[]).length?`<div class="section"><h3>${c.src?2:1}　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
-      actions=`${c.ignore==='暂无此设施'&&btnOn('submit')?'<button class="btn btn-outline" onclick="finishTask(\'已忽略（此次）\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
+      actions=`${c.ignore==='暂无此设施'&&btnOn('submit')?'<button class="btn btn-outline" onclick="finishTask(\'已忽略\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
         ${btnOn('ignoreNow')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>`:''}
         ${btnOn('submit')?(c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
           :c.pol?`<button class="btn btn-primary" ${polSel.bf?'':'disabled'} onclick="finishTask('执行中','酒店政策已提交，AI 正在统一填写抖音来客五组政策并校验')">提交</button>`
-          :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
+          :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行成功\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
           :c.faudit?'<button class="btn btn-primary" onclick="finishTask(\'执行中\',\'已提交审核，AI 正在使用替换图片在抖音来客重新提交设施审核，提交成功并完成结果校验后任务标记为已完成；暂无此设施将改为「无」\')">提交审核</button>'
-          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行完成\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.presale?'预售方案已提交，AI 正在写入抖音来客并校验':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图，替换成功即完成任务':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':c.bt?'修改已提交，AI 正在写入抖音来客并校验结果':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`):''}`;
+          :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行成功\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.presale?'预售方案已提交，AI 正在写入抖音来客并校验':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图，替换成功即完成任务':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':c.bt?'修改已提交，AI 正在写入抖音来客并校验结果':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`):''}`;
     }
     return `<div class="page">
-    <button class="back" onclick="go('tasks')">‹ 返回任务列表</button>
-    <div class="page-head"><div><h1>${t.name}</h1><p>${t.path} · 当前酒店：${activeHotel.name}</p></div><i class="tag red">待处理</i></div>
-    <main>
+    <button class="back" onclick="${roTask?'closeRo()':'go(\'tasks\')'}">${roTask?'‹ 返回已处理':'‹ 返回任务列表'}</button>
+    <div class="page-head"><div><h1>${t.name}</h1><p>${t.path} · 当前酒店：${activeHotel.name}</p></div>${roTask?`<i class="tag ${roTask.exec==='执行中'?'':execTag(roTask.exec)}"${roTask.exec==='执行中'?' style="background:var(--primary-soft);color:var(--primary)"':''}>${roTask.exec}</i>`:'<i class="tag red">待处理</i>'}</div>
+    ${roTask?`<div class="notice"><span class="notice-icon">ⓘ</span><div><b>处理详情 · 数据快照</b><span>以下为该任务处理时的数据，仅供查看，不可编辑。</span></div></div>`:''}
+    ${roTask&&roTask.reason?`<div class="notice" style="border-color:#fecaca;background:#fef2f2"><span class="notice-icon" style="color:#b91c1c">✕</span><div><b style="color:#b91c1c">执行失败</b><span style="color:#b91c1c">失败原因：${roTask.reason}</span></div></div>`:''}
+    <main${roTask?' class="ro"':''}>
       ${main}
-      <div class="action-bar">${actions}</div>
+      ${roTask?'':`<div class="action-bar">${actions}</div>`}
     </main>
   </div>`}
 
-  /* ===== 诊断日志（每次诊断一行：诊断次数 / 任务数 / 执行成功数 / 执行失败数 / 详情） ===== */
+  /* ===== 诊断任务·已处理：按次诊断分组（任务ID / 诊断名称 / 生成任务数 / 执行中数量 / 执行成功数 / 执行失败数 / 已忽略数 / 诊断时间），展开查看该次诊断的任务明细 ===== */
   const LOG_TASKS={ // 任务名 → [检查路径]
     '中差评回复':['评价回复 · 待回复中差评'],
     '商家经营分-评价分提升':['评价 · 评价评分'],
@@ -1321,58 +1378,50 @@
     '联系电话修正任务':['基本信息 · 联系电话'],
     '门店名称修改建议任务':['基本信息 · 门店名称']
   };
-  const LOG_ST={done:['已完成','green'],fail:['执行失败','red'],wait:['待处理','gray']};
-  const DIAG_LOG=[ // 时间正序；ts: [任务名, 状态, 失败原因?]；最新一次与「诊断任务」页当前 22 条待处理任务一致
+  const RUN_ST={run:['执行中',''],ok:['执行成功','green'],fail:['执行失败','red'],ign:['已忽略','gray']};
+  const RUN_IDS=['83641029574','83658210473','83675031882','83699027641','83721458096','83734620915']; // 任务ID 由后端生成、全局唯一，原型以示例编号呈现
+  const DIAG_LOG=[ // 历史诊断记录，时间正序；ts: [任务名, 状态, 失败原因?]；待处理任务不在已处理展示
     {time:'2026-08-08 16:40',ts:[
-      ['营业状态修正任务','done'],['房间总数修正任务','done'],['联系电话修正任务','done'],
-      ['团购商品核对任务','done'],['预售房型补充任务','done'],['早餐份数修正·景观双床房','done'],
-      ['早餐份数修正·巨幕投影大床房','done'],['房型新增·电竞大床房','done'],['房型信息核对·亲子家庭房','done'],
-      ['悦享双床房近 7 天价格偏高','fail','价格护栏校验未通过：调整后价格超出近 30 天成交价波动范围'],['中差评回复','done'],
-      ['商家经营分-评价分提升','done']]},
+      ['营业状态修正任务','ok'],['房间总数修正任务','ok'],['联系电话修正任务','ok'],
+      ['团购商品核对任务','ok'],['预售房型补充任务','ok'],['早餐份数修正·景观双床房','ok'],
+      ['早餐份数修正·巨幕投影大床房','ok'],['房型新增·电竞大床房','ok'],['房型信息核对·亲子家庭房','ok'],
+      ['悦享双床房近 7 天价格偏高','fail','价格护栏校验未通过：调整后价格超出近 30 天成交价波动范围'],['中差评回复','ok'],
+      ['商家经营分-评价分提升','ign']]},
     {time:'2026-08-13 14:02',ts:[
-      ['悦享双床房近 7 天价格偏高','done'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],
-      ['头图相册补充任务','done'],['中差评回复','done']]},
+      ['悦享双床房近 7 天价格偏高','ok'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],
+      ['头图相册补充任务','ok'],['中差评回复','ok']]},
     {time:'2026-08-15 09:18',ts:[
-      ['门店名称修改建议任务','done'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],['房型新增·电竞大床房','done']]},
+      ['门店名称修改建议任务','ok'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],['房型新增·电竞大床房','ok']]},
     {time:'2026-08-20 11:24',ts:[
-      ['酒店设施信息核对任务','done'],['悦享双床房近 7 天价格偏高','done'],['团购商品核对任务','done']]},
+      ['酒店设施信息核对任务','run'],['悦享双床房近 7 天价格偏高','ok'],['团购商品核对任务','ok']]},
     {time:'2026-08-27 18:06',ts:[
-      ['门店装修审核整改任务','done'],['酒店设施审核整改任务','fail','审核不通过标签整组写入被平台拦截，需按驳回原因重新整改'],
-      ['酒店设施信息核对任务','done'],['外显小图替换建议任务','done'],['找店指引素材补充','done'],
-      ['酒店政策联合补充任务','done'],['头图相册补充任务','done'],['中差评回复','done']]},
-    {time:'2026-08-28 10:32',ts:Object.keys(LOG_TASKS).map(n=>[n,'wait'])}
+      ['门店装修审核整改任务','ok'],['酒店设施审核整改任务','fail','审核不通过标签整组写入被平台拦截，需按驳回原因重新整改'],
+      ['酒店设施信息核对任务','ok'],['外显小图替换建议任务','ok'],['找店指引素材补充','ign'],
+      ['酒店政策联合补充任务','ok'],['头图相册补充任务','ok'],['中差评回复','ok']]}
   ];
-  let logOpen=null;
-  function toggleLog(i){logOpen=logOpen===i?null:i;render()}
-  function records(){
-    const runs=DIAG_LOG.map((r,n)=>({r,n:n+1}))
-      .map(o=>({...o,task:o.r.ts.length,ok:o.r.ts.filter(t=>t[1]==='done').length,bad:o.r.ts.filter(t=>t[1]==='fail').length}))
-      .reverse();
-    return `<div class="page">
-    <div class="page-head"><div><h1>诊断日志</h1><p>每次诊断一行，点击「详情」展开该次诊断的任务列表与每一条执行详情</p></div></div>
-    <div class="lcard">
-      <div class="lgrid lhead"><span>诊断次数</span><span>任务数</span><span>执行成功数</span><span>执行失败数</span><span>详情</span></div>
-      ${runs.map(o=>{return `<div class="lgrid lrow">
-        <span class="lmain"><b>第 ${o.n} 次诊断</b><small>${o.r.time}</small></span>
-        <span class="lnum"><b>${o.task}</b><small>个任务</small></span>
-        <span class="lnum"><b style="color:#15803d">${o.ok}</b><small>个已完成</small></span>
-        <span class="lnum"><b style="color:${o.bad?'#b91c1c':'var(--ink-4)'}">${o.bad}</b><small>个失败</small></span>
-        <span>${btnOn('logDetail')?`<button class="lbtn" onclick="toggleLog(${o.n-1})">${logOpen===o.n-1?'收起':'详情'}</button>`:''}</span>
-      </div>
-      ${logOpen===o.n-1?`<div class="lpanel">
-        <div class="lt-cap">第 ${o.n} 次诊断 · ${o.r.time} · 共 ${o.task} 条任务详情</div>
-        ${o.r.ts.map(t=>{const s=LOG_ST[t[1]];const note=t[1]==='done'?'已确认并写入抖音来客，结果校验通过':t[1]==='fail'?(t[2]||'写入校验未通过，可在诊断任务中重试'):'已生成任务，等待用户确认并执行';
-          return `<div class="lt-line">
-          <span><b>${t[0]}</b></span>
-          <span>${LOG_TASKS[t[0]]?LOG_TASKS[t[0]][0]:''}</span>
-          <span><i class="tag ${s[1]}">${s[0]}</i></span>
-          <span>${note}</span>
-        </div>`}).join('')}
-      </div>`:''}`}).join('')}
-    </div>
-  </div>`}
+  let runOpen=0,roTask=null;
+  function toggleRun(i){runOpen=runOpen===i?null:i;render()}
+  /* 已处理诊断记录：历史诊断 + 当次诊断（当次仅统计已处理的任务，待处理任务不展示） */
+  function diagRuns(){
+    const runs=DIAG_LOG.map((r,i)=>{
+      const cnt=st=>r.ts.filter(t=>t[1]===st).length;
+      return {id:RUN_IDS[i],name:`第${i+1}次诊断（${r.time.slice(0,10).replace(/-/g,'')}）`,time:r.time,total:r.ts.length,
+        runn:cnt('run'),ok:cnt('ok'),fail:cnt('fail'),ign:cnt('ign'),
+        tasks:r.ts.map(t=>({name:t[0],path:(LOG_TASKS[t[0]]||['—'])[0],exec:RUN_ST[t[1]][0],cls:RUN_ST[t[1]][1],reason:t[2]||''}))}});
+    const processed=taskData.filter(t=>t.status==='已处理');
+    if(processed.length){
+      const tasks=processed.map(t=>({name:t.name,path:t.path,exec:t.exec,cls:execTag(t.exec),reason:''}));
+      const c=st=>tasks.filter(t=>t.exec===st).length;
+      runs.push({id:RUN_IDS[5],name:`第${runs.length+1}次诊断（20260828）`,time:processed[processed.length-1].submitTime||'2026-08-28 12:30:00',
+        total:taskData.length,runn:c('执行中'),ok:c('执行成功'),fail:c('执行失败'),ign:c('已忽略'),tasks});
+    }
+    return runs.reverse();
+  }
+  /* 处理详情：数据快照纯展示（只读），执行失败任务展示失败原因 */
+  function viewTask(ri,ti){const t=diagRuns()[ri].tasks[ti];roTask={name:t.name,path:t.path,exec:t.exec,reason:t.reason||''};go('detail')}
+  function closeRo(){roTask=null;go('tasks')}
 
-  /* ===== 系统管理：用户管理 / 角色管理 / 菜单管理 / 我的信息（RBAC 标准；表格样式对齐 Ant Design Pro） ===== */
+    /* ===== 系统管理：用户管理 / 角色管理 / 菜单管理 / 我的信息（RBAC 标准；表格样式对齐 Ant Design Pro） ===== */
   const hotelName=i=>hotels[i].name;
   const denyPage=t=>`<div class="page"><div class="page-head"><div><h1>${t}</h1></div></div><div class="empty-state"><i>🔒</i>仅管理员可访问${t}</div></div>`;
   const RES_LABEL={menu:'菜单',btn:'按钮',api:'接口'};
@@ -1456,7 +1505,7 @@
     <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">取消</button><button class="btn btn-primary" onclick="applyAddHotel()">确认新增</button></div>
   </div></div>`}
   function applyAddHotel(){if(!newHotel.name.trim()){toast('请输入酒店名称');return}
-    hotels.push({name:newHotel.name.trim(),sub:'待补充门店信息',douyin:'off',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]});
+    hotels.push({id:'6200'+String(11+hotels.length),name:newHotel.name.trim(),sub:'待补充门店信息',douyin:'off',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]});
     newHotel={name:''};closeAccModal();render();toast('酒店已新增，抖音来客、抖音授权与携程官网默认未授权')}
   /* ----- 配置酒店 / 任务权限（业务数据权限，按账户维度） ----- */
   function openAccHotels(ui){accHotelsFor=ui;renderAccHotels()}
@@ -1492,7 +1541,7 @@
     const bt=k.filter(x=>x.indexOf('btn:')===0).length;
     const ap=k.filter(x=>x.indexOf('api:')===0).length;
     return `${mn} 个菜单 · ${bt} 个按钮 · ${ap} 个接口`};
-  const roleTreeData=()=>{const groups=['酒店管理','诊断工作台','诊断任务','诊断日志'];
+  const roleTreeData=()=>{const groups=['酒店管理','诊断工作台','诊断任务'];
     return permMenus.map((m,k)=>({mk:k,name:m.name,
       btns:permButtons.filter(b=>b.group===groups[k]).map(b=>({key:b.key,name:b.name})),
       apis:MENU_META[k].api().map(a=>({code:a.code,name:a.name}))}))};
@@ -1514,9 +1563,9 @@
     </div>`).join('')}
     </div>`,
     '保存','applyRoleModal()')}
-  const ROLE_MENU_API=[['api:GET /api/hotels','api:POST /api/hotels','api:POST /api/hotels/auth'],['api:POST /api/diag/start','api:GET /api/diag/steps','api:POST /api/diag/tasks'],['api:GET /api/tasks','api:POST /api/tasks/submit','api:POST /api/tasks/ignore'],['api:GET /api/diag/records']];
+  const ROLE_MENU_API=[['api:GET /api/hotels','api:POST /api/hotels','api:POST /api/hotels/auth'],['api:POST /api/diag/start','api:GET /api/diag/steps','api:POST /api/diag/tasks'],['api:GET /api/tasks','api:POST /api/tasks/submit','api:POST /api/tasks/ignore']];
   function toggleRoleMenu(k,on){const mid='m'+k;
-    const kids=permButtons.filter(b=>['酒店管理','诊断工作台','诊断任务','诊断日志'][k]===b.group).map(b=>'btn:'+b.key).concat(ROLE_MENU_API[k]);
+    const kids=permButtons.filter(b=>['酒店管理','诊断工作台','诊断任务'][k]===b.group).map(b=>'btn:'+b.key).concat(ROLE_MENU_API[k]);
     if(on){if(!rtmp.resKeys.includes(mid))rtmp.resKeys.push(mid);kids.forEach(x=>{if(!rtmp.resKeys.includes(x))rtmp.resKeys.push(x)})}
     else rtmp.resKeys=rtmp.resKeys.filter(x=>x!==mid&&!kids.includes(x))}
   function rtmpResChk(key,on){if(on&&!rtmp.resKeys.includes(key))rtmp.resKeys.push(key);if(!on)rtmp.resKeys=rtmp.resKeys.filter(x=>x!==key)}
@@ -1537,7 +1586,7 @@
   function setMenuPerm(k,on){permMenus[k].on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${permMenus[k].name}」菜单权限`)}
   function setBtnPerm(key,on){const b=permButtons.find(b=>b.key===key);b.on=on?1:0;render();toast(`已${on?'开通':'关闭'}「${b.name}」按钮权限`)}
   function resTree(){
-    const groups=['酒店管理','诊断工作台','诊断任务','诊断日志'];
+    const groups=['酒店管理','诊断工作台','诊断任务'];
     const withCustom=(id,kids)=>kids.concat(resCustom.filter(c=>c.parent===id).map(c=>({id:'c'+c.cid,type:c.type,name:c.name,code:c.code,path:c.path,sort:c.sort,on:1})));
     const menus=permMenus.map((m,k)=>{
       const bs=permButtons.filter(b=>b.group===groups[k]).map((b,bi)=>({type:'btn',name:b.name,code:'btn:'+b.key,path:'—',sort:bi+1,on:b.on===1,bind:{t:'btn',k:b.key}}));
@@ -1681,7 +1730,7 @@
   function authorize(){hotels[authIndex][platform]='ok';reauth=false;toast(`${platform==='douyin'?'抖音来客':'携程官网'}授权成功`);modal();render()}
   function closeModal(e){if(e&&e.target!==e.currentTarget)return;$('#modalRoot').innerHTML='';authIndex=null}
 
-  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,records,users:usersPage,roles:rolesPage,res:resPage,profile:profilePage};$('#app').innerHTML=pages[view]()}
+  function render(){nav();const pages={hotels:hotelsPage,diag:diagPage,tasks,detail,users:usersPage,roles:rolesPage,res:resPage,profile:profilePage};$('#app').innerHTML=(pages[view]||hotelsPage)()}
   render();
 </script>
 </body>
