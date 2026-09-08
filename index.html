@@ -491,7 +491,7 @@
       ['找店指引','找店指引不为空，含起点、途经点、终点的路线内容与素材','fail','找店指引素材补充','信息完善']]},
     {name:'酒店政策',path:'店铺管理 › 酒店信息管理 › 酒店政策（联合诊断节点）',items:[
       ['入离政策','五组联合对比：最晚离店 15:00 与携程「10:30后入住、13:00前退房」不一致','fail','酒店政策联合补充任务','信息完善'],
-      ['办理入住年龄','已配置 最小 18 / 最大不限制，与携程接待提示一致','pass','','','ctrip'],
+      ['办理入住年龄','已配置 最小 18 / 最大不限制，与携程接待提示一致（非房间相关数据，重试后采集成功）','pass','','','ctrip'],
       ['加床及儿童','五组联合对比：现有床 0-12 岁与携程「17 岁及以下免费」不一致、加床「不提供」与携程收费加床不一致、儿童早餐未选择','fail','酒店政策联合补充任务','信息完善'],
       ['宠物政策','五组联合对比：宠物免费「是」与携程「收费」标签不一致','fail','酒店政策联合补充任务','信息完善'],
       ['早餐政策','五组联合对比：早餐时间 08:00~10:00 与携程 07:00~10:00 不一致','fail','酒店政策联合补充任务','信息完善']]},
@@ -510,7 +510,7 @@
       ['景观棋牌娱乐房','早餐份数与携程一致：抖音 2 份＝携程 2 份','pass','','','both'],
       ['巨幕投影大床房','抖音日历房早餐 0 份，携程当前 2 份；不一致，该房型单独形成 1 条早餐份数修改任务','fail','早餐份数修正·巨幕投影大床房','信息完善'],
       ['三床家庭房','早餐份数与携程一致：抖音 3 份＝携程 3 份','pass','','','douyin'],
-      ['景观大床房','早餐份数与携程一致：抖音 1 份＝携程 1 份','pass','','','ctrip',1],
+      ['景观大床房','早餐份数与携程一致：抖音 1 份＝携程 1 份（房间相关数据，不提供重试）','pass','','','ctrip',1],
       ['亲子家庭房','早餐份数与携程一致：抖音 2 份＝携程 2 份','pass','',''],
       ['景观双床房','抖音日历房早餐 1 份，携程当前 2 份；不一致，该房型单独形成 1 条早餐份数修改任务','fail','早餐份数修正·景观双床房','信息完善']]},
     {name:'房价房态管理',path:'商品与货架 › 房价房态管理 › 房价房态管理',items:[
@@ -597,6 +597,8 @@
     cfail_ctrip:'<span class="stb stb-cf">采集失败（携程）</span>',
     cfail_both:'<span class="stb stb-cf">采集失败（抖音来客、携程）</span>'};
   const isCfail=s=>!!s&&String(s).indexOf('cfail_')===0;
+  /* 携程采集失败重试：仅所采集数据非房间相关数据（房型名称、房型设施、床型、楼层、价格等之外）提供重试按钮；
+     种子第 7 位：1=房间相关数据（无重试按钮），2=重试演示（5 次仍失败后置死），缺省=重试即采集成功 */
   function retryCollect(si,ii){const it=diagRun.steps[si].items[ii];if(it.retryDead||it.state==='retry'||(it.retryN||0)>=5)return;it.state='retry';render();
     diagT.push(setTimeout(()=>{it.retryN=(it.retryN||0)+1;const seed=diagSteps[si].items[ii];
       if(!seed[6]){it.state='pass';toast('重新采集成功：'+seed[0])}
@@ -779,7 +781,7 @@
             else if(st==='retry')right='<span class="spinner"></span><span style="color:var(--primary)">重新采集中</span>';
             else if(ST_LABEL[st]){right=ST_LABEL[st];
               if(st==='cfail_douyin'||st==='cfail_both')right+='<span class="cf-hint">请前往抖音来客检查此项是否符合标准</span>';
-              if(st==='cfail_ctrip')right+=run.retryDead?'<span class="cf-hint">采集异常，请联系技术管理员</span>':` <button class="btn btn-outline" style="height:24px;padding:0 10px;font-size:12px;margin-left:8px" onclick="retryCollect(${f},${ii})">重试${run.retryN?`（${run.retryN}/5）`:''}</button>`;
+              if(st==='cfail_ctrip'&&step.items[ii][6]!==1)right+=run.retryDead?'<span class="cf-hint">采集异常，请联系技术管理员</span>':` <button class="btn btn-outline" style="height:24px;padding:0 10px;font-size:12px;margin-left:8px" onclick="retryCollect(${f},${ii})">重试${run.retryN?`（${run.retryN}/5）`:''}</button>`;
             }
             else right=pv?(pv==='pass'?'<span style="color:var(--ok)">✓ 上次通过</span>':pv==='fail'?'<span style="color:#b91c1c">✕ 上次不通过</span>':'<span style="color:var(--ink-4)">上次：</span>'+ST_LABEL[pv]):'<span style="color:var(--ink-4)">未诊断</span>';
             return `<div class="ditem col"><span class="dn">${it[0]}</span><span class="dr">${it[1]}</span><span class="ds">${right}</span></div>`}).join('')}
