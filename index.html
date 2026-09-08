@@ -1380,7 +1380,7 @@
   };
   const RUN_ST={run:['执行中',''],ok:['执行成功','green'],fail:['执行失败','red'],ign:['已忽略','gray']};
   const RUN_IDS=['83641029574','83658210473','83675031882','83699027641','83721458096','83734620915']; // 任务ID 由后端生成、全局唯一，原型以示例编号呈现
-  const DIAG_LOG=[ // 历史诊断记录，时间正序；ts: [任务名, 状态, 失败原因?]；待处理任务不在已处理展示
+  const DIAG_LOG=[ // 历史诊断记录，时间正序；ts: [任务名, 状态, 失败原因?]；历史记录均为终态，不含执行中
     {time:'2026-08-08 16:40',ts:[
       ['营业状态修正任务','ok'],['房间总数修正任务','ok'],['联系电话修正任务','ok'],
       ['团购商品核对任务','ok'],['预售房型补充任务','ok'],['早餐份数修正·景观双床房','ok'],
@@ -1393,7 +1393,7 @@
     {time:'2026-08-15 09:18',ts:[
       ['门店名称修改建议任务','ok'],['酒店设施信息核对任务','fail','逐设施写入时部分设施校验超时，可重试'],['房型新增·电竞大床房','ok']]},
     {time:'2026-08-20 11:24',ts:[
-      ['酒店设施信息核对任务','run'],['悦享双床房近 7 天价格偏高','ok'],['团购商品核对任务','ok']]},
+      ['酒店设施信息核对任务','ok'],['悦享双床房近 7 天价格偏高','ok'],['团购商品核对任务','ok']]},
     {time:'2026-08-27 18:06',ts:[
       ['门店装修审核整改任务','ok'],['酒店设施审核整改任务','fail','审核不通过标签整组写入被平台拦截，需按驳回原因重新整改'],
       ['酒店设施信息核对任务','ok'],['外显小图替换建议任务','ok'],['找店指引素材补充','ign'],
@@ -1401,18 +1401,18 @@
   ];
   let runOpen=0,roTask=null;
   function toggleRun(i){runOpen=runOpen===i?null:i;render()}
-  /* 已处理诊断记录：历史诊断 + 当次诊断（当次仅统计已处理的任务，待处理任务不展示） */
+  /* 已处理诊断记录：历史诊断 + 当次诊断（诊断完成后即出现当次记录；未处理任务以待处理状态展示，历史记录不含执行中） */
   function diagRuns(){
     const runs=DIAG_LOG.map((r,i)=>{
       const cnt=st=>r.ts.filter(t=>t[1]===st).length;
       return {id:RUN_IDS[i],name:`第${i+1}次诊断（${r.time.slice(0,10).replace(/-/g,'')}）`,time:r.time,total:r.ts.length,
         runn:cnt('run'),ok:cnt('ok'),fail:cnt('fail'),ign:cnt('ign'),
         tasks:r.ts.map(t=>({name:t[0],path:(LOG_TASKS[t[0]]||['—'])[0],exec:RUN_ST[t[1]][0],cls:RUN_ST[t[1]][1],reason:t[2]||''}))}});
-    const processed=taskData.filter(t=>t.status==='已处理');
-    if(processed.length){
-      const tasks=processed.map(t=>({name:t.name,path:t.path,exec:t.exec,cls:execTag(t.exec),reason:''}));
+    const hasCur=diagRun&&diagRun.phase==='done'&&taskData.length>0; // 最新一次诊断完成后即计入已处理
+    if(hasCur){
+      const tasks=taskData.map(t=>({name:t.name,path:t.path,exec:t.status==='待处理'?'待处理':t.exec,cls:t.status==='待处理'?'gray':execTag(t.exec),reason:''}));
       const c=st=>tasks.filter(t=>t.exec===st).length;
-      runs.push({id:RUN_IDS[5],name:`第${runs.length+1}次诊断（20260828）`,time:processed[processed.length-1].submitTime||'2026-08-28 12:30:00',
+      runs.push({id:RUN_IDS[5],name:`第${runs.length+1}次诊断（20260828）`,time:taskData[taskData.length-1].submitTime||'2026-08-28 12:30:00',
         total:taskData.length,runn:c('执行中'),ok:c('执行成功'),fail:c('执行失败'),ign:c('已忽略'),tasks});
     }
     return runs.reverse();
