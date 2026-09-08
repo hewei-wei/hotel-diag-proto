@@ -339,7 +339,7 @@
   .hero-sub{margin:9px 0 0;font-size:13.5px;color:var(--ink-3);line-height:1.6}
   .hero-cta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .btn-start{height:46px;padding:0 32px;font-size:15px;font-weight:600;box-shadow:0 8px 20px rgba(79,70,229,.25)}
-  .hero-note{flex:none;max-width:160px;font-size:12px;color:var(--ink-3);line-height:1.5}
+  .hero-note{flex:none;max-width:220px;font-size:12px;color:var(--ink-3);line-height:1.5}
   .hero-progress{display:flex;align-items:center;gap:14px;margin-top:24px}
   .hero-progress .pbar{flex:1;height:12px}
   .hero-pct{flex:none;min-width:52px;text-align:right;font-size:15px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
@@ -348,7 +348,12 @@
   .hstat b{font-size:26px;font-variant-numeric:tabular-nums;line-height:1.2}
   .hstat.clickable{cursor:pointer}
   .hstat.clickable:hover b{opacity:.75}
-  .cf-hint{margin-left:10px;font-size:12px;color:var(--ink-3)}
+  .stb{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap}
+  .stb-ok{background:var(--ok);color:#fff}
+  .stb-pass{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+  .stb-fail{background:#b91c1c;color:#fff}
+  .stb-cf{background:#b45309;color:#fff}
+  .cf-hint{display:block;margin-top:6px;font-size:12.5px;font-weight:600;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:4px 8px;width:max-content;max-width:100%;text-align:left}
   .dlist{position:relative}
   .drow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 10px;border-radius:var(--r-md)}
   .drow:hover{background:var(--surface-2)}
@@ -471,8 +476,8 @@
     {id:'620014',name:'山屿酒店',sub:'重庆北站店',douyin:'off',dy:'off',ctrip:'off',lastDiagnosis:null,diagHistory:[]}
   ];
   const NOW=new Date('2026-08-28T12:00:00'),diagDays=h=>h.lastDiagnosis?Math.floor((NOW-new Date(h.lastDiagnosis.replace(' ','T')))/864e5):null;
-  /* 诊断频率：每 24 小时内最多 1 次 */
-  const DIAG_LIMIT=864e5,diagUsed=h=>h.diagHistory.filter(t=>NOW-new Date(t.replace(' ','T'))<DIAG_LIMIT).length,diagLeft=h=>Math.max(0,1-diagUsed(h));
+  /* 诊断频率：每 24 小时内最多 1 次，且近 7 天内最多 2 次 */
+  const DIAG_LIMIT=864e5,DIAG_WEEK=6048e5,diagAge=t=>NOW-new Date(t.replace(' ','T')),diagUsed=h=>h.diagHistory.filter(t=>diagAge(t)<DIAG_LIMIT).length,diagUsed7=h=>h.diagHistory.filter(t=>diagAge(t)<DIAG_WEEK).length,diagLeft=h=>Math.max(0,Math.min(1-diagUsed(h),2-diagUsed7(h)));
   let activeHotel=null,view='hotels',authIndex=null,platform='douyin',method='sms',reauth=false,hotelFilter='all',hotelQuery='';
   const $=s=>document.querySelector(s), both=h=>h.douyin==='ok'&&h.ctrip==='ok', attr=s=>s.replace(/[&"<]/g,c=>({'&':'&amp;','"':'&quot;','<':'&lt;'}[c]));
 
@@ -586,11 +591,11 @@
   function initRediag(){diagT.forEach(clearTimeout);diagT=[];const old=diagRun;diagRun={phase:'idle',focus:0,added:[],failCount:0,hotel:old&&old.hotel,steps:diagSteps.map((s,si)=>({state:'pending',prev:old?old.steps[si].state:null,items:s.items.map((it,ii)=>({state:'pending',prev:old?old.steps[si].items[ii].state:null}))}))}}
   const stepFails=si=>diagRun.steps[si].items.filter(it=>it.state==='fail').length;
   /* 检查项状态标签（采集失败（抖音来客/携程/双方）、采集成功＋通过/不通过） */
-  const ST_LABEL={pass:'<span style="color:var(--ink-3)">采集成功</span><span style="color:var(--ok);font-weight:600"> ＋ 通过</span>',
-    fail:'<span style="color:var(--ink-3)">采集成功</span><span style="color:#b91c1c;font-weight:600"> ＋ 不通过</span>',
-    cfail_douyin:'<span style="color:#b45309;font-weight:600">采集失败（抖音来客）</span>',
-    cfail_ctrip:'<span style="color:#b45309;font-weight:600">采集失败（携程）</span>',
-    cfail_both:'<span style="color:#b45309;font-weight:600">采集失败（抖音来客、携程）</span>'};
+  const ST_LABEL={pass:'<span class="stb stb-ok">采集成功</span><span style="color:var(--ink-3)">＋</span><span class="stb stb-pass">通过</span>',
+    fail:'<span class="stb stb-ok">采集成功</span><span style="color:var(--ink-3)">＋</span><span class="stb stb-fail">不通过</span>',
+    cfail_douyin:'<span class="stb stb-cf">采集失败（抖音来客）</span>',
+    cfail_ctrip:'<span class="stb stb-cf">采集失败（携程）</span>',
+    cfail_both:'<span class="stb stb-cf">采集失败（抖音来客、携程）</span>'};
   const isCfail=s=>!!s&&String(s).indexOf('cfail_')===0;
   function retryCollect(si,ii){const it=diagRun.steps[si].items[ii];if(it.retryDead||it.state==='retry'||(it.retryN||0)>=5)return;it.state='retry';render();
     diagT.push(setTimeout(()=>{it.retryN=(it.retryN||0)+1;const seed=diagSteps[si].items[ii];
@@ -609,8 +614,8 @@
       <div style="max-height:60vh;overflow:auto;margin-top:6px">${rows.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${r.s.name} · ${r.it[0]}</span><span style="font-size:12px;white-space:nowrap">${isCfail(r.st)?ST_LABEL[r.st]:ST_LABEL[r.st]||'<span style="color:var(--ink-4)">'+(r.st==='running'?'诊断中':r.st==='retry'?'重新采集中':'未诊断')+'</span>'}</span></div>`).join('')||'<p style="color:var(--ink-3);font-size:13px">暂无</p>'}</div>
       <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">关闭</button></div>
     </div></div>`}
-  function startDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('每 24 小时只能诊断 1 次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));runStep(0)}
-  function resetDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('每 24 小时只能诊断 1 次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));initRediag();toast('已开始重新诊断');runStep(0)}
+  function startDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('7天内只能诊断2次，每 24 小时只能诊断 1 次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));runStep(0)}
+  function resetDiag(){if(activeHotel&&diagLeft(activeHotel)<1){toast('7天内只能诊断2次，每 24 小时只能诊断 1 次，请合理使用');return}if(diagRun&&diagRun.added.length)taskData=taskData.filter(t=>!diagRun.added.includes(t));initRediag();toast('已开始重新诊断');runStep(0)}
   function scrollStep(){const el=document.querySelector('.drow.running')||(document.querySelectorAll('.drow')||[])[diagRun.focus];if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'})}
   function runStep(si){diagRun.phase='running';diagRun.focus=si;diagRun.steps[si].state='running';runItem(si,0);render();scrollStep()}
   function runItem(si,ii){
@@ -707,9 +712,9 @@
     const runningIdx=diagRun.steps.findIndex(s=>s.state==='running');
     const curIdx=runningIdx<0?diagRun.focus:runningIdx;
     const left=activeHotel?diagLeft(activeHotel):1,limited=left<1;
-    const note='<small class="hero-note">每 24 小时只能诊断 1 次，请合理使用</small>';
-    const heroSub=diagRun.phase==='idle'?(limited?'24 小时内已诊断 1 次，达到诊断上限'
-      :`共 ${diagSteps.length} 个步骤、${total} 项检查，点击“开始诊断”逐项执行 · 24 小时内还可诊断 ${left} 次`)
+    const note='<small class="hero-note">7天内只能诊断2次，每 24 小时只能诊断 1 次，请合理使用</small>';
+    const heroSub=diagRun.phase==='idle'?(limited?(activeHotel&&diagUsed(activeHotel)>=1?'24 小时内已诊断 1 次，达到诊断上限':'7 天内已诊断 2 次，达到诊断上限')
+      :`共 ${diagSteps.length} 个步骤、${total} 项检查，点击“开始诊断”逐项执行 · 还可诊断 ${left} 次`)
       :diagRun.phase==='running'?`诊断中 · 第 ${curIdx+1}/${diagSteps.length} 步 ${diagSteps[curIdx].name}`
       :`诊断完成：不通过 ${failed} 项，已生成 ${diagRun.added.length} 个任务`;
     const f=diagRun.focus,step=diagSteps[f],rs=diagRun.steps[f];
