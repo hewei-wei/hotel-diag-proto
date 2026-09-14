@@ -212,6 +212,16 @@
   .tag.red{background:#fef2f2;color:#b91c1c}
   .tag.gray{background:var(--line-soft);color:var(--ink-2)}
   .tag.green{background:var(--ok-bg);color:var(--ok)}
+  .tag.blue{background:#eff6ff;color:#2563eb}
+  /* 抖音来客「信用卡 & 第三方支付」多选下拉（全选＋复选列表，与商家后台一致） */
+  .gb-ms{display:inline-block;position:relative;min-width:240px;max-width:520px;min-height:32px;padding:4px 26px 4px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;line-height:1.5;vertical-align:middle}
+  .gb-ms::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--ink-4);font-size:12px}
+  .gb-ms.open{border-color:var(--primary)}
+  .gb-ms i{font-style:normal;color:var(--ink-4)}
+  .gb-mspop{display:block;flex-basis:100%;max-width:560px;max-height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:#fff;padding:8px 12px}
+  .gb-mspop .gb-radio{margin:3px 0}
+  .ro .gb-ms,.ro .gb-mspop{pointer-events:none}
+  .gb-hol-it>span{color:var(--ink-4);font-size:11px}
 
   /* 返回 / 详情 */
   .back{color:var(--ink-3);font-size:13px;margin-bottom:var(--s3);display:inline-flex;align-items:center;gap:6px}
@@ -500,7 +510,42 @@
       ['信用卡 & 第三方支付','携程支持的支付方式在抖音为「请选择」未配置时，按携程值预填形成补充/校验任务；已配置且一致则通过；携程未采集字段不由 AI 推测，由用户自行选择','fail','支付方式配置补充任务','信息完善']]},
     {name:'酒店设施',path:'店铺管理 › 酒店信息管理 › 酒店设施',items:[
       ['酒店设施审核不通过标签','酒店设施顶部存在“审核不通过”标签时，读取全部被驳回设施及审核不通过原因；某一项设施图片审核不通过，仅替换该设施的图片，其他图片与字段不动；多个设施图片不通过合并为同一条整改任务。本次不通过 2 个设施：餐厅、健身室','fail','酒店设施审核整改任务','信息完善'],
-      ['酒店设施通用规则','以携程用户端“服务及设施”为采集边界逐设施核对，合并为一条核对任务：携程有、抖音无→建议改为“有”并补充详情；已为“有”→逐字段校验，不一致按携程修正；携程未采集到的设施不做检测和诊断。本次不通过 5 个设施：充电车位、接机服务、接站服务缺失，停车场、餐厅字段不一致','fail','酒店设施信息核对任务','信息完善']]},
+      ['酒店设施通用规则','以携程用户端“服务及设施”为采集边界逐设施核对（仅覆盖未设单列节点的设施；行李寄存、前台、公共区wifi、干洗、送餐服务、会议厅等单列设施及棋牌室、KTV 等「有 / 无＋上传图片」设施各自独立成任务，互不重复），合并为一条核对任务：携程有、抖音无→建议改为“有”并补充详情；已为“有”→逐字段校验，不一致按携程修正；携程未采集到的设施不做检测和诊断。本次不通过 5 个设施：充电车位、接机服务、接站服务缺失，停车场、餐厅字段不一致','fail','酒店设施信息核对任务','信息完善'],
+      ['行李寄存','携程「服务及设施」展示「行李寄存 · 免费」→收费信息=免费；抖音为「无」时建议改为「有」，一个设施单独形成 1 条任务。本次抖音为「无」','fail','行李寄存设施详情补充任务','信息完善'],
+      ['前台','携程「24 小时前台」→前台服务类型=24 小时前台；未展示明确类型时不自动填写。本次抖音前台为「无」','fail','前台设施详情补充任务','信息完善'],
+      ['公共区wifi','携程「全区域免费 WiFi」→收费信息=免费；本次抖音公共区 wifi 为「无」','fail','公共区wifi设施详情补充任务','信息完善'],
+      ['棋牌室','携程「服务及设施」存在「棋牌室」并采集到设施图片，抖音为「无」→ 按「有 / 无＋上传图片（无其他字段）」规则一个设施单独形成 1 条任务，建议改为「有」，图片按携程预填','fail','棋牌室设施图片补充任务','信息完善'],
+      ['KTV','携程存在「KTV」并采集到设施图片，抖音为「无」→ 单独形成 1 条任务，建议改为「有」，图片按携程预填','fail','KTV设施图片补充任务','信息完善'],
+      ['茶室','携程存在「茶室」并采集到设施图片，抖音为「无」→ 单独形成 1 条任务，建议改为「有」，图片按携程预填','fail','茶室设施图片补充任务','信息完善'],
+      ['家庭影院','携程存在「家庭影院」、未采集到设施图片，抖音为「无」→ 单独形成 1 条任务，图片须由用户上传后方可提交','fail','家庭影院设施图片补充任务','信息完善'],
+      ['共用厨房','携程存在「共用厨房」、未采集到设施图片，抖音为「无」→ 单独形成 1 条任务，图片须由用户上传后方可提交','fail','共用厨房设施图片补充任务','信息完善'],
+      ['行政酒廊','携程存在「行政酒廊」、未采集到设施图片，抖音为「无」→ 单独形成 1 条任务，图片须由用户上传后方可提交','fail','行政酒廊设施图片补充任务','信息完善'],
+      ['咖啡厅','携程存在「咖啡厅」，抖音已为「有」：该类设施无其他详情字段可校验，诊断通过不生成任务','pass','',''],
+      ['大堂吧','携程存在「大堂吧」，抖音已为「有」：该类设施无其他详情字段可校验，诊断通过不生成任务','pass','',''],
+      ['水上运动','携程用户端「服务及设施」未展示浮潜/潜水/皮划艇/帆船/冲浪等水上运动服务，不触发该节点','pass','',''],
+      ['冒险运动','携程用户端未展示登山/山地骑行/帆伞运动/攀岩/滑索等冒险运动服务，不触发该节点','pass','',''],
+      ['儿童泳池','携程用户端未展示儿童泳池，不触发该节点','pass','',''],
+      ['运动场地','携程用户端未展示桌球室/乒乓球室/网球场/篮球场等运动场地，不触发该节点','pass','',''],
+      ['营地设施和要求','携程用户端未展示营地/营地卫生间/露营设备搭建等营地相关服务，不触发该节点','pass','',''],
+      ['儿童托管','携程用户端未展示儿童托管服务，不触发该节点','pass','',''],
+      ['健身课程','携程用户端未展示健身课程，不触发该节点','pass','',''],
+      ['私人教练','携程用户端未展示私人教练服务，不触发该节点','pass','',''],
+      ['瑜伽课程','携程用户端未展示瑜伽课程，不触发该节点','pass','',''],
+      ['美容美体服务','携程用户端未展示美容化妆/美发护发/美甲/身体护理等美容美体服务，不触发该节点','pass','',''],
+      ['spa服务','携程用户端未展示 Spa/全方位水疗中心等 spa 相关服务，不触发该节点','pass','',''],
+      ['代客泊车','携程用户端未展示代客泊车服务，不触发该节点','pass','',''],
+      ['房东接待服务','连锁经营门店，携程用户端未展示房东接待服务，不触发该节点','pass','',''],
+      ['熨衣服务','携程「熨衣服务 · 收费」，抖音已配置「有 · 收费」，一致通过','pass','',''],
+      ['干洗','携程「干洗 · 收费」→收费信息=收费；本次抖音干洗为「无」','fail','干洗设施详情补充任务','信息完善'],
+      ['送餐服务','携程「送餐服务 [周一–周日] 07:00–22:00」→每日开放 07:00–22:00；本次抖音送餐服务为「无」','fail','送餐服务设施详情补充任务','信息完善'],
+      ['送机服务','携程用户端仅展示接机/接站服务，未展示送机服务，不触发该节点','pass','',''],
+      ['穿梭机场班车','携程用户端未展示穿梭机场班车，不触发该节点','pass','',''],
+      ['送站服务','携程用户端未单独展示送站服务，不触发该节点（接站服务已在酒店设施信息核对任务中处理）','pass','',''],
+      ['班车服务','携程用户端未展示班车服务，不触发该节点','pass','',''],
+      ['自行车租赁服务','携程用户端未展示自行车租赁服务，不触发该节点','pass','',''],
+      ['传真/复印','携程「传真/复印 · 收费」，抖音已配置「有 · 收费」，一致通过','pass','',''],
+      ['会议厅','携程「会议厅 · 免费」→收费信息=免费；图片为提交必填字段（750×562 或 4:3、≤5MB）。本次抖音会议厅为「无」','fail','会议厅设施详情补充任务','信息完善'],
+      ['商务中心','携程用户端未展示商务中心，不触发该节点','pass','','']]},
     {name:'门店装修',path:'店铺管理 › 店铺装修 › 门店装修',items:[
       ['装修审核不通过','「门店装修 › 头图和相册」有审核不通过标识，被驳回图片合并为一条整改任务，用户重新上传或删除后提交','fail','门店装修审核整改任务','信息完善'],
       ['外显小图','外显小图经图片识别与携程「外观」类别图片比对不一致','fail','外显小图替换建议任务','图片替换'],
@@ -530,7 +575,7 @@
     {name:'商家经营分',path:'经营成长 › 商家经营分',items:[
       ['装修 · 开业/装修时间','「开业时间和装修时间」未满分：抖音来客「门店管理 › 基本信息」两项均未填写，复用门店管理原路径规则形成补充任务','fail','开业装修时间补充任务','信息完善'],
       ['装修 · 热门设施','「有图服务设施及热门设施」未满分：抖音实际认定热门设施 4 种 < 目标 6 种，尚缺 2 种，需用户从「无」设施中真实选择补足','fail','热门设施补足任务','信息完善'],
-      ['装修 · 带图设施','「有图服务设施及热门设施」未满分：带图服务设施 2 个 < 目标 3 个，尚缺 1 个，需选择设施并确认图片','fail','带图服务设施补充任务','信息完善'],
+      ['装修 · 带图设施','「有图服务设施及热门设施」未满分：带图服务设施 2 个 < 目标 3 个；复用「酒店设施 › 有 / 无＋上传图片」原路径规则，棋牌室、KTV、茶室、家庭影院、共用厨房、行政酒廊 6 项「携程有、抖音无」按设施分别生成 6 条任务（不合并），任一完成后重新读取计入评分','fail','棋牌室设施图片补充任务','信息完善'],
       ['装修 · 营业状态','营业状态须为「正常营业」；当前「暂停营业」未达标，复用门店管理规则（同名待处理任务不重复生成）','fail','营业状态修正任务','信息完善'],
       ['装修 · 联系方式','联系电话不能为空；当前已配置（座机 1 个），达标','pass','',''],
       ['装修 · 相册高清图片','「相册高清图片」未满分：当前 13 张 < 目标 16 张，尚缺 3 张','fail','相册高清图片补充任务','图片替换'],
@@ -820,8 +865,8 @@
   function setTaskTab(t){taskTab=t;roTask=null;render()}
   function setTaskExec(v){taskExec=v;render()}
   function setTaskQuery(next){taskQuery=next;render();const input=$('#taskSearch');input.focus();input.setSelectionRange(next.length,next.length)}
-  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';roTask=null;guideMode=null;guideVia=1;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;smkPick=1;paySel={};hotSel={};hpicPick=null;go('detail')}
-  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';roTask=null;taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;smkPick=1;paySel={};hotSel={};hpicPick=null;go('tasks')}
+  function openTask(i){taskIdx=taskData.indexOf(todoTasks()[i]);taskTab='todo';roTask=null;guideMode=null;guideVia=1;replySel={};replyText={};gbSel={};gbPriv={};auAct={};facPick={};calTo=null;polSel={};xspPick=0;smkPick=1;paySel={};payOpen=null;hotSel={};picUpl=false;go('detail')}
+  function finishTask(exec,msg){const t=taskData[taskIdx];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec=exec;toast(msg);taskTab='done';roTask=null;taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};facPick={};calTo=null;polSel={};xspPick=0;smkPick=1;paySel={};payOpen=null;hotSel={};picUpl=false;go('tasks')}
   /* 二次确认弹窗：此次忽略 */
   let confirmAsk=null;
   function askIgnore(i,type){const t0=taskData[i];confirmAsk={i,type};const t=t0;
@@ -835,7 +880,7 @@
   function closeConfirm(e){if(e&&e.target!==e.currentTarget)return;confirmAsk=null;$('#modalRoot').innerHTML=''}
   function doIgnore(){const a=confirmAsk;closeConfirm();const t=taskData[a.i];t.status='已处理';t.submitTime='2026-08-28 12:30:00';t.exec='已忽略';
     toast('已忽略本次任务，下次诊断仍会检查');
-    taskTab='done';roTask=null;taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};calTo=null;polSel={};xspPick=0;smkPick=1;paySel={};hotSel={};hpicPick=null;go('tasks')}
+    taskTab='done';roTask=null;taskQuery='';taskExec='全部';guideMode=null;replySel={};replyText={};gbSel={};gbPriv={};auAct={};facPick={};calTo=null;polSel={};xspPick=0;smkPick=1;paySel={};payOpen=null;hotSel={};picUpl=false;go('tasks')}
   function tasks(){
     const todo=todoTasks(),done=doneTasks();
     const execOpts=['全部','执行中','执行成功','执行失败','已忽略'];
@@ -905,6 +950,13 @@
   /* 缺失房型新增：总间数由用户填写，未填写时提交置灰 */
   function rtQtySync(v){const b=document.getElementById('rtSubmit');if(b)b.disabled=!v.trim()}
   /* 外显小图替换建议：图片识别一致性比对，替换成功即任务完成 */
+  /* 抖音来客「信用卡 & 第三方支付」下拉选项（按商家后台实拍录入：国内银联卡 / 国外信用卡为全选＋复选多选下拉，第三方支付同；现金支付为单选下拉） */
+  const DY_UNION_CARDS=['中国银行-信用卡','中国工商银行-信用卡','中国交通银行-信用卡','中国招商银行-直付通','华夏银行-信用卡','银联手机支付通','宁波银行-信用卡','中国农业银行-信用卡','中国建设银行-信用卡','中国招商银行-信用卡','广东发展银行-信用卡','中国光大银行-信用卡','中国民生银行-信用卡','中信银行-信用卡','上海浦东发展银行-信用卡','携程银行-商旅业务担保卡','兴业银行-信用卡','深圳平安银行-信用卡','上海银行-信用卡','深圳发展银行-信用卡','中国工商银行-借记卡','中国招商银行-借记卡','银联借记卡','国内发行银联卡'];
+  const DY_FOREIGN_CARDS=['万事达 (Master)','威士 (VISA)','运通 (AMEx)','大来(Diners Club)','JCB','BC-Card','KH széchenyi pihenő kártya','széchenyi pihenő kártya','AirPlus','PayPal','ANCV cheques-vacances','PayPlug','Euro 6000','Postepay','Sistema 4B','PagSeguro','Elo Creditcard','Bcash','Interac e-Transfer','M-Pesa','Knet','Western Union','Apple Pay','iDeal','BankAxept','Reka-Check','Paysera.com','BankLink','Tenpay'];
+  /* 「有 / 无＋上传图片（无其他字段）」设施任务模板：一个设施一条任务、不与其他设施合并；
+     hasImg=携程已采集到设施图片（预填可保留/更换），否则图片须由用户上传后方可提交 */
+  const picfCfg=(name,hasImg)=>({advice:`携程「服务及设施」存在「${name}」${hasImg?'并采集到设施图片':'、未采集到设施图片'}；抖音来客「酒店设施 › ${name}」当前为「无」。按规则表「有 / 无＋上传图片（无其他字段）」：该类设施仅含「有 / 无＋上传图片」、无其他详情字段，一个设施只形成 1 条任务，多个设施分别生成任务、分别确认、分别提交，不与其他设施或字段任务合并。已按携程预填建议值「有」；图片为提交必填字段${hasImg?'，已按携程设施图片预填、可保留或更换':'，携程无图须由用户上传后才可提交，AI 不得生成设施图片'}；规格 750×562 或 4:3、≤5MB，审核通过后生效，审核不通过展示原因、替换后重新提交，同一图片累计 3 次不通过转线下人工处理。`,src:[['规则节点',`酒店设施 › 有 / 无＋上传图片 › ${name}`],['携程采集',hasImg?'存在 · 有设施图片':'存在 · 无设施图片'],['抖音当前值','无']],ignore:'暂无此设施',
+    picf:{name,img:hasImg?'携程设施图':null}});
   const taskDetailCfg={
     '悦享双床房近 7 天价格偏高':{advice:'携程用户端悦享双床房近 7 天均价 ¥428，抖音来客当前卖价 ¥519，价差 21%，价格竞争力不足。建议按携程近 7 天均价同步调整。',fields:[{label:'建议写入价格',input:'¥428',note:'已按携程近 7 天均价预填，可修改'}],ignore:'此次忽略'},
     '门店名称修改建议任务':{advice:'门店名称不符合抖音来客名称公式，缺少地标简称。',fields:[{label:'建议名称',input:'重庆西站华岩寺尚宽酒店店'}],ignore:'此次忽略'},
@@ -1065,19 +1117,46 @@
          cur:'健身室旧图',curNote:'2026-08-20 上传 · 抖音来客「酒店设施 › 健身室」',
          rep:null,keep:'开放时间等已配置字段'}
       ]}},
+    /* 以下单列设施节点：一个设施一条任务、独立于其他设施任务（与《抖音来客诊断规则表》酒店设施单列节点一致） */
+    '行李寄存设施详情补充任务':{advice:'携程「服务及设施」展示「行李寄存 · 免费」；抖音来客行李寄存当前为「无」。按映射建议改为「有」、收费信息=免费；仅处理行李寄存一个设施，独立于其他设施任务，确认后 AI 写入并校验。',src:[['携程采集','行李寄存 · 免费标签'],['抖音当前值','无'],['采集来源','携程用户端「服务及设施」']],ignore:'此次忽略',
+      fac:{list:[{name:'行李寄存',tag:'缺失补充',ctrip:'行李寄存 · 免费',change:'抖音为「无」→建议改为「有」并填写收费信息',
+        rows:[{t:'radio',label:'有无',opts:['有','无'],v:'有',note:'携程存在该设施→有，已预填；选「无」隐藏下方字段'},
+          {t:'radio',label:'收费信息',opts:['免费','收费'],v:'免费',dep:'on',note:'携程「免费」标签→免费，已预填；选「收费」仅须填写价格（元）'}]}]}},
+    '前台设施详情补充任务':{advice:'携程「服务及设施」展示「24 小时前台」；抖音来客前台当前为「无」。按映射建议改为「有」、前台服务类型=24小时前台；前台服务类型选「非24小时前台」时须填写开放时间（每日开放/指定时间），携程未采集到开放时间时不由 AI 推测，由用户选择填写。',src:[['携程采集','24 小时前台'],['抖音当前值','无'],['映射建议','有 · 24小时前台']],ignore:'此次忽略',
+      fac:{list:[{name:'前台',tag:'缺失补充',ctrip:'24 小时前台',change:'抖音为「无」→建议改为「有」并选择前台服务类型',
+        rows:[{t:'radio',label:'有无',opts:['有','无'],v:'有',note:'携程存在该设施→有，已预填；选「无」隐藏下方字段'},
+          {t:'radio',label:'前台服务类型',opts:['非24小时前台','24小时前台'],v:'24小时前台',key:'ftype',dep:'on',note:'携程「24 小时前台」→24小时前台，已预填；选「非24小时前台」须填写开放时间'},
+          {t:'time',label:'开放时间',dep:'on,ftype:非24小时前台',note:'携程未采集到开放时间，不由 AI 推测：选「每日开放」填写统一时段，或选「指定时间」按周选择日期与时段'}]}]}},
+    '公共区wifi设施详情补充任务':{advice:'携程「服务及设施」展示「全区域免费 WiFi」；抖音来客公共区 wifi 当前为「无」。按映射建议改为「有」、收费信息=免费；携程未采集到明确收费信息时不自动填写，由用户选择。',src:[['携程采集','全区域免费 WiFi'],['抖音当前值','无'],['映射建议','有 · 免费']],ignore:'此次忽略',
+      fac:{list:[{name:'公共区wifi',tag:'缺失补充',dy:'特色',ctrip:'全区域免费 WiFi',change:'抖音为「无」→建议改为「有」并填写收费信息',
+        rows:[{t:'radio',label:'有无',opts:['有','无'],v:'有',note:'携程存在该设施→有，已预填；选「无」隐藏下方字段'},
+          {t:'radio',label:'收费信息',opts:['免费','收费'],v:'免费',dep:'on',note:'携程「免费」标签→免费，已预填；选「收费」仅须填写价格（元），无计费单位'}]}]}},
+    '干洗设施详情补充任务':{advice:'携程「服务及设施」展示「干洗 · 收费」；抖音来客干洗当前为「无」。按映射建议改为「有」、收费信息=收费；携程未采集到的字段不由 AI 推测或填写。',src:[['携程采集','干洗 · 收费标签'],['抖音当前值','无'],['映射建议','有 · 收费']],ignore:'此次忽略',
+      fac:{list:[{name:'干洗',tag:'缺失补充',ctrip:'干洗 · 收费',change:'抖音为「无」→建议改为「有」并填写收费信息',
+        rows:[{t:'radio',label:'有无',opts:['有','无'],v:'有',note:'携程存在该设施→有，已预填；选「无」隐藏下方字段'},
+          {t:'radio',label:'收费信息',opts:['免费','收费'],v:'收费',dep:'on',note:'携程「收费」标签→收费，已预填；携程未采集到价格，不由 AI 推测，请自行填写（元）'}]}]}},
+    '送餐服务设施详情补充任务':{advice:'携程「服务及设施」展示「送餐服务 [周一–周日] 07:00–22:30」；抖音来客送餐服务当前为「无」。按映射建议改为「有」、每日开放 07:00–22:30；不同日期不同时段时应选指定时间。',src:[['携程采集','送餐服务 [周一–周日] 07:00–22:30'],['抖音当前值','无'],['映射建议','有 · 每日开放 07:00–22:30']],ignore:'此次忽略',
+      fac:{list:[{name:'送餐服务',tag:'缺失补充',ctrip:'送餐服务 [周一–周日] 07:00–22:30',change:'抖音为「无」→建议改为「有」并填写开放时间',
+        rows:[{t:'radio',label:'有无',opts:['有','无'],v:'有',note:'携程存在该设施→有，已预填；选「无」隐藏下方字段'},
+          {t:'time',label:'开放时间',v:'每日开放',t1:'07:00',t2:'22:30',dep:'on',note:'携程每日固定时段→每日开放，已预填可修改；不同日期不同时段时应选指定时间'}]}]}},
+    '会议厅设施详情补充任务':{advice:'携程「服务及设施」展示「会议厅 · 免费」；抖音来客会议厅当前为「无」。按映射建议改为「有」、收费信息=免费；图片为提交必填字段，携程用户端有会议厅图片时预填、无图须用户上传后才可提交（750×562 或 4:3、≤5MB）。',src:[['携程采集','会议厅 · 免费 · 有设施图片'],['抖音当前值','无'],['图片要求','750×562 或 4:3、≤5MB · 提交必填']],ignore:'此次忽略',
+      fac:{list:[{name:'会议厅',tag:'缺失补充',ctrip:'会议厅 · 免费',change:'抖音为「无」→建议改为「有」，收费信息=免费，须确认设施图片',
+        rows:[{t:'radio',label:'有无',opts:['有','无'],v:'有',note:'携程存在该设施→有，已预填；选「无」隐藏下方字段'},
+          {t:'radio',label:'收费信息',opts:['免费','收费'],v:'免费',dep:'on',pu:'unit',note:'携程「免费」标签→免费，已预填；选「收费」须填写计费单位与价格（可多档），审核后才可生效'},
+          {t:'img',label:'设施图片',dep:'on',note:'携程会议厅图片已预填，可替换；图片为提交必填字段'}]}]}},
     /* 门店地址线下自查：纯建议任务，无采集接口（与《抖音来客诊断规则表》「线下基础信息确认」自查清单一致） */
     '门店地址线下自查提醒':{advice:'线下自查清单：请核对营业执照地址与高德/百度地图坐标，确保门店地址误差 ≤10 米、导航可准确到达门店，减少因定位偏差导致的客人流失。本项为纯线下自查项，不依赖采集接口，AI 不自动诊断与执行；请酒店线下自行核实，确认完成后点击「已完成」。',src:[['任务节点','店铺管理 › 门店管理 › 基本信息 › 门店地址'],['策略规则','纯建议：线下自行核实'],['数据接口','无（纯线下自查项，不依赖采集接口）']],offline:true},
-    /* 信用卡 & 第三方支付：携程图标映射预填，未采集字段不由 AI 推测（与规则表「酒店政策 › 信用卡 & 第三方支付」一致） */
-    '支付方式配置补充任务':{advice:'已将携程用户端「前台及预订担保支付方式」与抖音来客「酒店信息管理 › 酒店政策 › 信用卡 & 第三方支付」逐一比对：前台国内银联卡、国外信用卡、现金支付已配置且一致；前台第三方支付、预订担保国外信用卡当前为「请选择」未配置，已按携程支付图标映射预填；预订担保国内银联卡携程未采集到，不由 AI 推测，请自行选择后提交。',src:[['携程采集','前台：银联卡、国外卡、支付宝、微信、现金；预订担保：国外卡'],['抖音当前配置','前台 3 项已配置 · 第三方支付、预订担保 2 项「请选择」'],['比对结果','未配置 3 项 · 按携程预填 2 项 · 1 项需用户选择']],ignore:'此次忽略',
+    /* 信用卡 & 第三方支付：下拉为真实多选（全选＋选项）/ 单选，携程图标映射预填，未采集或未细分字段不由 AI 推测（与规则表「酒店政策 › 信用卡 & 第三方支付」一致） */
+    '支付方式配置补充任务':{advice:'已将携程用户端「前台及预订担保支付方式」与抖音来客「酒店信息管理 › 酒店政策 › 信用卡 & 第三方支付」逐一比对：前台国内银联卡（已选「国内发行银联卡」）、前台国外信用卡（已选「万事达 (Master)、威士 (VISA)」）、前台现金支付（支持）已配置且一致；前台第三方支付抖音为「请选择」未配置，已按携程支付图标映射预填「微信支付、支付宝支付」；预订担保国内银联卡携程未采集到、预订担保国外信用卡携程仅采集到「国外卡」未细分卡组织，具体选项不由 AI 推测，请自行勾选后提交（两项提交前必选）。',src:[['携程采集','前台：银联卡、国外卡、支付宝、微信、现金；预订担保：国外卡（未细分卡组织）'],['抖音当前配置','前台 3 项已配置 · 前台第三方支付、预订担保 2 项「请选择」'],['比对结果','前台第三方支付按携程预填 · 预订担保 2 项需用户自行勾选']],ignore:'此次忽略',
       pay:{
         front:[
-          {label:'前台 · 国内银联卡',opts:['支持','不支持'],v:'支持',note:'携程「支持银联卡」→支持，已预填可修改'},
-          {label:'前台 · 国外信用卡',opts:['支持','不支持'],v:'支持',note:'携程「支持国外卡」→支持，已预填可修改'},
-          {label:'前台 · 第三方支付',alipay:1,wechat:1,note:'携程图标：支付宝＋微信 → 两项均勾选，可增删'},
-          {label:'前台 · 现金支付',opts:['支持','不支持'],v:'支持',note:'携程标注支持现金→支持，已预填可修改'}],
+          {label:'前台 · 国内银联卡',key:'f1',ph:'请选择国内银联卡',opts:DY_UNION_CARDS,sel:['国内发行银联卡'],note:'抖音已配置「国内发行银联卡」，与携程「支持银联卡」一致；如需按发卡行细化可在下拉中增删'},
+          {label:'前台 · 国外信用卡',key:'f2',ph:'请选择国外信用卡',opts:DY_FOREIGN_CARDS,sel:['万事达 (Master)','威士 (VISA)'],note:'抖音已配置「万事达 (Master)、威士 (VISA)」，与携程「支持国外卡」一致，可增删'},
+          {label:'前台 · 第三方支付',key:'f3',ph:'请选择第三方支付',opts:['微信支付','支付宝支付','银联云闪付'],sel:['微信支付','支付宝支付'],pre:1,note:'抖音「请选择」未配置；携程图标：支付宝＋微信 → 已预填「支付宝支付、微信支付」，可增删'},
+          {label:'前台 · 现金支付',opts:['请选择是否支持现金支付','支持','不支持'],v:'支持',note:'携程标注支持现金→支持，已预填可修改'}],
         guar:[
-          {label:'预订担保 · 国内银联卡',opts:['请选择','支持','不支持'],user:1,note:'携程未采集到该字段，不由 AI 推测或填写，请自行选择（提交前必选）'},
-          {label:'预订担保 · 国外信用卡',opts:['支持','不支持'],v:'支持',note:'携程「预订担保可用银行：国外卡」→支持，已预填可修改'}]}},
+          {label:'预订担保 · 国内银联卡',key:'g1',ph:'请选择国内银联卡',opts:DY_UNION_CARDS,need:1,note:'携程未采集到该字段，不由 AI 推测或勾选，请自行在下拉中勾选（提交前必选）'},
+          {label:'预订担保 · 国外信用卡',key:'g2',ph:'请选择国外信用卡',opts:DY_FOREIGN_CARDS,need:1,note:'携程仅采集到「国外卡」、未细分卡组织，不由 AI 推测，请自行在下拉中勾选（提交前必选）'}]}},
     /* 吸烟政策：一个房型一条任务，可编辑单选（与规则表「房型信息——吸烟政策」一致） */
     '吸烟政策修改·商务大床房':{advice:'携程「商务大床房」吸烟标识为「无烟房」，映射为「不可吸烟」；抖音来客该房型吸烟政策当前为「可吸烟」，不一致。一个房型一条任务、不跨房型合并、不与其他字段任务合并；已按携程预填建议值，可改选，确认后 AI 仅修改该房型的吸烟政策并校验。',src:[['房型对应','携程「商务大床房」＝抖音「商务大床房·重庆西站免费接站」（已确认）'],['携程吸烟标识','无烟房'],['抖音当前值','可吸烟']],ignore:'此次忽略',
       smk:{room:{name:'商务大床房·重庆西站免费接站',id:'7659677500224816359',spec:'20-26㎡ · 1张1.8m大床 · 有窗 · 可住2人'},
@@ -1089,10 +1168,14 @@
     '热门设施补足任务':{advice:'商家经营分「装修 › 有图服务设施及热门设施」未满分：抖音当前实际认定热门设施 4 种，目标 ≥6 种，尚缺 2 种。下方为全部状态为「无」的设施，勾选真实存在的设施改为「有」（任一设施改为「有」后均可被抖音认定并计入）；AI 不得将未经确认的设施改为「有」，至少选择 2 个后才能提交，最终以抖音重新读取的实际认定数量为准。',src:[['评分节点','装修 › 热门设施 · 未满分'],['当前认定','4 种 · 尚缺 2 种'],['携程证据','标注 ※ 的设施携程「服务及设施」存在，可参考']],ignore:'此次忽略',
       hot:{cur:4,target:6,need:2,list:[
         {name:'温泉',ctrip:1},{name:'泳池',ctrip:1},{name:'儿童乐园',ctrip:1},{name:'骑行',ctrip:1},
-        {name:'滑雪项目',ctrip:0},{name:'水上乐园',ctrip:0},{name:'马术·骑马',ctrip:0},{name:'行政酒廊',ctrip:0}]}},
-    '带图服务设施补充任务':{advice:'商家经营分「装修 › 带图服务设施」未满分：当前带图服务设施 2 个，目标 ≥3 个，尚缺 1 个。从下方候选设施中选择 1 个补足：携程已有图片的设施自动预填图片；无图设施须由用户上传图片后才可生效，AI 不得生成设施图片。',src:[['评分节点','装修 › 带图服务设施 · 未满分'],['当前数量','2 个 · 尚缺 1 个'],['携程图片','温泉、儿童乐园已有设施图片']],ignore:'此次忽略',
-      hpic:{cur:2,need:1,cands:[
-        {name:'温泉',img:'携程设施图'},{name:'会议室',img:null},{name:'儿童乐园',img:'携程设施图'}]}},
+        {name:'滑雪项目',ctrip:0},{name:'水上乐园',ctrip:0},{name:'马术·骑马',ctrip:0},{name:'行政酒廊',ctrip:1}]}},
+    /* 带/无图设施（有 / 无＋上传图片，无其他字段）：一个设施一条任务、相互隔离（与规则表「不得合并」一致） */
+    '棋牌室设施图片补充任务':picfCfg('棋牌室',1),
+    'KTV设施图片补充任务':picfCfg('KTV',1),
+    '茶室设施图片补充任务':picfCfg('茶室',1),
+    '家庭影院设施图片补充任务':picfCfg('家庭影院',0),
+    '共用厨房设施图片补充任务':picfCfg('共用厨房',0),
+    '行政酒廊设施图片补充任务':picfCfg('行政酒廊',0),
     '相册高清图片补充任务':{advice:'商家经营分「装修 › 相册高清图片」未满分：商家相册当前高清图片 13 张，目标 ≥16 张，尚缺 3 张。优先使用用户确认的携程分类图片，不足部分由用户上传；提交后 AI 上传确认图片并重新读取相册数量校验，未达标不得完成。',src:[['评分节点','装修 › 相册高清图片 · 未满分'],['当前数量','13 张 · 尚缺 3 张'],['图片来源','携程分类图片优先，不足由用户上传']],ignore:'此次忽略',
       album16:{cur:13,target:16,need:3,cats:[
         {cat:'休闲',cur:'2 张',srcCat:'携程「休闲」类别',imgs:['泳池','健身房']},
@@ -1115,16 +1198,27 @@
   /* 吸烟政策：smkPick 当前选中的单选序号（默认=携程建议值） */
   let smkPick=1;
   function setSmkPick(i){smkPick=i;render()}
-  /* 支付方式：paySel 记录用户必选项（预订担保·国内银联卡），未选择时提交不可用 */
-  let paySel={};
-  function setPaySel(k,v){paySel[k]=v;render()}
+  /* 支付方式：paySel[key] 记录各多选下拉当前勾选项、payOpen 记录展开的下拉；预订担保两项须用户自行勾选后方可提交 */
+  let paySel={},payOpen=null;
+  function payCur(p){return paySel[p.key]!==undefined?paySel[p.key]:p.sel||[]}
+  function payRows(){const c=taskDetailCfg['支付方式配置补充任务'].pay;return c.front.concat(c.guar).filter(p=>p.key)}
+  function payGuarOk(){return taskDetailCfg['支付方式配置补充任务'].pay.guar.every(p=>payCur(p).length>0)}
+  function togPayOpen(k){payOpen=payOpen===k?null:k;render()}
+  function togPay(k,o){const p=payRows().find(r=>r.key===k);if(!p)return;const cur=payCur(p);
+    paySel[k]=o==='全选'?(cur.length===p.opts.length?[]:p.opts.slice()):(cur.includes(o)?cur.filter(x=>x!==o):cur.concat([o]));
+    render()}
+  /* 多选下拉：收起时显示已选项（或占位文字），展开时显示全选＋全部选项（与抖音来客一致） */
+  const msHtml=p=>{const sel=payCur(p),open=payOpen===p.key,all=sel.length>0&&sel.length===p.opts.length;
+    return `<span class="gb-ms${open?' open':''}" onclick="togPayOpen('${p.key}')">${sel.length?sel.join('、'):`<i>${p.ph}</i>`}</span>`
+      +(open?`<span class="gb-mspop"><label class="gb-radio"><input type="checkbox"${all?' checked':''} onclick="event.stopPropagation();togPay('${p.key}','全选')">全选</label>`
+        +p.opts.map(o=>`<label class="gb-radio"><input type="checkbox"${sel.includes(o)?' checked':''} onclick="event.stopPropagation();togPay('${p.key}','${o}')">${o}</label>`).join('')+'</span>':'')};
   /* 热门设施补足：hotSel 勾选状态，选足尚缺数量后才可提交 */
   let hotSel={};
   const hotCnt=()=>Object.keys(hotSel).filter(k=>hotSel[k]).length;
   function setHotSel(i,on){hotSel[i]=on;render()}
-  /* 带图设施补充：hpicPick 选中的候选设施序号 */
-  let hpicPick=null;
-  function setHpicPick(i){hpicPick=i;render()}
+  /* 带/无图设施（有 / 无＋上传图片）：picUpl 记录无携程图设施「已上传图片」；图片为提交必填，无图未上传时提交不可用 */
+  let picUpl=false;
+  function upPic(){picUpl=true;render()}
   /* 团购商品核对状态：gbSel 每个不通过项的确认意向（新增方案/价格/名称），未选择默认确认；gbPriv 礼遇添加表单展开态 */
   let gbSel={},gbPriv={};
   /* 外显小图替换：xspPick 当前选中的携程「外观」替换图片序号 */
@@ -1148,14 +1242,28 @@
     ?`<label class="field"><span>${f.label}</span><input type="text" value="${f.input}"><small>${f.note||'已预填建议值，可修改'}</small></label>`
     :`<label class="field"><span>${f.label}</span><select>${f.options.map(o=>`<option>${o}</option>`).join('')}</select><small>${f.note||'来自携程用户端，可修改'}</small></label>`;
   /* 酒店设施核对表单行：与抖音来客「酒店设施」字段控件一致，已按携程映射预填，全部可修改 */
+  /* 有无/收费联动（与抖音来客实际表单一致）：选「无」隐藏该设施后续字段；收费信息选「收费」出现计费单位+价格 */
+  let facPick={};
+  const facEff=(fi,k,d)=>(facPick['fac-'+fi]&&facPick['fac-'+fi][k])||d;
+  function setFacPick(fi,k,v){facPick['fac-'+fi]=facPick['fac-'+fi]||{};facPick['fac-'+fi][k]=v;render()}
   const facRow=(r,fi)=>{
     const nm=`fac-${fi}-${r.label}`;let ctl='';
     if(r.t==='sel')ctl=`<select class="gb-sl">${gbOpts(r.opts,r.v)}</select>`;
     else if(r.t==='in')ctl=`<input class="gb-in gb-num" type="text" value="${r.v}">`;
     else if(r.t==='chk')ctl=r.opts.map(o=>`<label class="gb-radio"><input type="checkbox"${r.v.includes(o)?' checked':''}>${o}</label>`).join('');
-    else if(r.t==='radio')ctl=r.opts.map(o=>`<label class="gb-radio"><input type="radio" name="${nm}"${r.v===o?' checked':''}>${o}</label>`).join('');
+    else if(r.t==='radio'){const lk=r.label==='有无'?'on':r.label==='收费信息'&&r.opts&&r.opts[0]==='免费'&&r.opts[1]==='收费'?'fee':r.key||null,cur=lk?facEff(fi,lk,r.v):r.v;
+      ctl=r.opts.map(o=>`<label class="gb-radio"><input type="radio" name="${nm}"${cur===o?' checked':''}${lk?` onchange="setFacPick(${fi},'${lk}','${o}')"`:''}>${o}</label>`).join('');
+      /* 与抖音来客一致：收费信息选「收费」后同行展开价格输入；会议厅等按计费的设施为「计费单位＋价格（可多档）」，公共区wifi 等仅一个价格输入框 */
+      if(lk==='fee'&&cur==='收费')ctl+=r.pu==='unit'
+        ?`<select class="gb-sl">${gbOpts(['请选择','每天','次','小时','半小时','分钟'],r.unit)}</select><input class="gb-in gb-num" type="text" value="${r.price||''}" placeholder="价格"><span class="gb-unit">元</span><a class="exlink" onclick="toast('演示原型：可添加多档计费单位+价格')">＋ 添加</a>`
+        :`<input class="gb-in gb-num" type="text" value="${r.price||''}" placeholder="价格"><span class="gb-unit">元</span>`;}
     else if(r.t==='fee')ctl=`<label class="gb-radio"><input type="radio" name="${nm}"${r.fee==='免费'?' checked':''}>免费</label><label class="gb-radio"><input type="radio" name="${nm}"${r.fee==='收费'?' checked':''}>收费</label>${r.fee==='收费'?`<input class="gb-in gb-num" type="text" value="${r.price}"><span class="gb-unit">元 / 车</span>`:''}`;
-    else if(r.t==='time')ctl=`<label class="gb-radio"><input type="radio" name="${nm}" checked>每日开放</label><label class="gb-radio"><input type="radio" name="${nm}">指定时间</label><input class="gb-in gb-time" type="text" value="${r.t1}"><span class="gb-unit">至</span><input class="gb-in gb-time" type="text" value="${r.t2}">`;
+    /* 开放时间（与抖音来客一致）：每日开放→统一时段；指定时间→按周选择日期＋时段；未选时不显示时段输入 */
+    else if(r.t==='time'){const cur=facEff(fi,'ot',r.v),rd=o=>`<label class="gb-radio"><input type="radio" name="${nm}"${cur===o?' checked':''} onchange="setFacPick(${fi},'ot','${o}')">${o}</label>`;
+      ctl=rd('每日开放')+rd('指定时间');
+      if(!cur)ctl+=`<span class="gb-unit">请选择开放方式后再填写时段</span>`;
+      else if(cur==='每日开放')ctl+=`<input class="gb-in gb-time" type="text" value="${r.t1||''}" placeholder="开始时间"><span class="gb-unit">至</span><input class="gb-in gb-time" type="text" value="${r.t2||''}" placeholder="结束时间">`;
+      else ctl+=`<span class="gb-unit">每</span>${['一','二','三','四','五','六','日'].map(d=>`<label class="gb-radio"><input type="checkbox" checked>周${d}</label>`).join('')}<input class="gb-in gb-time" type="text" placeholder="开始时间"><span class="gb-unit">至</span><input class="gb-in gb-time" type="text" placeholder="结束时间">`;}
     else if(r.t==='freq')ctl=`<span class="gb-unit">每</span><input class="gb-in gb-num" type="text" value="${r.h}"><span class="gb-unit">小时</span><input class="gb-in gb-num" type="text" value="${r.c}"><span class="gb-unit">次</span>`;
     else if(r.t==='img')ctl=`<span class="gb-thumb">设施实拍</span><a class="exlink" onclick="toast('演示原型：可替换设施图片，重新提交审核')">替换</a>`;
     return gbRow(r.label,ctl+(r.note?`<span class="gb-unit">${r.note}</span>`:''),r.hl);
@@ -1350,13 +1458,16 @@
         </div>
       </div>`
       :c.fac?`<div class="section"><h3>2　诊断不通过设施与修改内容（${c.fac.list.length} 个 · 全部可修改）</h3>
-        ${c.fac.list.map((f,fi)=>`<div class="gb-card">
-          <div class="gb-head"><b>${f.name}<small>店铺管理 › 酒店信息管理 › 酒店设施 › ${f.name}</small></b><i class="tag ${f.tag==='缺失补充'?'red':'gray'}">${f.tag}</i>
+        ${c.fac.list.map((f,fi)=>{const eff={};
+          f.rows.forEach(r=>{const lk=r.t==='radio'?(r.label==='有无'?'on':r.label==='收费信息'&&r.opts&&r.opts[0]==='免费'&&r.opts[1]==='收费'?'fee':r.key||null):r.t==='time'?'ot':null;if(lk)eff[lk]=facEff(fi,lk,r.v)});
+          const vis=r=>!r.dep||r.dep.split(',').every(d=>{const i=d.indexOf(':');if(i<0)return d==='on'?eff.on==='有':eff.fee==='收费';return eff[d.slice(0,i)]===d.slice(i+1)});
+          return `<div class="gb-card">
+          <div class="gb-head"><b>${f.name}${f.dy?`<i class="tag blue">${f.dy}</i>`:''}<small>店铺管理 › 酒店信息管理 › 酒店设施 › ${f.name}</small></b><i class="tag ${f.tag==='缺失补充'?'red':'gray'}">${f.tag}</i>
             <label class="act-sel"><span>处理意向</span><select onchange="setGbSel('f${fi}',this.value)"><option${(gbSel['f'+fi]||'确认修改')==='确认修改'?' selected':''}>确认修改</option><option${gbSel['f'+fi]==='暂无此设施'?' selected':''}>暂无此设施</option></select></label></div>
           ${gbRow('携程采集值',`<b>${f.ctrip}</b>`)}
           ${gbRow('修改内容',`<b>${f.change}</b>`,true)}
-          ${f.rows.map(r=>facRow(r,fi)).join('')}
-        </div>`).join('')}
+          ${f.rows.filter(vis).map(r=>facRow(r,fi)).join('')}
+        </div>`}).join('')}
       </div>`
       :c.cal?`<div class="section"><h3>1　本次不通过房型（仅本任务）</h3>
         <div class="gb-card">
@@ -1408,18 +1519,16 @@
         </div>
       </div>`
       :c.pay?`<div class="section"><h3>1　支付方式配置（前台 / 预订担保 · 可编辑）</h3>
-        <p class="review-tip">与抖音来客「酒店政策 › 信用卡 & 第三方支付」字段一致：携程支付图标按映射预填（支付宝/微信→第三方支付，银联卡→国内银联卡，国外卡→国外信用卡，现金→现金支付），未采集字段不由 AI 推测，全部可修改。</p>
+        <p class="review-tip">与抖音来客「酒店政策 › 信用卡 & 第三方支付」字段一致：国内银联卡、国外信用卡、第三方支付为多选下拉（含全选，选项与商家后台一致），现金支付为「支持 / 不支持」下拉；携程支付图标按映射预填（支付宝/微信→第三方支付，银联卡→国内银联卡，国外卡→国外信用卡，现金→现金支付），未采集或携程未细分的选项不由 AI 推测，全部可修改。</p>
         <div class="gb-card">
           <div class="gb-head"><b>前台支付方式<small>携程「前台可用银行卡 / 第三方支付 / 现金支付」</small></b></div>
-          ${c.pay.front.map(p=>gbRow(p.label,p.alipay!==undefined
-            ?`<label class="gb-radio"><input type="checkbox" checked>支持支付宝</label><label class="gb-radio"><input type="checkbox" checked>支持微信支付</label><span class="gb-unit">${p.note}</span>`
-            :`<select class="gb-sl">${gbOpts(p.opts,p.v)}</select><span class="gb-unit">${p.note}</span>`,p.hl)).join('')}
+          ${c.pay.front.map(p=>gbRow(p.label,p.key
+            ?`${msHtml(p)}<span class="gb-unit">${p.note}</span>`
+            :`<select class="gb-sl">${gbOpts(p.opts,p.v)}</select><span class="gb-unit">${p.note}</span>`,p.pre)).join('')}
         </div>
         <div class="gb-card">
           <div class="gb-head"><b>预订担保支付方式<small>携程「预订担保可用银行」</small></b></div>
-          ${c.pay.guar.map(p=>gbRow(p.label,p.user
-            ?`<select class="gb-sl" onchange="setPaySel('gd',this.value)">${p.opts.map(o=>`<option${(paySel.gd||'请选择')===o?' selected':''}>${o}</option>`).join('')}</select><span class="gb-unit">${p.note}</span>`
-            :`<select class="gb-sl">${gbOpts(p.opts,p.v)}</select><span class="gb-unit">${p.note}</span>`,p.user)).join('')}
+          ${c.pay.guar.map(p=>gbRow(p.label,`${msHtml(p)}<span class="gb-unit">${p.note}</span>`,p.need)).join('')}
         </div>
       </div>`
       :c.smk?`<div class="section"><h3>1　吸烟政策（按房型 · 单独任务）</h3>
@@ -1440,13 +1549,14 @@
           ${gbRow('已选数量',`<b>${hotCnt()} / 至少 ${c.hot.need}</b><span class="gb-unit">${hotCnt()>=c.hot.need?'已满足提交条件':'尚未选足，提交不可用'}</span>`,true)}
         </div>
       </div>`
-      :c.hpic?`<div class="section"><h3>1　带图服务设施补充（当前 ${c.hpic.cur} 个 · 尚缺 ${c.hpic.need} 个）</h3>
-        <p class="review-tip">选择 1 个候选设施补足：携程已有图片的设施自动预填图片；无图设施须由用户上传图片后才可生效，AI 不得生成设施图片。</p>
-        ${c.hpic.cands.map((f,i)=>`<div class="gb-card">
-          <div class="gb-head"><b>${f.name}<small>候选设施 ${i+1}/${c.hpic.cands.length}</small></b>
-            <label class="gb-radio"><input type="radio" name="hpic-pick"${hpicPick===i?' checked':''} onchange="setHpicPick(${i})">选择该设施</label></div>
-          ${gbRow('设施图片',f.img?`<span class="gb-thumb">${f.img}</span><span class="gb-unit">已按携程设施图片预填，可更换</span><a class="exlink" onclick="toast('演示原型：打开携程设施图片列表更换')">更换图片</a>`:`<span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片直接上传')">＋ 上传图片</span><span class="gb-unit gb-req">携程无该设施图片，必须由用户上传</span>`,true)}
-        </div>`).join('')}
+      :c.picf?`<div class="section"><h3>1　${c.picf.name}（有 / 无＋上传图片）</h3>
+        <p class="review-tip">按规则表「酒店设施 › 有 / 无＋上传图片（无其他字段）」执行：该类设施仅含「有 / 无＋上传图片」、无其他详情字段，一个设施只形成 1 条任务，多个设施分别生成任务、分别确认、分别提交，不与其他设施或字段任务合并。图片为提交必填字段：携程有图自动预填、可保留或更换，无图须由用户上传后才可提交，AI 不得生成设施图片；规格 750×562 或 4:3、≤5MB，审核通过后生效。</p>
+        <div class="gb-card">
+          <div class="gb-head"><b>${c.picf.name}<small>店铺管理 › 酒店信息管理 › 酒店设施 › ${c.picf.name}（有 / 无＋上传图片）</small></b><i class="tag red">携程有 · 抖音无</i></div>
+          ${gbRow('有无',`<label class="gb-radio"><input type="radio" name="picf-on" checked>有</label><label class="gb-radio"><input type="radio" name="picf-on">无</label><span class="gb-unit">抖音当前「无」，按携程存在该设施预填建议值「有」，可修改</span>`)}
+        ${gbRow('设施图片',c.picf.img
+          ?`<span class="gb-thumb">${c.picf.img}</span><span class="gb-unit">已按携程设施图片预填，可保留或更换</span><a class="exlink" onclick="toast('演示原型：打开携程设施图片列表更换')">更换图片</a>`
+          :`<span class="gb-upload" onclick="upPic()">${picUpl?'✔ 已上传图片':'＋ 上传图片'}</span><span class="gb-unit${picUpl?'':' gb-req'}">${picUpl?'已上传，可提交':'携程无该设施图片，必须由用户上传后才可提交'}</span>`,true)}
       </div>`
       :c.album16?`<div class="section"><h3>1　相册高清图片补充（当前 ${c.album16.cur}/${c.album16.target} 张 · 尚缺 ${c.album16.need} 张）</h3>
         <p class="review-tip">优先使用用户确认的携程分类图片，不足部分由用户上传；建议比例 4:3、高清无水印。提交后 AI 上传确认图片并重新读取相册数量校验，未达标不得完成。</p>
@@ -1468,16 +1578,16 @@
       :(c.fields||[]).length?`<div class="section"><h3>${c.src?2:1}　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join('')}</div>
       </div>`:''}`;
-      actions=`${c.ignore==='暂无此设施'&&btnOn('submit')?'<button class="btn btn-outline" onclick="finishTask(\'已忽略\',\'已选择暂无此设施，任务已忽略\')">暂无此设施</button>':''}
+      actions=`${c.ignore==='暂无此设施'&&btnOn('submit')?'<button class="btn btn-outline" onclick="finishTask(\'执行中\',\'已确认酒店暂无该设施，AI 正在将该设施保持为「无」，写入成功并完成结果校验后任务标记为已完成\')">暂无此设施</button>':''}
         ${btnOn('ignoreNow')?`<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>`:''}
         ${btnOn('submit')?(c.rtNew?`<button id="rtSubmit" class="btn btn-primary" disabled onclick="finishTask('执行中','新增方案已提交，AI 正在抖音来客「手动创建」该房型')">提交</button>`
           :c.pol?`<button class="btn btn-primary" ${polSel.bf?'':'disabled'} onclick="finishTask('执行中','酒店政策已提交，AI 正在统一填写抖音来客五组政策并校验')">提交</button>`
           :c.audit?'<button class="btn btn-primary" onclick="finishTask(\'执行成功\',\'已写入抖音来客并重新提交审核，本轮诊断成功结束；再次被驳回不重新生成任务\')">提交</button>'
           :c.faudit?'<button class="btn btn-primary" onclick="finishTask(\'执行中\',\'已提交审核，AI 正在使用替换图片在抖音来客重新提交设施审核，提交成功并完成结果校验后任务标记为已完成；暂无此设施将改为「无」\')">提交审核</button>'
-          :c.pay?`<button class="btn btn-primary" ${paySel.gd&&paySel.gd!=='请选择'?'':'disabled'} onclick="finishTask('执行中','支付方式已提交，AI 正在写入抖音来客「信用卡 & 第三方支付」并校验')">提交</button>`
+          :c.pay?`<button class="btn btn-primary" ${payGuarOk()?'':'disabled'} onclick="finishTask('执行中','支付方式已提交，AI 正在写入抖音来客「信用卡 & 第三方支付」并校验')">提交</button>`
           :c.smk?`<button class="btn btn-primary" onclick="finishTask('执行中','吸烟政策已提交，AI 正在修改该房型吸烟政策并校验')">提交</button>`
           :c.hot?`<button class="btn btn-primary" ${hotCnt()>=taskDetailCfg[t.name].hot.need?'':'disabled'} onclick="finishTask('执行中','热门设施已提交，AI 正在将确认设施改为「有」并重新读取认定数量校验')">提交</button>`
-          :c.hpic?`<button class="btn btn-primary" ${hpicPick!=null?'':'disabled'} onclick="finishTask('执行中','带图设施已提交，AI 正在上传设施图片并重新读取带图设施数校验')">提交</button>`
+          :c.picf?`<button class="btn btn-primary" ${(c.picf.img||picUpl)?'':'disabled'} onclick="finishTask('执行中','${c.picf.name}已提交，AI 正在将其改为「有」并上传确认图片，写入成功并完成结果校验后任务标记为已完成')">提交</button>`
           :c.album16?'<button class="btn btn-primary" onclick="finishTask(\'执行中\',\'相册图片已提交，AI 正在上传确认图片并重新读取相册数量校验\')">提交</button>'
           :c.act?'<button class="btn btn-primary" onclick="finishTask(\'执行中\',\'报名已确认，AI 正在点击「立即报名」并重新读取活动状态，变为「参与详情」后完成\')">提交</button>'
           :c.offline?'<button class="btn btn-primary" onclick="finishTask(\'执行成功\',\'已确认完成，提醒任务已结束\')">已完成</button>':`<button class="btn btn-primary" onclick="finishTask('执行中','${c.reviews?'回复内容已提交，AI 正在逐条写入抖音来客':c.gbuy?'核对结果已提交，AI 正在逐项写入抖音来客':c.presale?'预售方案已提交，AI 正在写入抖音来客并校验':c.xsp?'替换方案已提交，AI 正在替换抖音来客外显小图，替换成功即完成任务':c.cal?'修改已提交，AI 正在写入抖音来客早餐份数并同步校验日历房名称':c.rt?'修改内容已提交，AI 正在按确认结果写入抖音来客':c.fac?'核对结果已提交，AI 正在将全部确认数据一并写入抖音来客':c.bt?'修改已提交，AI 正在写入抖音来客并校验结果':'任务已提交，AI 正在同步至抖音来客'}')">提交</button>`):''}`;
@@ -1499,7 +1609,12 @@
     '商家经营分-评价分提升':['商家经营分 · 评价评分'],
     '开业装修时间补充任务':['商家经营分 · 装修 · 开业/装修时间'],
     '热门设施补足任务':['商家经营分 · 装修 · 热门设施'],
-    '带图服务设施补充任务':['商家经营分 · 装修 · 带图设施'],
+    '棋牌室设施图片补充任务':['酒店设施 · 棋牌室（有/无＋上传图片）'],
+    'KTV设施图片补充任务':['酒店设施 · KTV（有/无＋上传图片）'],
+    '茶室设施图片补充任务':['酒店设施 · 茶室（有/无＋上传图片）'],
+    '家庭影院设施图片补充任务':['酒店设施 · 家庭影院（有/无＋上传图片）'],
+    '共用厨房设施图片补充任务':['酒店设施 · 共用厨房（有/无＋上传图片）'],
+    '行政酒廊设施图片补充任务':['酒店设施 · 行政酒廊（有/无＋上传图片）'],
     '相册高清图片补充任务':['商家经营分 · 装修 · 相册高清图片'],
     '活动报名建议·中秋住店季':['活动广场 · 「中秋住店季」'],
     '活动报名建议·国庆住宿焕新':['活动广场 · 「国庆住宿焕新」'],
@@ -1544,7 +1659,7 @@
       ['开业装修时间补充任务','ok'],['热门设施补足任务','fail','写入后重新读取认定数量仍为 5 种（<6 种），未达标']]},
     {time:'2026-08-20 11:24',ts:[
       ['酒店设施信息核对任务','ok'],['悦享双床房近 7 天价格偏高','ok'],['团购商品核对任务','ok'],
-      ['热门设施补足任务','ok'],['带图服务设施补充任务','ok'],['吸烟政策修改·商务大床房','ok']]},
+      ['热门设施补足任务','ok'],['棋牌室设施图片补充任务','ok'],['共用厨房设施图片补充任务','ok'],['行政酒廊设施图片补充任务','ign'],['吸烟政策修改·商务大床房','ok']]},
     {time:'2026-08-27 18:06',ts:[
       ['门店装修审核整改任务','ok'],['酒店设施审核整改任务','fail','审核不通过标签整组写入被平台拦截，需按驳回原因重新整改'],
       ['酒店设施信息核对任务','ok'],['外显小图替换建议任务','ok'],['找店指引素材补充','ign'],
