@@ -1841,6 +1841,75 @@
         flex-direction: column;
         gap: 4px;
       }
+      /* 缺失房型新增：左右双卡匹配布局（左：抖音待创建 · 右：携程采集） */
+      .rt-duo {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+      .rt-duo .gb-card {
+        margin-bottom: 0;
+      }
+      .rt-match {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+        font-size: 12.5px;
+        color: var(--ink-3);
+      }
+      .rt-match b {
+        color: var(--ink-2);
+      }
+      /* 房型匹配总览：多组「抖音物理房型 ⇄ 携程房型」逐对匹配（支持任意 N 对 M，未匹配侧留空位） */
+      .rt-pairs {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .rt-pair {
+        display: grid;
+        grid-template-columns: 1fr 148px 1fr;
+        gap: 10px;
+        align-items: stretch;
+      }
+      .rt-pcell {
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        padding: 8px 10px;
+        background: var(--surface);
+        font-size: 12.5px;
+      }
+      .rt-pcell b {
+        font-weight: 600;
+        color: var(--ink-2);
+      }
+      .rt-pcell small {
+        display: block;
+        color: var(--ink-4);
+        font-size: 11.5px;
+        margin-top: 2px;
+      }
+      .rt-pnone {
+        border-style: dashed;
+        background: var(--surface-2);
+      }
+      .rt-pnone b {
+        color: var(--ink-3);
+      }
+      .rt-pmid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        text-align: center;
+        font-size: 13px;
+        color: var(--ink-3);
+      }
       .gb-ta {
         width: 100%;
         min-height: 56px;
@@ -5776,6 +5845,17 @@
               "电竞耳机",
               "电竞显示器",
             ],
+            /* 房型匹配总览：抖音物理房型 ↔ 携程在售房型 逐对匹配（支持任意 N 对 M，dy 为空＝携程独有待新增，ct 为空＝抖音多出不处理） */
+            pairs: [
+              { dy: "商务大床房·重庆西站免费接站", ct: "商务大床房", how: "名称近似 · 已确认" },
+              { dy: "景观棋牌娱乐房", ct: "景观棋牌娱乐房", how: "名称一致" },
+              { dy: "巨幕投影大床房", ct: "巨幕投影大床房", how: "名称一致" },
+              { dy: "三床家庭房", ct: "三床家庭房", how: "名称一致" },
+              { dy: "景观大床房", ct: "景观大床房", how: "名称一致" },
+              { dy: "亲子家庭房-赠送小孩早餐·免费携带宠物", ct: "亲子家庭房", how: "主体名称一致" },
+              { dy: "景观双床房", ct: "景观双床房", how: "名称一致" },
+              { ct: "电竞大床房", how: "无对应 · 本任务新增", note: "在售 · ¥369 / 晚（诊断时）" },
+            ],
           },
         },
         门店装修审核整改任务: {
@@ -6881,23 +6961,56 @@
         </div>
       </div>`
                         : c.rtNew
-                          ? `<div class="section"><h3>2　缺失房型 · 需填入的字段（与抖音来客「创建房型」一致）</h3>
-        <p class="review-tip">携程在售、抖音「房型管理」无对应房型。以下仅展示需填入的字段，已按携程预填、全部可修改；「总间数」携程不提供，须由用户填写后才能提交。提交后 AI 进入抖音来客「房型管理 → 创建房型 → 手动创建」，仅创建当前房型。</p>
+                          ? `<div class="section"><h3>2　房型匹配与创建（左：抖音物理房型 ⇄ 右：携程采集房型 · 逐对匹配）</h3>
+        <p class="review-tip">携程 8 个在售房型与抖音来客「房型管理」7 个物理房型逐一匹配（支持任意数量组合，如三对三、二对三）：7 组已建立对应（「亲子家庭房」主体名称一致自动对应、「商务大床房」名称近似已人工确认，其余名称一致自动匹配）；「电竞大床房」无对应抖音物理房型，按缺失房型形成本新增任务（抖音多出的房型不删除、不形成任务）。先看全部匹配对，再展开本任务匹配对的创建表单：左侧为抖音来客「创建房型 → 手动创建」待填写字段（已按右侧携程采集值预填、可修改），右侧为携程采集数据（只读对照）；右侧为「—」的字段（英文名称、总间数、吸烟政策）携程不提供、须由用户在左侧自行填写，其中「总间数」须填写后才能提交。提交后 AI 进入抖音来客「房型管理」，仅创建该房型并建立两侧对应关系。</p>
         <div class="gb-card">
-          <div class="gb-head"><b>${c.rtNew.name} · 新增房型<small>携程用户端在售 · ${c.rtNew.price}（诊断时采集）</small></b></div>
-          ${gbRow("中文名称", `<input class="gb-in" type="text" value="${c.rtNew.name}"><span class="gb-unit">已按携程房型名称预填，可修改</span>`)}
-          ${gbRow("英文名称", `<input class="gb-in" type="text" placeholder="请补充"><span class="gb-unit">携程未提供，请补充，可留空</span>`)}
-          ${gbRow("房型图片", `<span class="gb-thumb">携程房型图 1</span><span class="gb-thumb">携程房型图 2</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a><span class="gb-unit">已按携程房型图预填 2 张（最多 10 张，第 1 张为头图），可修改</span>`)}
-          ${gbRow("总间数", `<input id="rtQty" class="gb-in gb-num" type="text" placeholder="请填写" oninput="rtQtySync(this.value)"><span class="gb-unit gb-req">间 · 携程不提供总间数，须由用户填写后才能提交</span>`, true)}
-          ${gbRow("楼层", `<input class="gb-in gb-num" type="text" value="6"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="8"><span class="gb-unit">层 · 可修改</span>`)}
-          ${gbRow("面积（㎡）", `<input class="gb-in gb-num" type="text" value="20.00"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="25.00"><span class="gb-unit">可修改</span>`)}
-          ${gbRow("窗户", `<input class="gb-in" type="text" value="有窗 · 落地窗"><span class="gb-unit">已按携程预填，可修改</span>`)}
-          ${gbRow("床型", `<input class="gb-in" type="text" value="大床 2.00 米 × 1张"><span class="gb-unit">已按携程预填，可修改</span>`)}
-          ${gbRow("最大可住人数", `<input class="gb-in gb-num" type="text" value="2"><span class="gb-unit">人 · 已按携程预填，可修改</span>`)}
-          ${gbRow("吸烟政策", `<select class="gb-sl"><option>请选择</option></select><span class="gb-unit">携程未提供，请补充</span>`)}
-          ${gbRow("网络", `<label class="gb-radio"><input type="checkbox" checked>可上网</label><label class="gb-radio"><input type="checkbox" checked>WiFi 免费</label><label class="gb-radio"><input type="checkbox">有线网络</label><span class="gb-unit">已按携程勾选，可增删</span>`)}
-          ${gbRow("房型特殊说明", `<textarea class="gb-ta" maxlength="300" oninput="this.nextElementSibling.textContent=this.value.length+' / 300'">${c.rtNew.remark}</textarea><small class="count">${c.rtNew.remark.length} / 300</small>`)}
-          ${gbRow("房型设施", `<div class="gb-hol">${c.rtNew.facs.map((f) => `<label class="gb-hol-it"><input type="checkbox" checked>${f}</label>`).join("")}</div><span class="gb-unit">仅展示需勾选写入的设施，可增删</span>`)}
+          <div class="gb-head"><b>房型匹配总览<small>左：抖音来客「房型管理」采集到的物理房型 · 右：携程用户端采集到的在售房型 · 逐对匹配</small></b><i class="tag gray">${c.rtNew.pairs.filter((p) => p.dy && p.ct).length} 组已匹配 · ${c.rtNew.pairs.filter((p) => !p.dy || !p.ct).length} 组待处理</i></div>
+          <div class="rt-pairs">
+            ${c.rtNew.pairs
+              .map(
+                (p) => `<div class="rt-pair">
+              ${p.dy ? `<div class="rt-pcell"><b>${p.dy}</b><small>抖音物理房型 · 已建立对应</small></div>` : `<div class="rt-pcell rt-pnone"><b>无对应物理房型</b><small>抖音「房型管理」缺少该房型</small></div>`}
+              <div class="rt-pmid">${p.dy && p.ct ? "<b>⇄</b>" : "<b>→</b>"}<i class="tag ${p.dy && p.ct ? "green" : p.ct ? "red" : "gray"}">${p.how}</i></div>
+              ${p.ct ? `<div class="rt-pcell"><b>${p.ct}</b><small>${p.note || "携程用户端在售"}</small></div>` : `<div class="rt-pcell rt-pnone"><b>携程无对应房型</b><small>抖音多出，不删除、不形成任务</small></div>`}
+            </div>`,
+              )
+              .join("")}
+          </div>
+        </div>
+        <div class="rt-match"><i class="tag red">本任务匹配对 · 抖音来客：无对应物理房型</i><b>⇄ 按房型名称匹配</b><i class="tag gray">携程用户端：电竞大床房 · 在售</i></div>
+        <div class="rt-duo">
+          <div class="gb-card">
+            <div class="gb-head"><b>左 · 抖音来客「创建房型」<small>待填写字段 · 已按右侧携程值预填、全部可修改</small></b><i class="tag red">待创建</i></div>
+            ${gbRow("中文名称", `<input class="gb-in" type="text" value="${c.rtNew.name}"><span class="gb-unit">已按右侧携程房型名称预填，可修改</span>`)}
+            ${gbRow("英文名称", `<input class="gb-in" type="text" placeholder="请补充"><span class="gb-unit">右侧未提供，请补充，可留空</span>`)}
+            ${gbRow("房型图片", `<span class="gb-thumb">携程房型图 1</span><span class="gb-thumb">携程房型图 2</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a><span class="gb-unit">已按右侧房型图预填 2 张（最多 10 张、第 1 张为头图），可替换</span>`)}
+            ${gbRow("总间数", `<input id="rtQty" class="gb-in gb-num" type="text" placeholder="请填写" oninput="rtQtySync(this.value)"><span class="gb-unit gb-req">间 · 右侧携程不提供，须填写后才能提交</span>`, true)}
+            ${gbRow("楼层", `<input class="gb-in gb-num" type="text" value="6"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="8"><span class="gb-unit">层 · 已按右侧携程值预填，可修改</span>`)}
+            ${gbRow("面积（㎡）", `<input class="gb-in gb-num" type="text" value="20.00"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="25.00"><span class="gb-unit">已按右侧携程值预填，可修改</span>`)}
+            ${gbRow("窗户", `<input class="gb-in" type="text" value="有窗 · 落地窗"><span class="gb-unit">已按右侧携程值预填，可修改</span>`)}
+            ${gbRow("床型", `<input class="gb-in" type="text" value="大床 2.00 米 × 1张"><span class="gb-unit">已按右侧携程值预填，可修改</span>`)}
+            ${gbRow("最大可住人数", `<input class="gb-in gb-num" type="text" value="2"><span class="gb-unit">人 · 已按右侧携程值预填，可修改</span>`)}
+            ${gbRow("吸烟政策", `<select class="gb-sl"><option>请选择</option></select><span class="gb-unit">右侧未识别到吸烟信息，由用户选择</span>`)}
+            ${gbRow("网络", `<label class="gb-radio"><input type="checkbox" checked>可上网</label><label class="gb-radio"><input type="checkbox" checked>WiFi 免费</label><label class="gb-radio"><input type="checkbox">有线网络</label><span class="gb-unit">已按右侧携程信息勾选，可增删</span>`)}
+            ${gbRow("房型特殊说明", `<textarea class="gb-ta" maxlength="300" oninput="this.nextElementSibling.textContent=this.value.length+' / 300'">${c.rtNew.remark}</textarea><small class="count">${c.rtNew.remark.length} / 300</small>`)}
+            ${gbRow("房型设施", `<div class="gb-hol">${c.rtNew.facs.map((f) => `<label class="gb-hol-it"><input type="checkbox" checked>${f}</label>`).join("")}</div><span class="gb-unit">仅展示可映射设施，已按右侧携程房间详情勾选、可增删</span>`)}
+          </div>
+          <div class="gb-card">
+            <div class="gb-head"><b>右 · 携程采集「${c.rtNew.name}」<small>携程用户端在售 · ${c.rtNew.price}（诊断时采集）· 只读对照</small></b><i class="tag gray">匹配来源</i></div>
+            ${gbRow("中文名称", `<b>${c.rtNew.name}</b><span class="gb-unit">用户端在售名称，与左侧创建名称一致</span>`)}
+            ${gbRow("英文名称", `<b>—</b><span class="gb-unit">携程未提供</span>`)}
+            ${gbRow("房型图片", `<b>房型图 2 张</b><span class="gb-unit">第 1 张为头图 · 已预填至左侧</span>`)}
+            ${gbRow("总间数", `<b>—</b><span class="gb-unit">携程不提供，须由用户在左侧填写</span>`)}
+            ${gbRow("楼层", `<b>6–8 层</b>`)}
+            ${gbRow("面积（㎡）", `<b>20.00–25.00</b>`)}
+            ${gbRow("窗户", `<b>有窗 · 落地窗</b>`)}
+            ${gbRow("床型", `<b>大床 2.00 米 × 1张</b>`)}
+            ${gbRow("最大可住人数", `<b>2 人</b>`)}
+            ${gbRow("吸烟政策", `<b>—</b><span class="gb-unit">未识别到吸烟信息，留空由用户选择</span>`)}
+            ${gbRow("网络", `<b>无线网络（WiFi）免费</b><span class="gb-unit">有线网络未提及</span>`)}
+            ${gbRow("房间详情", `<span class="gb-unit">${c.rtNew.remark}</span>`)}
+            ${gbRow("房间设施", `<b>${c.rtNew.facs.length} 项可明确映射</b><span class="gb-unit">已全部勾选至左侧</span>`)}
+          </div>
         </div>
       </div>`
                           : c.bt
