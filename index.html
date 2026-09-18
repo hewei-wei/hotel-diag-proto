@@ -4620,7 +4620,8 @@
           },
         },
         门店名称修改建议任务: {
-          advice: "门店名称「尚宽酒店」不符合抖音来客名称公式（城市＋地标简称1＋地标简称2＋店），缺城市与地标简称。注意：门店名称与门头照片在同一页面修改，修改名称时必须同时人工上传门店招牌（门头）照片（最多10张，门头完整、招牌文字清晰），照片与变更后名称的一致性由人工核对、AI 不自动核对；变更后名称须包含门店招牌名称，否则降低审核通过率。",
+          advice:
+            "门店名称「尚宽酒店」不符合抖音来客名称公式（城市＋地标简称1＋地标简称2＋店），缺城市与地标简称。注意：门店名称与门头照片在同一页面修改，修改名称时必须同时人工上传门店招牌（门头）照片（最多10张，门头完整、招牌文字清晰），照片与变更后名称的一致性由人工核对、AI 不自动核对；变更后名称须包含门店招牌名称，否则降低审核通过率。",
           nameEdit: {
             cur: "尚宽酒店",
             formula: "酒店名称（城市＋地标简称1＋地标简称2＋店）",
@@ -4628,7 +4629,10 @@
             sug: "重庆西站华岩寺尚宽酒店店",
           },
           src: [
-            ["提交说明", "门店名称与门头照片在「设置-门店管理」同一页面修改，必须一并提交"],
+            [
+              "提交说明",
+              "门店名称与门头照片在「设置-门店管理」同一页面修改，必须一并提交",
+            ],
             ["地标数据", "由 AI 生成（地标简称建议）"],
           ],
           ignore: "此次忽略",
@@ -4704,7 +4708,10 @@
             "已将抖音来客「酒店信息管理 › 酒店设施」与携程「服务及设施」逐一比对，全部设施合并为一条任务、仅展示审核不通过与需要修改的设施、按三类分组（待处理优先级最高）：一、待处理：抖音已存在但审核不通过；二、「有/无」＋图片（待补充，图片为提交必填）；三、「有/无」＋其他字段（待修正）。与携程一样、无需修改的设施（原一致通过与抖音、携程均无，默认保持「无」、AI 不推测）不生成任务、不在任务页展示。逐设施确认（处理意向可选「暂无此设施」），统一提交后 AI 按各设施确认结果分别写入并分别校验，设施间互不影响。",
           src: [
             ["检查路径", "店铺管理 › 酒店信息管理 › 酒店设施"],
-            ["任务组织", "全部设施合并 1 条任务 · 仅展示不通过与需修改设施 · 三类分组（待处理优先） · 分别确认分别写入"],
+            [
+              "任务组织",
+              "全部设施合并 1 条任务 · 仅展示不通过与需修改设施 · 三类分组（待处理优先） · 分别确认分别写入",
+            ],
             ["采集来源", "携程「服务及设施」＋抖音来客酒店设施"],
             [
               "设施覆盖",
@@ -5446,7 +5453,8 @@
                 book: "需要提前预约 · 提前 1 天",
                 tin: "14:00",
                 tout: "12:00",
-                usage: "入住需携带身份证原件办理登记；酒店提供重庆西站免费接站，需提前 1 天预约确认。",
+                usage:
+                  "入住需携带身份证原件办理登记；酒店提供重庆西站免费接站，需提前 1 天预约确认。",
               },
             ],
             prices: [],
@@ -5482,7 +5490,8 @@
                 book: "需要提前预约 · 提前 1 天",
                 tin: "14:00",
                 tout: "12:00",
-                usage: "入住需携带身份证原件办理登记；酒店提供重庆西站免费接站，需提前 1 天预约确认。",
+                usage:
+                  "入住需携带身份证原件办理登记；酒店提供重庆西站免费接站，需提前 1 天预约确认。",
               },
             ],
             prices: [],
@@ -5681,7 +5690,12 @@
         "日历房新增·商务大床房": {
           advice:
             "日历房「房型集合」诊断：抖音来客房型管理已存在「商务大床房·重庆西站免费接站」，但「日历房」未上架该房型（其余 6 个房型已上架 10 个日历房），认定为缺失日历房，按规则单独形成 1 条新增任务、不与其他房型合并。新增表单按抖音来客「新建日历房」页面（商品信息 → 设置价量态 两步）展示，已按携程预填：早餐份数（携程当前无早 → 预填 0 份）、房价（诊断时携程实时价 ¥339 / 晚），均可核对修改；该房型无已下架日历房占用物理房型引用，确认后直接新增并上架。提交后 AI 在抖音来客「商品管理（日历房）」新增该房型日历房并上架，写入并校验成功后任务完成；已上架日历房的现有房价不在本任务内修改（由房价房态管理节点诊断）。",
-          src: [["缺失房型", "商务大床房·重庆西站免费接站 · 房型管理已存在 · 日历房未上架"]],
+          src: [
+            [
+              "缺失房型",
+              "商务大床房·重庆西站免费接站 · 房型管理已存在 · 日历房未上架",
+            ],
+          ],
           ignore: "此次忽略",
           calAdd: {
             room: {
@@ -5771,7 +5785,10 @@
             ["审核失败提交时间", "2026-08-06 14:52"],
             ["审核不通过节点", "头图和相册 · 商家相册"],
             ["被驳回图片", "4 张（外观 1 · 房间 3）"],
-            ["处理方式", "仅删除（不执行上传）· 空缺由「头图和相册」节点补充任务再上传"],
+            [
+              "处理方式",
+              "仅删除（不执行上传）· 空缺由「头图和相册」节点补充任务再上传",
+            ],
           ],
           ignore: "此次忽略",
           audit: {
@@ -6694,8 +6711,8 @@
           )
           .join("")}
       </div>`
-                  : c.audit
-                    ? `<div class="section"><h3>2　被驳回图片（共 ${c.audit.rejected.length} 张 · 确认删除）</h3>
+                : c.audit
+                  ? `<div class="section"><h3>2　被驳回图片（共 ${c.audit.rejected.length} 张 · 确认删除）</h3>
         <p class="review-tip">与抖音来客「头图和相册」详情一致，被驳回图片带“审核不通过”标识；按规则处理方式仅「删除」：确认提交后 AI 仅删除以下审核不通过的图片、不执行上传。删除造成的空缺（门店头图为空或相册类别无图）由「头图和相册」节点后续诊断生成补充任务、再由该任务上传新图——先删除、再上传，不在本任务内一步替换。</p>
         ${c.audit.rejected
           .map(
@@ -6707,10 +6724,10 @@
           )
           .join("")}
       </div>`
-                    : c.facAll
-                      ? (() => {
-                          let fi = -1;
-                          return `<div class="section"><h3>1　酒店设施 · 三类分组确认 · 待处理优先（共 ${c.facAll.reduce((n, g) => n + g.items.length, 0)} 个设施 · 仅展示不通过与需修改的设施，与携程一样、无需修改的不展示 · 一个任务统一提交、分别写入分别校验）</h3>
+                  : c.facAll
+                    ? (() => {
+                        let fi = -1;
+                        return `<div class="section"><h3>1　酒店设施 · 三类分组确认 · 待处理优先（共 ${c.facAll.reduce((n, g) => n + g.items.length, 0)} 个设施 · 仅展示不通过与需修改的设施，与携程一样、无需修改的不展示 · 一个任务统一提交、分别写入分别校验）</h3>
         ${c.facAll
           .map(
             (
@@ -6795,9 +6812,9 @@
           )
           .join("")}
         </div>`;
-                        })()
-                      : c.faudit
-                        ? `<div class="section"><h3>1　被驳回设施与图片替换（${c.faudit.list.length} 个设施 · 合并一条任务）</h3>
+                      })()
+                    : c.faudit
+                      ? `<div class="section"><h3>1　被驳回设施与图片替换（${c.faudit.list.length} 个设施 · 合并一条任务）</h3>
         <p class="review-tip">上传设施图片需平台审核通过后才可生效，请选择与该设施相关的图片以便于审核通过，建议分辨率 750×562 或比例 4:3、大小不超过 5MB。</p>
         ${c.faudit.list
           .map(
@@ -6824,8 +6841,8 @@
           )
           .join("")}
       </div>`
-                        : c.rt
-                          ? `<div class="section"><h3>1　字段差异与修改内容（共 ${c.rt.diffs.length} 项，可修改）</h3>
+                      : c.rt
+                        ? `<div class="section"><h3>1　字段差异与修改内容（共 ${c.rt.diffs.length} 项，可修改）</h3>
         ${c.rt.tip ? `<p class="review-tip">${c.rt.tip}</p>` : ""}
         <div class="gb-card">
           ${c.rt.room ? `<div class="gb-head"><b>${c.rt.room.name}<small>物理房型 ID：${c.rt.room.id} · ${c.rt.room.spec}</small></b>${c.rt.review ? '<i class="tag gray">无差异 · 人工核对</i>' : `<i class="tag red">${c.rt.diffs.length} 项字段差异</i>`}</div>` : ""}
@@ -6836,30 +6853,35 @@
             <b>${d.field}</b><span>${d.cur}</span><span>${d.ctrip}</span>
             <span class="rt-fix">${
               d.ctl === "smoke"
-                ? d.opts.map((o, i) => `<label class="gb-radio"><input type="radio" name="rt-smoke"${(smkPick === null ? (d.sug ?? 0) : smkPick) === i ? " checked" : ""} onchange="setSmkPick(${i})">${o}</label>`).join("") + `<small class="count">${d.note}</small>`
+                ? d.opts
+                    .map(
+                      (o, i) =>
+                        `<label class="gb-radio"><input type="radio" name="rt-smoke"${(smkPick === null ? (d.sug ?? 0) : smkPick) === i ? " checked" : ""} onchange="setSmkPick(${i})">${o}</label>`,
+                    )
+                    .join("") + `<small class="count">${d.note}</small>`
                 : d.ctl === "check"
-                ? `<label class="gb-radio"><input type="checkbox" checked>${d.to}</label><small class="count">勾选后写入，可取消</small>`
-                : d.ctl === "range"
-                  ? `<input class="gb-in gb-num" type="text" value="${d.from}"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="${d.to}"><span class="gb-unit">${d.unit} · 按区间写入，可修改，不可改为固定值</span>`
-                  : d.ctl === "net"
-                    ? d.opts
-                        .map(
-                          (o) =>
-                            `<label class="gb-radio"><input type="checkbox"${o[1] ? " checked" : ""}>${o[0]}</label>`,
-                        )
-                        .join("") +
-                      `<small class="count">已按携程勾选，可增删</small>`
-                    : d.ctl === "beds"
-                      ? rtBedsCtl(d)
-                      : `<input class="gb-in" type="text" value="${d.to}"><small class="count">已按携程值预填 · 可修改</small>`
+                  ? `<label class="gb-radio"><input type="checkbox" checked>${d.to}</label><small class="count">勾选后写入，可取消</small>`
+                  : d.ctl === "range"
+                    ? `<input class="gb-in gb-num" type="text" value="${d.from}"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="${d.to}"><span class="gb-unit">${d.unit} · 按区间写入，可修改，不可改为固定值</span>`
+                    : d.ctl === "net"
+                      ? d.opts
+                          .map(
+                            (o) =>
+                              `<label class="gb-radio"><input type="checkbox"${o[1] ? " checked" : ""}>${o[0]}</label>`,
+                          )
+                          .join("") +
+                        `<small class="count">已按携程勾选，可增删</small>`
+                      : d.ctl === "beds"
+                        ? rtBedsCtl(d)
+                        : `<input class="gb-in" type="text" value="${d.to}"><small class="count">已按携程值预填 · 可修改</small>`
             }</span>
           </div>`,
             )
             .join("")}
         </div>
       </div>`
-                          : c.rtNew
-                            ? `<div class="section"><h3>2　缺失房型 · 需填入的字段（与抖音来客「创建房型」一致）</h3>
+                        : c.rtNew
+                          ? `<div class="section"><h3>2　缺失房型 · 需填入的字段（与抖音来客「创建房型」一致）</h3>
         <p class="review-tip">携程在售、抖音「房型管理」无对应房型。以下仅展示需填入的字段，已按携程预填、全部可修改；「总间数」携程不提供，须由用户填写后才能提交。提交后 AI 进入抖音来客「房型管理 → 创建房型 → 手动创建」，仅创建当前房型。</p>
         <div class="gb-card">
           <div class="gb-head"><b>${c.rtNew.name} · 新增房型<small>携程用户端在售 · ${c.rtNew.price}（诊断时采集）</small></b></div>
@@ -6878,8 +6900,8 @@
           ${gbRow("房型设施", `<div class="gb-hol">${c.rtNew.facs.map((f) => `<label class="gb-hol-it"><input type="checkbox" checked>${f}</label>`).join("")}</div><span class="gb-unit">仅展示需勾选写入的设施，可增删</span>`)}
         </div>
       </div>`
-                            : c.bt
-                              ? `<div class="section"><h3>1　差异与修改内容（${c.bt.cur} → ${c.bt.to}）</h3>
+                          : c.bt
+                            ? `<div class="section"><h3>1　差异与修改内容（${c.bt.cur} → ${c.bt.to}）</h3>
         <p class="review-tip">${c.bt.phones ? `下方弹窗与抖音来客「${c.bt.modal}」一致，电话列表已按携程整组预填、可修改（至少保留 1 个、最多 3 个）；确认后 AI 将确认后的电话列表整组覆盖写入抖音来客——整体替换当前全部电话（非追加合并），写入后来客联系电话＝确认的列表（1–3 个、不能为空），写入成功并完成结果校验。` : `下方弹窗与抖音来客「${c.bt.modal}」一致，修改内容已预填、可修改，确认后 AI 写入抖音来客并校验。`}</p>
         <div class="gb-card">
           <div class="gb-head"><b>${c.bt.modal}<small>店铺管理 › 门店管理 · ${c.bt.where}</small></b></div>
@@ -6890,8 +6912,8 @@
           ${c.bt.phones ? gbRow("门店电话", c.bt.phones.map((p) => `<div class="gb-qtyrow"><select class="gb-sl"><option selected>${p[0]}</option><option>${p[0] === "座机" ? "手机" : "座机"}</option></select>${p[0] === "座机" ? `<input class="gb-in gb-num" type="text" value="${p[1]}" placeholder="区号">` : ""}<input class="gb-in" type="text" value="${p[2]}"><a class="exlink" onclick="toast('演示原型：可删除该电话，整组覆盖写入后不能为空、至少保留 1 个方可提交')">删除</a></div>`).join("") + `<a class="exlink" onclick="toast('演示原型：可继续添加电话，整组覆盖写入后最多 3 个')">${c.bt.addTel}</a><span class="gb-unit">${c.bt.telNote}</span>`, true) : ""}
         </div>
       </div>`
-                              : c.fac
-                                ? `<div class="section"><h3>2　诊断不通过设施与修改内容（${c.fac.list.length} 个 · 全部可修改）</h3>
+                            : c.fac
+                              ? `<div class="section"><h3>2　诊断不通过设施与修改内容（${c.fac.list.length} 个 · 全部可修改）</h3>
         ${c.fac.list
           .map((f, fi) => {
             const eff = {};
@@ -6932,8 +6954,8 @@
           })
           .join("")}
       </div>`
-                                : c.calAdd
-                                  ? `<div class="section"><h3>${c.src ? 2 : 1}　缺失日历房 · 新增并上架（按抖音来客「新建日历房」页面表单）</h3>
+                              : c.calAdd
+                                ? `<div class="section"><h3>${c.src ? 2 : 1}　缺失日历房 · 新增并上架（按抖音来客「新建日历房」页面表单）</h3>
         <p class="review-tip">「房型管理」存在、日历房未上架的房型认定为缺失日历房，每个缺失房型单独形成 1 条新增任务。表单按「商品信息 → 设置价量态」两步展示，与抖音来客「商品管理 › 日历房 › 新建日历房」页面一致；房型、早餐份数、房价三项已按携程预填（高亮）并可核对修改；该房型无已下架日历房占用物理房型引用，确认后直接新增并上架；已上架日历房的现有房价不在本任务内修改（由「房价房态管理」节点诊断）。</p>
         <div class="gb-card">
           <div class="gb-head"><b>商品信息<small>步骤 1/2 · 新建日历房 · 物理房型 ID：${c.calAdd.room.id} · ${c.calAdd.room.spec}</small></b><i class="tag red">日历房未上架 · 缺失</i></div>
@@ -6966,7 +6988,7 @@
         </div>
       </div>`
                                 : c.cal
-                                    ? `<div class="section"><h3>${c.src ? 2 : 1}　早餐份数修改（仅展示差异项，其余配置不动）</h3>
+                                  ? `<div class="section"><h3>${c.src ? 2 : 1}　早餐份数修改（仅展示差异项，其余配置不动）</h3>
         <p class="review-tip">按规则「早餐份数不一致」任务：任务页仅展示房型名称、携程当前早餐份数、抖音当前早餐份数与建议修改值；提交后 AI 仅修改当前房型的早餐份数，日历房其余配置（售卖时段、退改规则、房价房量等）保持当前值不动——已上架日历房现有房价不在本节点诊断，由「房价房态管理」节点单独检查。</p>
         <div class="gb-card">
           <div class="gb-head"><b>${c.cal.room.roomName}<small>日历房 ID：${c.cal.room.calId} · 物理房型 ID：${c.cal.room.roomId} · ${c.cal.room.spec} · 已上架</small></b><i class="tag red">早餐份数不一致</i></div>
@@ -7091,16 +7113,16 @@
           }
         </div>
       </div>`
-                                            : c.rate
-                                              ? `<div class="section"><h3>${c.src ? 2 : 1}　${c.rate.room} 近 7 天逐日价格对比（异常 ${c.rate.bad} / 7 天）</h3>
+                                    : c.rate
+                                      ? `<div class="section"><h3>${c.src ? 2 : 1}　${c.rate.room} 近 7 天逐日价格对比（异常 ${c.rate.bad} / 7 天）</h3>
         <p class="review-tip">按「同一房型＋同一日期」逐日对比携程实时价格与抖音来客「房价房态管理」当前价格：抖音价格 ≤ 携程价格标记「通过」、建议不修改；抖音价格 ＞ 携程价格标记「价格偏高」，建议价格已按该日期携程实时价格预填（单位：元）、可修改，确认后 AI 按修改后的价格写入抖音来客。提交后 AI 仅修改异常日期的价格，通过日期保持不变，并逐日重新读取校验。</p>
         <table class="cal-list">
           <thead><tr><th>日期</th><th>携程实时价格</th><th>抖音当前价格</th><th>诊断结果</th><th>建议价格</th></tr></thead>
           <tbody>${c.rate.days.map((x) => `<tr><td>${x.d}</td><td>¥${x.ct}</td><td>${x.bad ? "<b>¥" + x.dy + "</b>" : "¥" + x.dy}</td><td>${x.bad ? '<i class="tag red">价格偏高</i>' : '<i class="tag green">通过</i>'}</td><td>${x.bad ? '<input class="gb-in gb-num" type="text" value="' + x.ct + '">' : '<i class="tag gray">不修改</i>'}</td></tr>`).join("")}</tbody>
         </table>
       </div>`
-                                              : c.nameEdit
-                                                ? `<div class="section"><h3>${c.src ? 2 : 1}　门店名称修改与门头照片（同一页面一并提交）</h3>
+                                      : c.nameEdit
+                                        ? `<div class="section"><h3>${c.src ? 2 : 1}　门店名称修改与门头照片（同一页面一并提交）</h3>
         <p class="review-tip">门店名称与门头照片在「设置-门店管理」同一页面修改，提交时必须一并提交：请确认或自行编辑变更后名称（须包含门店招牌名称，否则降低审核通过率），并人工上传门店招牌（门头）照片（建议现场拍摄、最多 10 张、门头完整、招牌文字清晰）。门头照片与变更后名称的一致性由人工核对，AI 不自动核对。</p>
         <div class="gb-card">
           <div class="gb-head"><b>门店名称<small>基本信息 · 门店管理 · 名称＋门头照片一并提交</small></b><i class="tag red">不符合名称公式</i></div>
@@ -7111,11 +7133,11 @@
           ${gbRow("门头照片（必传）", `${Array.from({ length: namePics }, (_, i) => `<span class="gb-thumb">门头实拍 ${i + 1}</span><a class="exlink" onclick="delNamePic()">删除</a>`).join("")}<span class="gb-upload" onclick="addNamePic()">＋ 上传照片</span><span class="gb-unit">已传 ${namePics} / 10 张 · 人工线下现场拍摄后上传，门头完整、招牌文字清晰</span>${namePics ? "" : '<span class="gb-unit gb-req">与门店名称在同一页面修改、必须一并提交，请先上传门头照片</span>'}`, true)}
         </div>
       </div>`
-                                              : (c.fields || []).length
-                                                ? `<div class="section"><h3>${c.src ? 2 : 1}　建议写入抖音来客</h3>
+                                        : (c.fields || []).length
+                                          ? `<div class="section"><h3>${c.src ? 2 : 1}　建议写入抖音来客</h3>
         <div class="fields">${c.fields.map(fieldHtml).join("")}</div>
       </div>`
-                                                : ""
+                                          : ""
       }`;
           actions = `${c.ignore === "暂无此设施" && btnOn("submit") ? "<button class=\"btn btn-outline\" onclick=\"finishTask('执行中','已确认酒店暂无该设施，AI 正在将该设施保持为「无」，写入成功并完成结果校验后任务标记为已完成')\">暂无此设施</button>" : ""}
         ${btnOn("ignoreNow") ? `<button class="btn btn-outline" onclick="askIgnore(taskIdx,'skip')">此次忽略</button>` : ""}
@@ -7131,13 +7153,13 @@
                     ? `<button class="btn btn-primary" onclick="finishTask('执行中','酒店设施已提交，AI 正在按各设施确认结果分别写入抖音来客「酒店设施」并分别校验，全部写入完成后任务结束')">统一提交</button>`
                     : c.faudit
                       ? "<button class=\"btn btn-primary\" onclick=\"finishTask('执行中','已提交审核，AI 正在使用替换图片在抖音来客重新提交设施审核，提交成功并完成结果校验后任务标记为已完成；暂无此设施将改为「无」')\">提交审核</button>"
-                              : c.calAdd
-                                ? `<button class="btn btn-primary" onclick="finishTask('执行中','新增方案已确认，AI 正在抖音来客「商品管理 › 日历房」新增并上架「商务大床房·重庆西站免费接站」的日历房（房型＋早餐份数＋房价，无下架记录占用引用、直接新增），写入并校验成功后任务完成')">新增并上架</button>`
-                                : c.nameEdit
-                                ? `<button class="btn btn-primary" ${namePics ? "" : "disabled"} title="${namePics ? "" : "请先上传门头照片：与门店名称在同一页面一并提交"}" onclick="finishTask('执行中','名称与门头照片已提交，AI 正在将变更后名称与门头照片一并写入抖音来客「设置-门店管理」并校验（一致性已由人工核对，AI 不做自动核对）')">提交</button>`
-                                : c.offline
-                                ? "<button class=\"btn btn-primary\" onclick=\"finishTask('执行成功','已确认完成，提醒任务已结束')\">已完成</button>"
-                                : `<button class="btn btn-primary"${c.gbuy && gbNeedImg(c) ? ' disabled title="携程暂无房型图与套餐图，须由用户上传后才能提交"' : ""} onclick="finishTask('执行中','${c.reviews ? "回复内容已提交，AI 正在逐条写入抖音来客" : c.gbuy ? "核对结果已提交，AI 正在逐项写入抖音来客" : c.presale ? "预售方案已提交，AI 正在写入抖音来客并校验" : c.rate ? "价格修改已提交，AI 正在按确认结果仅修改 " + c.rate.bad + " 个异常日期的价格，并逐日重新读取校验" : c.cal ? "修改已提交，AI 正在仅修改当前房型早餐份数（其余配置保持当前值），并同步校验自动生成的日历房名称" : c.rt ? (c.rt.review ? "核对结果已提交，AI 正在复核该房型字段并校验，两侧一致时不改值" : "修改内容已提交，AI 正在按确认结果写入抖音来客") : c.fac ? "核对结果已提交，AI 正在将全部确认数据一并写入抖音来客" : c.bt ? (c.bt.phones ? "电话列表已提交，AI 正在将来客联系电话整组覆盖写入（整体替换当前全部电话、非追加合并）并校验" : "修改已提交，AI 正在写入抖音来客并校验结果") : "任务已提交，AI 正在同步至抖音来客"}')">提交</button>`
+                      : c.calAdd
+                        ? `<button class="btn btn-primary" onclick="finishTask('执行中','新增方案已确认，AI 正在抖音来客「商品管理 › 日历房」新增并上架「商务大床房·重庆西站免费接站」的日历房（房型＋早餐份数＋房价，无下架记录占用引用、直接新增），写入并校验成功后任务完成')">新增并上架</button>`
+                        : c.nameEdit
+                          ? `<button class="btn btn-primary" ${namePics ? "" : "disabled"} title="${namePics ? "" : "请先上传门头照片：与门店名称在同一页面一并提交"}" onclick="finishTask('执行中','名称与门头照片已提交，AI 正在将变更后名称与门头照片一并写入抖音来客「设置-门店管理」并校验（一致性已由人工核对，AI 不做自动核对）')">提交</button>`
+                          : c.offline
+                            ? "<button class=\"btn btn-primary\" onclick=\"finishTask('执行成功','已确认完成，提醒任务已结束')\">已完成</button>"
+                            : `<button class="btn btn-primary"${c.gbuy && gbNeedImg(c) ? ' disabled title="携程暂无房型图与套餐图，须由用户上传后才能提交"' : ""} onclick="finishTask('执行中','${c.reviews ? "回复内容已提交，AI 正在逐条写入抖音来客" : c.gbuy ? "核对结果已提交，AI 正在逐项写入抖音来客" : c.presale ? "预售方案已提交，AI 正在写入抖音来客并校验" : c.rate ? "价格修改已提交，AI 正在按确认结果仅修改 " + c.rate.bad + " 个异常日期的价格，并逐日重新读取校验" : c.cal ? "修改已提交，AI 正在仅修改当前房型早餐份数（其余配置保持当前值），并同步校验自动生成的日历房名称" : c.rt ? (c.rt.review ? "核对结果已提交，AI 正在复核该房型字段并校验，两侧一致时不改值" : "修改内容已提交，AI 正在按确认结果写入抖音来客") : c.fac ? "核对结果已提交，AI 正在将全部确认数据一并写入抖音来客" : c.bt ? (c.bt.phones ? "电话列表已提交，AI 正在将来客联系电话整组覆盖写入（整体替换当前全部电话、非追加合并）并校验" : "修改已提交，AI 正在写入抖音来客并校验结果") : "任务已提交，AI 正在同步至抖音来客"}')">提交</button>`
             : ""
         }`;
         }
@@ -7199,9 +7221,7 @@
         营业状态修正任务: ["基本信息 · 营业状态"],
         房间总数修正任务: ["基本信息 · 房间总数"],
         联系电话修正任务: ["基本信息 · 联系电话（整组覆盖写入）"],
-        门店名称修改建议任务: [
-          "基本信息 · 门店名称（名称＋门头照片一并提交）",
-        ],
+        门店名称修改建议任务: ["基本信息 · 门店名称（名称＋门头照片一并提交）"],
       };
       const RUN_ST = {
         run: ["执行中", ""],
