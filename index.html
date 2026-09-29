@@ -1030,6 +1030,75 @@
       .trow:last-child {
         border-bottom: 0;
       }
+      /* 待处理任务按诊断步骤分类（含房价房态单独一类）：可折叠大类，子任务行沿用 tgrid/trow */
+      .tcat {
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        margin-bottom: 12px;
+        background: var(--surface);
+      }
+      .tcat-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 52px;
+        padding: 0 18px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .tcat-head:hover {
+        background: #fafbfc;
+      }
+      .tcat-head .chev {
+        font-style: normal;
+        color: var(--ink-4);
+        font-size: 11px;
+        width: 12px;
+        flex: none;
+      }
+      .tcat-head b {
+        font-size: 13.5px;
+        flex: none;
+      }
+      .tcat-head small {
+        flex: 1;
+        min-width: 0;
+        font-size: 11.5px;
+        color: var(--ink-4);
+        font-weight: 400;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .tcat-n {
+        flex: none;
+        min-width: 24px;
+        height: 20px;
+        padding: 0 7px;
+        border-radius: 999px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tcat.empty .tcat-head {
+        opacity: 0.55;
+      }
+      .tcat.empty .tcat-n {
+        background: var(--line-soft);
+        color: var(--ink-4);
+      }
+      .tcat-body {
+        border-top: 1px solid var(--line);
+      }
+      .tcat-empty {
+        padding: 18px;
+        font-size: 12.5px;
+        color: var(--ink-4);
+      }
       .tcell-title {
         display: flex;
         flex-direction: column;
@@ -1453,6 +1522,213 @@
         border-top: 1px dashed var(--line);
         font-size: 12.5px;
       }
+      /* 取消预约规则旁的转化提升营销标签（按抖音来客真实页面） */
+      .gb-promo {
+        background: #fff7e8;
+        border: 1px solid #ffe1a8;
+        color: #92400e;
+        border-radius: 10px;
+        padding: 1px 8px;
+        font-size: 11px;
+      }
+      /* 取消预约规则子项卡片（按抖音来客真实页面） */
+      .gb-cancelcard {
+        width: 100%;
+        background: var(--surface-2);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .gb-cancelcard .gb-qtyrow {
+        width: 100%;
+      }
+      /* 限购规则子项卡片（按抖音来客真实页面）：勾选项下方缩进的灰色卡片 */
+      .gb-limitcard {
+        width: calc(100% - 26px);
+        margin-left: 26px;
+        background: var(--surface-2);
+        border-radius: 10px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      /* 不可入住日期·节假日卡片：下拉 + 区间列表竖排 */
+      .gb-limitcard.col {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      /* 每周不可用：可点击的星期 tag 方块（按抖音来客真实页面） */
+      .gb-wtag {
+        padding: 3px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-size: 12px;
+        color: var(--ink-2);
+        cursor: pointer;
+        user-select: none;
+      }
+      .gb-wtag.on {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+      }
+      /* 「添加餐食」弹窗：类型方块 + 每餐份数（按抖音来客真实页面） */
+      .gb-mrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 14px 0;
+      }
+      .gb-mlab {
+        width: 70px;
+        flex: none;
+        font-size: 13px;
+        color: var(--ink-2);
+      }
+      .gb-mtags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      /* 使用时段·仅指定时间可用：时间段行尾的删除 × */
+      .gb-del {
+        color: var(--ink-4);
+        font-size: 15px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 2px 6px;
+        user-select: none;
+      }
+      .gb-del:hover {
+        color: #e5484d;
+      }
+      /* 「添加预售房型」弹窗：全量房型单选列表 */
+      .gb-roomlist {
+        margin: 4px 0 8px;
+        max-height: 240px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .gb-roomit {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .gb-roomit:has(input:checked) {
+        border-color: var(--primary);
+        background: rgba(37, 99, 235, 0.04);
+      }
+      .gb-roomit b {
+        font-size: 13px;
+        color: var(--ink-2);
+      }
+      .gb-roomit small {
+        color: var(--ink-4);
+        font-size: 11px;
+      }
+      /* 加价规则：智能/手动添加切换 tab */
+      .gb-tab {
+        padding: 5px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-size: 12.5px;
+        color: var(--ink-2);
+        cursor: pointer;
+        user-select: none;
+      }
+      .gb-tab.on {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+      }
+      /* 可入住日期·指定日期（按抖音来客真实页面）：日期范围 + 双月日历面板 */
+      .gb-daterange {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .gb-cal {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+      }
+      .gb-cal-m {
+        flex: 1;
+        min-width: 220px;
+      }
+      .gb-cal-t {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink-2);
+        text-align: center;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .gb-cal-arr {
+        color: var(--ink-3);
+        cursor: pointer;
+        padding: 0 6px;
+        font-size: 15px;
+        line-height: 1;
+        user-select: none;
+      }
+      .gb-cal-arr:hover {
+        color: var(--primary);
+      }
+      .gb-cal-ftr {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 2px;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
+      }
+      .gb-cal-g {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+      }
+      .gb-cal-w {
+        font-size: 11px;
+        color: var(--ink-4);
+        text-align: center;
+        padding: 2px 0;
+      }
+      .gb-cal-d {
+        font-size: 11.5px;
+        color: var(--ink-2);
+        text-align: center;
+        padding: 4px 0;
+        border-radius: 6px;
+      }
+      .gb-cal-d.sel {
+        background: var(--primary);
+        color: #fff;
+        font-weight: 600;
+      }
       .gb-kv small {
         width: 96px;
         flex-shrink: 0;
@@ -1804,6 +2080,131 @@
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
+      }
+      /* 创建商品「商品详情」（按抖音来客真实页面）：商品名称/套餐图等字数较多、逐行堆叠的灰色提示 */
+      .gb-hints {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-start;
+      }
+      /* 创建房型「楼层」字段（按抖音来客真实页面）：每条楼层记录一张浅灰卡片（固定值/区间单选 + 数字输入），卡片右上删除、底部可继续添加 */
+      .fl-star {
+        color: #b91c1c;
+        font-style: normal;
+        margin-left: 2px;
+      }
+      .fl-ent {
+        width: 100%;
+        position: relative;
+        padding: 9px 30px 9px 10px;
+        background: var(--surface-2);
+        border-radius: var(--r-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .fl-md {
+        display: flex;
+        gap: 16px;
+      }
+      .fl-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .fl-del {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        color: var(--ink-4);
+        cursor: pointer;
+      }
+      .fl-del:hover {
+        color: #b91c1c;
+        background: var(--surface);
+      }
+      /* 创建房型「面积/窗户/床型」字段（按抖音来客真实页面）：选中后展开浅灰子面板（窗型单选组、床型设置行），多张床行间以「且」连接、每行可删 */
+      .fl-sub {
+        width: 100%;
+        position: relative;
+        padding: 10px 30px 10px 12px;
+        background: var(--surface-2);
+        border-radius: var(--r-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .fl-sub-t {
+        font-size: 12px;
+        color: var(--ink-3);
+        display: flex;
+        align-items: center;
+      }
+      .fl-q {
+        display: inline-flex;
+        width: 14px;
+        height: 14px;
+        margin-left: 3px;
+        border: 1px solid var(--ink-4);
+        border-radius: 50%;
+        color: var(--ink-4);
+        font-size: 10px;
+        font-style: normal;
+        align-items: center;
+        justify-content: center;
+        cursor: help;
+      }
+      .fl-and {
+        color: var(--ink-4);
+      }
+      .fl-del-i {
+        display: inline-flex;
+        width: 18px;
+        height: 18px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        color: var(--ink-4);
+        cursor: pointer;
+      }
+      .fl-del-i:hover {
+        color: #b91c1c;
+        background: var(--surface);
+      }
+      /* 创建预售房型（钟点房）：顶部蓝色发布条件提示条，可关闭 */
+      .ps-tip {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 26px 8px 12px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        border-radius: var(--r-sm);
+        font-size: 12px;
+        position: relative;
+      }
+      .ps-tip svg {
+        flex: none;
+      }
+      .ps-tip-x {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        color: var(--primary);
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
       }
       /* 房型信息核对：逐字段「由 → 修改为」差异表 */
       .rt-grid {
@@ -2403,6 +2804,21 @@
         border-color: var(--ok-line);
         color: var(--ok);
       }
+      .drow.matchwait .dnode {
+        background: var(--warn-bg);
+        border-color: var(--warn-line);
+        color: #b45309;
+      }
+      .drow.rtwait .dnode {
+        background: var(--warn-bg);
+        border-color: var(--warn-line);
+        color: #b45309;
+      }
+      .drow.pswait .dnode {
+        background: var(--warn-bg);
+        border-color: var(--warn-line);
+        color: #b45309;
+      }
       .drow .dt {
         flex: 1;
         min-width: 0;
@@ -2818,6 +3234,43 @@
         height: 40px;
         font-size: 12.5px;
       }
+      .recog {
+        border: 1px solid var(--ok-line);
+        background: var(--ok-bg);
+        border-radius: var(--r-sm);
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .recog.err {
+        border-color: var(--warn-line);
+        background: var(--warn-bg);
+      }
+      .recog .r-row {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        font-size: 12.5px;
+      }
+      .recog .r-row span {
+        flex: none;
+        width: 62px;
+        color: var(--ink-3);
+        font-weight: 600;
+      }
+      .recog .r-row b {
+        color: var(--ink-2);
+        word-break: break-all;
+      }
+      .recog .r-tip {
+        font-size: 11.5px;
+        color: var(--ink-3);
+      }
+      .recog .r-msg {
+        font-size: 12.5px;
+        color: var(--warn);
+      }
       .success {
         background: var(--ok-bg);
         border: 1px solid var(--ok-line);
@@ -2960,6 +3413,8 @@
         platform = "douyin",
         method = "sms",
         reauth = false,
+        ctripLink = "",
+        ctripRecog = null,
         hotelFilter = "all",
         hotelQuery = "";
       const $ = (s) => document.querySelector(s),
@@ -3383,6 +3838,19 @@
           ],
         },
         {
+          name: "房型匹配",
+          path: "商品与货架 › 房型管理 › 房型匹配（受限步骤前置）",
+          items: [
+            [
+              "电竞大床房",
+              "与携程 8 个在售房型逐一建立对应关系（用户手动点选匹配）：「电竞大床房」预计无对应抖音物理房型，形成房型匹配任务供人工逐对匹配确认，确认后仍无对应的携程房型按缺失生成新增任务",
+              "fail",
+              "房型匹配任务",
+              "信息完善",
+            ],
+          ],
+        },
+        {
           name: "房型管理",
           path: "商品与货架 › 房型管理 › 房型管理",
           items: [
@@ -3391,13 +3859,6 @@
               "与「亲子家庭房-赠送小孩早餐·免费携带宠物」主体名称一致自动对应；床型、最大可住人数 2 项不一致",
               "fail",
               "房型信息核对·亲子家庭房",
-              "信息完善",
-            ],
-            [
-              "电竞大床房",
-              "与携程 8 个在售房型逐一建立对应关系（用户手动点选匹配）：「电竞大床房」预计无对应抖音物理房型，形成房型匹配任务供人工逐对匹配确认，确认后仍无对应的携程房型按缺失生成新增任务",
-              "fail",
-              "房型匹配任务",
               "信息完善",
             ],
             [
@@ -3436,7 +3897,7 @@
             ],
             [
               "商务大床房",
-              "房型管理已存在「商务大床房·重庆西站免费接站」，但日历房未上架该房型（无已上架或下架记录占用引用），认定为缺失日历房；按规则单独形成 1 条新增任务（房型选择＋早餐份数＋诊断时携程实时房价，已按携程预填：无早 → 0 份、¥339 / 晚）",
+              "房型管理已存在「商务大床房·重庆西站免费接站」，但日历房未上架该房型（无已上架或下架记录占用引用），认定为缺失日历房；按规则单独形成 1 条新增任务（房型选择＋早餐份数（无早＝0 份）＋诊断时携程实时房价 ¥339 / 晚已预填）",
               "fail",
               "日历房新增·商务大床房",
               "信息完善",
@@ -3490,19 +3951,6 @@
           ],
         },
         {
-          name: "房价房态管理",
-          path: "商品与货架 › 房价房态管理 › 房价房态管理",
-          items: [
-            [
-              "近7天房型价格",
-              "近 7 天逐日价格不高于携程实时价格",
-              "fail",
-              "景观双床房近 7 天价格偏高",
-              "价格调整",
-            ],
-          ],
-        },
-        {
           name: "预售房型",
           path: "商品与货架 › 预售房型 › 预售房型",
           items: [
@@ -3546,6 +3994,19 @@
               "fail",
               "团购商品核对任务",
               "商品配置",
+            ],
+          ],
+        },
+        {
+          name: "房价房态管理",
+          path: "商品与货架 › 房价房态管理 › 房价房态管理",
+          items: [
+            [
+              "近7天房型价格",
+              "近 7 天逐日价格不高于携程实时价格",
+              "fail",
+              "景观双床房近 7 天价格偏高",
+              "价格调整",
             ],
           ],
         },
@@ -3949,6 +4410,9 @@
           focus: 0,
           added: [],
           failCount: 0,
+          matchGate: false,
+          rtGate: false,
+          psGate: false,
           steps: diagSteps.map((s) => ({
             state: "pending",
             items: s.items.map(() => ({ state: "pending" })),
@@ -3964,6 +4428,9 @@
           focus: 0,
           added: [],
           failCount: 0,
+          matchGate: false,
+          rtGate: false,
+          psGate: false,
           hotel: old && old.hotel,
           steps: diagSteps.map((s, si) => ({
             state: "pending",
@@ -4087,6 +4554,7 @@
         }
         if (diagRun && diagRun.added.length)
           taskData = taskData.filter((t) => !diagRun.added.includes(t));
+        diagRun.matchGate = false;
         runStep(0);
       }
       function resetDiag() {
@@ -4111,7 +4579,226 @@
             behavior: "smooth",
           });
       }
+      /* 步骤调度与三道前置闸门：
+         闸门 1「房型匹配」：独立诊断步骤（门店装修之后、房型管理之前）生成「房型匹配任务」，处理完成前「房型管理」及后续受限步骤全部暂停；
+         闸门 2「房型管理任务」：「房型管理」步骤诊断生成的任务全部处理完成前，「日历房」「预售房型」「团购」「房价房态管理」暂停；
+         闸门 3「预售房型任务」：团购商品需挂载预售房型，「预售房型」任务全部处理完成前「团购」暂停；
+         步骤级前置「房价房态管理」：日历房、预售房型、团购三步诊断全部完成后才开始（保持最后执行）；
+         受限步骤执行顺序：房型管理 → 日历房 → 预售房型 → 团购 → 房价房态管理（房价房态最后）；
+         未受限步骤（基本信息、酒店政策、酒店设施、门店装修、商家经营分、评价回复）不受约束、照常执行；
+         各前置条件满足后自动恢复，全部完成才结束本次诊断 */
+      const GATED_STEPS = [
+        "房型管理",
+        "日历房",
+        "预售房型",
+        "团购",
+        "房价房态管理",
+      ];
+      const isGatedStep = (i) => GATED_STEPS.includes(diagSteps[i].name);
+      const matchTaskDone = () =>
+        taskData.some((t) => t.name === "房型匹配任务" && t.status === "已处理");
+      /* 闸门 2 判定：「房型管理」路径下无待处理任务（含匹配确认后生成的「房型新增」任务）即视为处理完成 */
+      const rtTasksDone = () =>
+        !taskData.some(
+          (t) => t.path.startsWith("房型管理 · ") && t.status === "待处理",
+        );
+      /* 闸门 3 判定：「预售房型」路径下无待处理任务即视为处理完成 */
+      const psTasksDone = () =>
+        !taskData.some(
+          (t) => t.path.startsWith("预售房型 · ") && t.status === "待处理",
+        );
+      /* 「房价房态管理」步骤级前置：「日历房」「预售房型」「团购」三步诊断全部完成才开始 */
+      const pricePreStepsDone = () =>
+        ["日历房", "预售房型", "团购"].every(
+          (nm) =>
+            diagRun.steps[
+              diagSteps.findIndex((s) => s.name === nm)
+            ]?.state === "done",
+        );
+      const stepBlocked = (si) => {
+        const n = diagSteps[si].name;
+        if (n === "房型管理") return !matchTaskDone();
+        if (n === "团购")
+          return !matchTaskDone() || !rtTasksDone() || !psTasksDone();
+        if (n === "房价房态管理") return !pricePreStepsDone();
+        if (GATED_STEPS.includes(n)) return !matchTaskDone() || !rtTasksDone();
+        return false;
+      };
+      function finishDiag() {
+        if (diagRun.phase === "done") return; // 双链汇合时只收尾一次
+        diagRun.phase = "done";
+        activeHotel.lastDiagnosis = "2026-08-28 12:06";
+        activeHotel.diagHistory.push("2026-08-28 12:06");
+        toast(
+          `诊断完成：不通过 ${diagRun.failCount} 项，已生成 ${diagRun.added.length} 个任务`,
+        );
+        render();
+      }
+      function advanceDiag(fromSi) {
+        const gateA = diagSteps.findIndex((s) => s.name === "房型管理");
+        const gateB = diagSteps.findIndex((s) => s.name === "日历房");
+        if (fromSi === gateA && !diagRun.matchGate && !matchTaskDone()) {
+          diagRun.matchGate = true;
+          pauseForMatch();
+        }
+        if (fromSi === gateB && !diagRun.rtGate && !rtTasksDone()) {
+          diagRun.rtGate = true;
+          pauseForRtTasks();
+        }
+        const gateC = diagSteps.findIndex((s) => s.name === "团购");
+        if (fromSi === gateC && !diagRun.psGate && !psTasksDone()) {
+          diagRun.psGate = true;
+          pauseForPsTasks();
+        }
+        let si = fromSi;
+        while (
+          si < diagSteps.length &&
+          (stepBlocked(si) || // 前置闸门未放行：跳过受限步骤
+            (diagRun.matchGate && diagRun.steps[si].state === "done")) // 恢复链跳过已执行的未受限步骤
+        )
+          si++;
+        if (si >= diagSteps.length) {
+          const gatedLeft = diagSteps.some(
+            (_, i) => isGatedStep(i) && diagRun.steps[i].state !== "done",
+          );
+          if (gatedLeft && !matchTaskDone()) {
+            diagRun.phase = "matchwait"; // 未受限步骤全部执行完，等待房型匹配
+            render();
+          } else if (gatedLeft && !rtTasksDone()) {
+            diagRun.phase = "rtwait"; // 房型匹配已完成，等待「房型管理」任务处理
+            render();
+          } else if (gatedLeft && !psTasksDone()) {
+            diagRun.phase = "pswait"; // 房型管理任务已处理，等待「预售房型」任务处理
+            render();
+          } else if (!gatedLeft) finishDiag();
+          return; // 受限步骤正在恢复链中执行时，由该链负责收尾
+        }
+        diagT.push(setTimeout(() => runStep(si), 500));
+      }
+      /* 「房型匹配」步骤检查完成后：诊断中断在本步骤（而非房型管理）；「房型匹配任务」正常由该步骤检查项生成，此处兜底补生成（防重） */
+      function pauseForMatch() {
+        const mSi = diagSteps.findIndex((s) => s.name === "房型匹配");
+        diagRun.steps[mSi].state = "matchwait";
+        diagRun.focus = mSi;
+        if (!taskData.some((t) => t.name === "房型匹配任务")) {
+          const seed = diagSteps[mSi].items.find((it) => it[3] === "房型匹配任务");
+          const row = {
+            name: "房型匹配任务",
+            path: "房型匹配 · " + seed[0],
+            node: seed[0],
+            rule: seed[1],
+            type: seed[4],
+            diagTime:
+              "2026-08-28 12:0" +
+              (mSi < 6 ? 0 : 1) +
+              ":" +
+              String(8 + mSi * 3).padStart(2, "0"),
+            status: "待处理",
+            submitTime: null,
+            exec: null,
+          };
+          diagRun.added.push(row);
+          taskData.unshift(row);
+        }
+        toast("诊断已中断在「房型匹配」：请先完成「房型匹配任务」，处理后继续「房型管理」及后续受限步骤");
+      }
+      /* 跳转到「房型匹配任务」处理（暂停提示 / 横幅 / 按钮入口） */
+      function goMatchTask() {
+        const t = taskData.find(
+          (x) => x.name === "房型匹配任务" && x.status === "待处理",
+        );
+        if (!t) {
+          toast("未找到待处理的「房型匹配任务」");
+          return;
+        }
+        openTask(todoTasks().indexOf(t));
+      }
+      /* 「房型匹配任务」确认后：中断在「房型匹配」的步骤收口为完成，恢复受限步骤诊断（房型管理 → 命中闸门 2 再暂停） */
+      function resumeAfterMatch() {
+        if (!diagRun || !diagRun.matchGate || !matchTaskDone()) return;
+        const mSi = diagSteps.findIndex((s) => s.name === "房型匹配");
+        if (diagRun.steps[mSi].state === "matchwait")
+          diagRun.steps[mSi].state = "done";
+        let si = 0;
+        while (
+          si < diagSteps.length &&
+          !(isGatedStep(si) && diagRun.steps[si].state !== "done")
+        )
+          si++;
+        if (si >= diagSteps.length) return;
+        diagRun.phase = "running";
+        toast("房型匹配已完成，继续诊断：房型管理（日历房、预售房型、团购、房价房态管理在房型管理任务处理后继续）");
+        diagT.push(setTimeout(() => runStep(si), 600));
+      }
+      /* 闸门 2：「房型管理」步骤诊断完成后，日历房、预售房型、团购、房价房态管理暂停，等待「房型管理」任务全部处理（小任务暂存＋总体统一提交） */
+      function pauseForRtTasks() {
+        const si = diagSteps.findIndex((s) => s.name === "日历房");
+        diagRun.steps[si].state = "rtwait";
+        diagRun.focus = si;
+        const n = taskData.filter(
+          (t) =>
+            t.path.startsWith("房型管理 · ") &&
+            !t.master &&
+            t.status === "待处理",
+        ).length;
+        ensureRtMaster();
+        toast(
+          `「房型管理」诊断完成：已生成 ${n} 个小任务，小任务提交仅暂存，在「房型管理任务（总体）」统一提交后继续诊断日历房、预售房型（团购在「预售房型」任务处理后继续，房价房态管理保持最后）`,
+        );
+      }
+      /* 「房型管理」任务全部处理（提交/忽略）后：恢复日历房、预售房型诊断（团购、房价房态管理命中闸门 3 再暂停） */
+      function resumeAfterRt() {
+        if (!diagRun || !diagRun.rtGate || !rtTasksDone()) return;
+        diagRun.rtGate = false; // 闸门已放行即消费，避免后续任务状态变化重复触发、绕过闸门 3
+        let si = diagSteps.findIndex((s) => s.name === "日历房");
+        while (si < diagSteps.length && diagRun.steps[si].state === "done")
+          si++;
+        if (si >= diagSteps.length) return;
+        diagRun.phase = "running";
+        toast("房型管理任务已全部处理，继续诊断：日历房、预售房型（团购在「预售房型」任务处理后继续，房价房态管理保持最后）");
+        diagT.push(setTimeout(() => runStep(si), 600));
+      }
+      /* 任务状态变化（提交/忽略）后检查闸门 2 是否放行 */
+      function maybeResumeRt() {
+        if (diagRun && diagRun.rtGate && rtTasksDone()) resumeAfterRt();
+      }
+      /* 闸门 3：「预售房型」步骤诊断完成后，团购、房价房态管理暂停，等待「预售房型」任务全部处理（团购商品需挂载预售房型，须先建预售再建团购） */
+      function pauseForPsTasks() {
+        const si = diagSteps.findIndex((s) => s.name === "团购");
+        diagRun.steps[si].state = "pswait";
+        diagRun.focus = si;
+        const n = taskData.filter(
+          (t) => t.path.startsWith("预售房型 · ") && t.status === "待处理",
+        ).length;
+        toast(
+          `「预售房型」诊断完成：已生成 ${n} 个任务，全部处理后继续诊断团购（房价房态管理在日历房、预售房型、团购诊断完成后开始，保持最后）`,
+        );
+      }
+      /* 「预售房型」任务全部处理（提交/忽略）后：恢复团购、房价房态管理诊断 */
+      function resumeAfterPs() {
+        if (!diagRun || !diagRun.psGate || !psTasksDone()) return;
+        diagRun.psGate = false; // 闸门已放行即消费，避免后续任务状态变化重复触发
+        let si = diagSteps.findIndex((s) => s.name === "团购");
+        while (si < diagSteps.length && diagRun.steps[si].state === "done")
+          si++;
+        if (si >= diagSteps.length) return;
+        diagRun.phase = "running";
+        toast("预售房型任务已全部处理，继续诊断：团购（完成后房价房态管理开始，保持最后）");
+        diagT.push(setTimeout(() => runStep(si), 600));
+      }
+      /* 任务状态变化（提交/忽略）后检查闸门 3 是否放行 */
+      function maybeResumePs() {
+        if (diagRun && diagRun.psGate && psTasksDone()) resumeAfterPs();
+      }
       function runStep(si) {
+        /* 防重入：房型匹配恢复链与未受限链并发时，正在执行/已完成的步骤不重复启动 */
+        if (
+          !diagRun ||
+          !diagRun.steps[si] ||
+          diagRun.steps[si].state === "running" ||
+          diagRun.steps[si].state === "done"
+        )
+          return;
         diagRun.phase = "running";
         diagRun.focus = si;
         diagRun.steps[si].state = "running";
@@ -4139,6 +4826,11 @@
               run.items[ii].demoRule =
                 NO_TASK_ITEMS.get(nk) ||
                 "该项原为「通过 / 不触发」，已强制置为不通过，用于查看全量任务";
+            }
+            if (seed[3] === "房型匹配任务" && matchTaskDone()) {
+              run.items[ii].state = "pass";
+              run.items[ii].demoRule =
+                "「房型匹配任务」已完成，前置条件满足，本项按通过处理";
             }
             if (ii + 1 < run.items.length) {
               runItem(si, ii + 1);
@@ -4171,6 +4863,11 @@
                     taskData.some((t) => t.status === "待处理" && t.name === nm)
                   )
                     return; // 同名待处理任务不重复生成
+                  if (
+                    nm === "房型匹配任务" &&
+                    taskData.some((t) => t.name === nm)
+                  )
+                    return; // 房型匹配任务只生成一次（「房型匹配」步骤生成、暂停兜底防重），任何状态下不重复
                   const row = {
                     name: nm,
                     path:
@@ -4198,16 +4895,7 @@
                 toast(
                   `${diagSteps[si].name}诊断完成：${fails.length} 项不通过${cfails ? ` · ${cfails} 项采集失败` : ""}，已生成 ${added} 个任务`,
                 );
-              if (si + 1 < diagSteps.length)
-                diagT.push(setTimeout(() => runStep(si + 1), 500));
-              else {
-                diagRun.phase = "done";
-                activeHotel.lastDiagnosis = "2026-08-28 12:06";
-                activeHotel.diagHistory.push("2026-08-28 12:06");
-                toast(
-                  `诊断完成：不通过 ${diagRun.failCount} 项，已生成 ${diagRun.added.length} 个任务`,
-                );
-              }
+              advanceDiag(si + 1); // 步骤推进/收尾统一走调度器：受限步骤门控、末步收尾均在其中处理
               render();
             }
           }, 240),
@@ -4391,12 +5079,24 @@
               : `共 ${diagSteps.length} 个步骤、${total} 项检查，点击“开始诊断”逐项执行 · 还可诊断 ${left} 次`
             : diagRun.phase === "running"
               ? `诊断中 · 第 ${curIdx + 1}/${diagSteps.length} 步 ${diagSteps[curIdx].name}`
-              : `诊断完成：不通过 ${failed} 项，已生成 ${diagRun.added.length} 个任务`;
+              : diagRun.phase === "matchwait"
+                ? "诊断已中断在「房型匹配」步骤：检查完成并生成「房型匹配任务」· 完成任务后继续房型管理及后续受限步骤（商家经营分、评价回复不受限）"
+                : diagRun.phase === "rtwait"
+                ? `「房型管理」诊断完成并生成任务 · 等待「房型管理」任务全部处理后继续：日历房、预售房型（团购在「预售房型」任务处理后继续，房价房态管理保持最后；商家经营分、评价回复不受限）`
+                : diagRun.phase === "pswait"
+                ? `「预售房型」诊断完成并生成任务 · 等待「预售房型」任务全部处理后继续：团购；房价房态管理在日历房、预售房型、团购诊断完成后开始（保持最后；商家经营分、评价回复不受限）`
+                : `诊断完成：不通过 ${failed} 项，已生成 ${diagRun.added.length} 个任务`;
         const f = diagRun.focus,
           step = diagSteps[f],
           rs = diagRun.steps[f];
         const stepState =
-          rs.state === "running"
+          rs.state === "matchwait"
+            ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待房型匹配</i>'
+            : rs.state === "rtwait"
+            ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待房型管理任务</i>'
+            : rs.state === "pswait"
+            ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待预售房型任务</i>'
+            : rs.state === "running"
             ? '<i class="tag" style="background:var(--primary-soft);color:var(--primary)">诊断中</i>'
             : rs.state === "done"
               ? '<i class="tag green">诊断完成</i>'
@@ -4435,6 +5135,45 @@
       </div>
     </div>
 
+    ${
+      diagRun.matchGate && !matchTaskDone() && diagRun.phase !== "idle"
+        ? `<div class="panel" style="margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;border:1px solid var(--warn-line);background:var(--warn-bg);padding:14px 18px">
+      <div style="font-size:20px;line-height:1.3">⚠</div>
+      <div style="flex:1">
+        <b style="font-size:14px;color:#b45309">诊断已中断在「房型匹配」：等待完成「房型匹配任务」</b>
+        <p style="margin:4px 0 0;font-size:13px;color:var(--ink-2)">诊断中断在「房型匹配」步骤（门店装修之后、房型管理之前），其生成的「房型匹配任务」是「房型管理」「日历房」「预售房型」「团购」「房价房态管理」的前置条件，任务完成后「房型匹配」收口为完成并自动继续受限步骤诊断；「基本信息」「酒店政策」「酒店设施」「门店装修」「商家经营分」「评价回复」不受约束，正在继续执行。</p>
+        <div style="margin-top:10px">${btnOn("handle") ? '<button class="btn btn-primary" style="height:36px;padding:0 18px;font-size:13px" onclick="goMatchTask()">⇄　去处理房型匹配</button>' : ""}</div>
+      </div>
+    </div>`
+        : ""
+    }
+
+    ${
+      diagRun.rtGate && !rtTasksDone() && diagRun.phase !== "idle"
+        ? `<div class="panel" style="margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;border:1px solid var(--warn-line);background:var(--warn-bg);padding:14px 18px">
+      <div style="font-size:20px;line-height:1.3">⚠</div>
+      <div style="flex:1">
+        <b style="font-size:14px;color:#b45309">诊断已暂停：等待处理全部「房型管理」任务</b>
+        <p style="margin:4px 0 0;font-size:13px;color:var(--ink-2)">「房型匹配」确认后仍无对应的携程房型按缺失生成「房型管理」新增任务；小任务在其处理页提交仅<b>暂存</b>，须在「房型管理任务（总体）」统一提交（或逐个忽略）后，才会继续诊断「日历房」「预售房型」（「团购」还将在「预售房型」任务全部处理后继续，「房价房态管理」保持最后）；「商家经营分」「评价回复」不受约束，正在继续执行。</p>
+        <div style="margin-top:10px">${btnOn("handle") ? `<button class="btn btn-primary" style="height:36px;padding:0 18px;font-size:13px" onclick="goGateTasks('房型管理')">⇄　去处理房型管理任务（${taskData.filter((t) => t.path.startsWith("房型管理 · ") && !t.master && t.status === "待处理").length}）</button>` : ""}</div>
+      </div>
+    </div>`
+        : ""
+    }
+
+    ${
+      diagRun.psGate && !psTasksDone() && diagRun.phase !== "idle"
+        ? `<div class="panel" style="margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;border:1px solid var(--warn-line);background:var(--warn-bg);padding:14px 18px">
+      <div style="font-size:20px;line-height:1.3">⚠</div>
+      <div style="flex:1">
+        <b style="font-size:14px;color:#b45309">诊断已暂停：等待处理全部「预售房型」任务</b>
+        <p style="margin:4px 0 0;font-size:13px;color:var(--ink-2)">团购商品需挂载预售房型（先建预售、再建团购），「预售房型」任务全部处理（含忽略）后才会继续诊断「团购」；「房价房态管理」在日历房、预售房型、团购三步诊断全部完成后才开始（保持最后）；「商家经营分」「评价回复」不受约束，正在继续执行。</p>
+        <div style="margin-top:10px">${btnOn("handle") ? `<button class="btn btn-primary" style="height:36px;padding:0 18px;font-size:13px" onclick="goGateTasks('预售房型')">⇄　去处理预售房型任务（${taskData.filter((t) => t.path.startsWith("预售房型 · ") && t.status === "待处理").length}）</button>` : ""}</div>
+      </div>
+    </div>`
+        : ""
+    }
+
     <div class="detail-grid" style="grid-template-columns:1fr 360px">
       <main>
         <div class="section" style="margin-bottom:0">
@@ -4451,7 +5190,13 @@
                     t.path.startsWith(s.name + " ·"),
                   ).length;
                 const tag =
-                  st.state === "running"
+                  st.state === "matchwait"
+                    ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待房型匹配</i>'
+                    : st.state === "rtwait"
+                    ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待房型管理任务</i>'
+                    : st.state === "pswait"
+                    ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待预售房型任务</i>'
+                    : st.state === "running"
                     ? '<i class="tag" style="background:var(--primary-soft);color:var(--primary)">诊断中</i>'
                     : st.state === "done"
                       ? fl
@@ -4469,7 +5214,13 @@
                     isCfail(x.state),
                 ).length;
                 const cnt =
-                  st.state === "running"
+                  st.state === "matchwait"
+                    ? `前置：完成「房型匹配任务」后继续（共 ${n} 项）`
+                    : st.state === "rtwait"
+                    ? `前置：「房型管理」任务全部处理后继续（共 ${n} 项）`
+                    : st.state === "pswait"
+                    ? `前置：「预售房型」任务全部处理后继续（共 ${n} 项）`
+                    : st.state === "running"
                     ? `已检 ${dn}/${n} 项`
                     : st.state === "done"
                       ? fl
@@ -4549,7 +5300,8 @@
       let taskTab = "todo",
         taskIdx = 0,
         taskQuery = "",
-        taskExec = "全部";
+        taskExec = "全部",
+        taskCatOpen = {};
       const todoTasks = () => taskData.filter((t) => t.status === "待处理"),
         doneTasks = () => taskData.filter((t) => t.status === "已处理");
       const execTag = (e) =>
@@ -4565,6 +5317,17 @@
         taskTab = t;
         roTask = null;
         render();
+      }
+      /* 待处理任务大类折叠态：未点过的类别默认收起（首个有任务的类别默认展开） */
+      function toggleTaskCat(c) {
+        taskCatOpen[c] = !taskCatOpen[c];
+        render();
+      }
+      /* 闸门等待时跳转任务页并展开对应类别（类别默认折叠，直接跳过去容易找不到任务） */
+      function goGateTasks(cat) {
+        taskCatOpen[cat] = true;
+        taskTab = "todo";
+        go("tasks");
       }
       function setTaskExec(v) {
         taskExec = v;
@@ -4599,9 +5362,23 @@
       }
       function finishTask(exec, msg) {
         const t = taskData[taskIdx];
+        /* 「房型管理」小任务：提交仅暂存，由「房型管理任务（总体）」统一提交（闸门 2 在统一提交后才放行） */
+        if (
+          t &&
+          t.path &&
+          t.path.startsWith("房型管理 · ") &&
+          !t.master &&
+          taskData.some((x) => x.master && x.status === "待处理")
+        ) {
+          draftTask(msg);
+          return;
+        }
         t.status = "已处理";
         t.submitTime = "2026-08-28 12:30:00";
         t.exec = exec;
+        t.result = msg; // 处理结果快照：随任务展示在「已处理」列表与处理详情
+        maybeResumeRt(); // 闸门 2：「房型管理」任务全部处理后续诊日历房、预售房型
+        maybeResumePs(); // 闸门 3：「预售房型」任务全部处理后续诊团购、房价房态管理
         toast(msg);
         taskTab = "done";
         roTask = null;
@@ -4619,6 +5396,80 @@
         polMs = { open: null };
         smkPick = 1;
         namePics = 0;
+        go("tasks");
+      }
+      /* 「房型管理」总体任务：汇总本类别全部小任务；小任务提交仅暂存，统一提交后才算处理完成（防重） */
+      function ensureRtMaster() {
+        if (taskData.some((t) => t.master)) return;
+        const row = {
+          name: "房型管理任务（总体）",
+          path: "房型管理 · 全部节点汇总",
+          node: "全部节点汇总",
+          rule: "「房型管理」全部小任务逐个处理后仅暂存，在本总体任务中统一提交；统一提交后 AI 进入抖音来客执行，日历房、预售房型继续诊断",
+          type: "信息完善",
+          diagTime: "2026-08-28 12:02:00",
+          status: "待处理",
+          submitTime: null,
+          exec: null,
+          master: true,
+        };
+        if (diagRun) diagRun.added.push(row);
+        taskData.unshift(row);
+      }
+      /* 「房型管理」小任务提交＝暂存：不落已处理，回到「房型管理任务（总体）」等待统一提交 */
+      function draftTask(msg) {
+        const t = taskData[taskIdx];
+        t.draft = true;
+        t.exec = "已暂存";
+        t.submitTime = null;
+        t.draftMsg = msg || ""; // 暂存时的提交说明：统一提交后作为该任务的处理结果
+        toast(
+          `已暂存「${t.name}」：小任务提交仅暂存，请在「房型管理任务（总体）」中统一提交`,
+        );
+        const m = taskData.find((x) => x.master && x.status === "待处理");
+        if (m) openTask(todoTasks().indexOf(m));
+        else go("tasks");
+      }
+      /* 「房型管理任务（总体）」统一提交：全部小任务已暂存（或已处理/忽略）后，一次性提交整个「房型管理」类别 */
+      function rtMasterSubmit() {
+        const m = taskData.find((x) => x.master);
+        if (!m) return;
+        const smalls = taskData.filter(
+          (x) => x.path.startsWith("房型管理 · ") && !x.master,
+        );
+        const undrafted = smalls.filter(
+          (x) => x.status === "待处理" && !x.draft,
+        );
+        if (undrafted.length) {
+          toast(
+            `还有 ${undrafted.length} 个小任务未暂存（首个：「${undrafted[0].name}」），请逐个处理后暂存再统一提交`,
+          );
+          return;
+        }
+        const n = smalls.filter((x) => x.status === "待处理").length;
+        smalls
+          .filter((x) => x.status === "待处理")
+          .forEach((x) => {
+            x.status = "已处理";
+            x.submitTime = "2026-08-28 12:30:00";
+            x.exec = "执行中";
+            x.result =
+              x.draftMsg ||
+              "已暂存并随「房型管理任务（总体）」统一提交，AI 正在执行"; // 处理结果快照
+          });
+        m.status = "已处理";
+        m.submitTime = "2026-08-28 12:30:00";
+        m.exec = "执行中";
+        m.result = `已统一提交 ${n} 个已暂存小任务，AI 正在执行；日历房、预售房型将继续诊断`; // 处理结果快照
+        maybeResumeRt(); // 闸门 2：统一提交后「房型管理」类别全部已处理，续诊日历房、预售房型
+        maybeResumePs();
+        toast(
+          `房型管理任务已总体提交（含 ${n} 个已暂存小任务），AI 正在执行；日历房、预售房型将继续诊断`,
+        );
+        taskTab = "done";
+        roTask = null;
+        taskQuery = "";
+        taskExec = "全部";
         go("tasks");
       }
       /* 二次确认弹窗：此次忽略 */
@@ -4653,6 +5504,9 @@
         t.status = "已处理";
         t.submitTime = "2026-08-28 12:30:00";
         t.exec = "已忽略";
+        t.result = "任务已忽略：本次任务关闭，下次诊断仍会检查该节点"; // 处理结果快照
+        maybeResumeRt(); // 闸门 2：忽略也计入「已处理」，全部处理后自动续诊
+        maybeResumePs(); // 闸门 3：忽略同样计入「已处理」，全部处理后自动续诊
         toast("已忽略本次任务，下次诊断仍会检查");
         taskTab = "done";
         roTask = null;
@@ -4673,33 +5527,83 @@
         go("tasks");
       }
       function tasks() {
+        /* 「房型管理」总体任务存在后，列表不再重复展示其小任务（小任务在总体任务详情内处理）；行内索引仍按未过滤的 todoTasks() 计算 */
+        const hasRtMaster = taskData.some((x) => x.master);
         const todo = todoTasks(),
           done = doneTasks();
+        const todoShown = todo.filter((t) => !(hasRtMaster && !t.master && (t.path || "").startsWith("房型管理 · ")));
         const execOpts = ["全部", "执行中", "执行成功", "执行失败", "已忽略"];
         return `<div class="page">
     <div class="page-head"><div><h1>诊断任务</h1><p>本次诊断生成的任务，逐项确认后 AI 才会进入抖音来客执行修改</p></div></div>
     <div class="tabs">
-      <button class="${taskTab === "todo" ? "active" : ""}" onclick="setTaskTab('todo')">待处理 ${todo.length}</button>
+      <button class="${taskTab === "todo" ? "active" : ""}" onclick="setTaskTab('todo')">待处理 ${todoShown.length}</button>
       <button class="${taskTab === "done" ? "active" : ""}" onclick="setTaskTab('done')">已处理 ${done.length}</button>
     </div>
     <div class="panel">
       ${
         taskTab === "todo"
-          ? `<div class="tgrid thead" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr"><span>任务名称</span><span>任务路径</span><span>任务诊断时间</span><span style="text-align:right">操作</span></div>
+          ? (() => {
+              /* 待处理任务按诊断步骤分类：房价房态单独一类、排在日历房后；具体子任务折叠在大类内（类别与顺序按需求固定） */
+              const CATS = [
+                "基本信息",
+                "酒店政策",
+                "酒店设施",
+                "门店装修",
+                "房型匹配",
+                "房型管理",
+                "预售房型",
+                "团购",
+                "日历房",
+                "房价房态管理",
+                "商家经营分",
+                "评价回复",
+              ];
+              const catPath = {};
+              diagSteps.forEach((s) => (catPath[s.name] = s.path));
+              const catOf = (t) => (t.path || "").split(" · ")[0];
+              const groups = CATS.map((c) => ({
+                c,
+                list: todoShown.filter((t) => catOf(t) === c),
+              }));
+              const stray = todoShown.filter((t) => !CATS.includes(catOf(t)));
+              if (stray.length) groups.push({ c: "其他", list: stray }); // 兜底：路径前缀不在十大类内
+              const firstNonEmpty = groups.find((g) => g.list.length)?.c;
+              return todo.length
+                ? groups
+                    .map(({ c, list }) => {
+                      const open =
+                        taskCatOpen[c] !== undefined
+                          ? taskCatOpen[c]
+                          : c === firstNonEmpty;
+                      return `<div class="tcat${list.length ? "" : " empty"}">
+        <div class="tcat-head" onclick="toggleTaskCat('${c}')"><i class="chev">${open ? "▾" : "▸"}</i><b>${c}</b><small>${catPath[c] || ""}</small><span class="tcat-n">${list.length}</span></div>
         ${
-          todo.length
-            ? todo
-                .map((x, i) => {
-                  const di = taskData.indexOf(x);
-                  return `<div class="tgrid trow" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr">
-          <div class="tcell-title"><b>${x.name}</b><small>已完成数据比对，等待人工确认</small></div>
-          <span>${x.path}</span><span>${x.diagTime}</span>
-          <span style="text-align:right;white-space:nowrap">${btnOn("handle") ? `<button class="btn btn-primary btn-sm" onclick="openTask(${i})">去处理</button>` : ""}${btnOn("ignoreNow") ? `<button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'skip')">此次忽略</button>` : ""}</span>
-        </div>`;
-                })
-                .join("")
-            : '<div class="empty-state"><i>✓</i>暂无待处理任务</div>'
-        }`
+          open
+            ? `<div class="tcat-body">
+          <div class="tgrid thead" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr"><span>任务名称</span><span>任务路径</span><span>任务诊断时间</span><span style="text-align:right">操作</span></div>
+          ${
+            list.length
+              ? list
+                  .map((x) => {
+                    const ti = todo.indexOf(x),
+                      di = taskData.indexOf(x);
+                    return `<div class="tgrid trow" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr">
+            <div class="tcell-title"><b>${x.name}${x.draft && x.status === "待处理" ? ' <i class="tag" style="background:#e0f2fe;color:#0369a1">已暂存</i>' : ""}</b><small>${x.master ? "汇总本类别全部小任务，统一提交后「房型管理」才算处理完成" : x.draft && x.status === "待处理" ? "已暂存 · 待在「房型管理任务（总体）」统一提交" : "已完成数据比对，等待人工确认"}</small></div>
+            <span>${x.path}</span><span>${x.diagTime}</span>
+            <span style="text-align:right;white-space:nowrap">${btnOn("handle") ? `<button class="btn btn-primary btn-sm" onclick="openTask(${ti})">去处理</button>` : ""}${btnOn("ignoreNow") && !x.master ? `<button class="btn btn-outline btn-sm tgap" onclick="askIgnore(${di},'skip')">此次忽略</button>` : ""}</span>
+          </div>`;
+                  })
+                  .join("")
+              : `<div class="tcat-empty">该类别暂无待处理任务（诊断通过或无差异时不生成任务）</div>`
+          }
+        </div>`
+            : ""
+        }
+      </div>`;
+                    })
+                    .join("")
+                : '<div class="empty-state"><i>✓</i>暂无待处理任务</div>';
+            })()
           : `<div class="panel-toolbar">
           <label class="search">⌕<input id="taskSearch" value="${attr(taskQuery)}" placeholder="搜索任务名称" oninput="setTaskQuery(this.value)"></label>
           <div class="seg">${execOpts.map((s) => `<button class="${taskExec === s ? "active" : ""}" onclick="setTaskExec('${s}')">${s}</button>`).join("")}</div>
@@ -4743,7 +5647,7 @@
           ${rows
             .map(
               (t) => `<div class="lt-line">
-            <span><b>${t.name}</b>${t.reason ? `<small class="fail-reason">失败原因：${t.reason}</small>` : ""}</span>
+            <span><b>${t.name}</b>${t.reason ? `<small class="fail-reason">失败原因：${t.reason}</small>` : ""}${t.res && t.exec !== "待处理" ? `<small class="fail-reason" style="color:#15803d">处理结果：${t.res}</small>` : ""}</span>
             <span>${t.path}</span>
             <span><i class="tag ${t.cls}"${t.exec === "执行中" ? ' style="background:var(--primary-soft);color:var(--primary)"' : ""}>${t.exec}</i></span>
             <span style="text-align:right">${btnOn("runDetail") ? `<button class="lbtn" onclick="event.stopPropagation();viewTask(${ri},${t.ti})">详情</button>` : ""}</span>
@@ -4921,7 +5825,14 @@
       ];
       let mt = null; // { pairs: 已匹配对, selDy/selCt: 左右两侧当前点选待匹配的卡片 }
       function mtInit() {
-        if (!mt) mt = { pairs: [], selDy: null, selCt: null };
+        if (!mt) {
+          mt = { pairs: [], selDy: null, selCt: null };
+          /* 同名房型系统已自动匹配：进入页面即在「匹配成功列表」展示、不出现在选择池（点 ✕ 可取消后重新匹配） */
+          MT_DY.forEach((d, di) => {
+            const ci = MT_CT.findIndex((c) => c.name === d.name);
+            if (ci >= 0) mt.pairs.push({ dy: di, ct: ci, how: "同名自动匹配" });
+          });
+        }
       }
       function mtReset() {
         mt = null;
@@ -4961,7 +5872,7 @@
         </div>`;
         };
         return `<div class="section"><h3>2　房型匹配（左：抖音物理房型 ⇄ 右：携程采集房型 · 左右各点击选中 1 张卡片即匹配成功）</h3>
-        <p class="review-tip">携程 ${MT_CT.length} 个在售房型与抖音来客「房型管理」${MT_DY.length} 个物理房型需逐一建立对应关系（支持任意数量组合，如三对三、二对三），由用户手动匹配：在左右两侧选择池中各点击选中 1 张卡片即匹配成功、成对进入上方「匹配成功列表」，已匹配的卡片不再显示在下方选择池；点击列表每行末尾的 ✕ 即可取消该组匹配，取消后两张卡片回到选择池、可重新点选匹配。点击「确认匹配」提交全部匹配结果，AI 建立两侧房型对应关系，无对应抖音物理房型的携程房型按缺失房型形成「房型新增」任务、同名待处理不重复生成（抖音多出的房型不删除、不形成任务）。</p>
+        <p class="review-tip">携程 ${MT_CT.length} 个在售房型与抖音来客「房型管理」${MT_DY.length} 个物理房型需逐一建立对应关系（支持任意数量组合，如三对三、二对三）：两侧<b>同名房型系统已自动匹配</b>（进入本页即在上方「匹配成功列表」展示、不出现在下方选择池，点 ✕ 可取消后重新匹配），其余由用户手动匹配：在左右两侧选择池中各点击选中 1 张卡片即匹配成功、成对进入上方「匹配成功列表」，已匹配的卡片不再显示在下方选择池。点击「确认匹配」提交全部匹配结果，AI 建立两侧房型对应关系，无对应抖音物理房型的携程房型按缺失房型形成「房型新增」任务、同名待处理不重复生成（抖音多出的房型不删除、不形成任务）。</p>
         <div class="gb-card">
           <div class="gb-head"><b>匹配成功列表<small>抖音物理房型 ⇄ 携程采集房型 · 成对展示 · 点击行末 ✕ 取消该组匹配</small></b><i class="tag green">${mt.pairs.length} 组已匹配</i></div>
           <div class="mt-list">
@@ -5060,9 +5971,22 @@
           if (diagRun) diagRun.added.push(row);
           taskData.unshift(row);
         });
+        ensureRtMaster(); // 房型新增小任务就位后，同步生成「房型管理任务（总体）」
+        const autoN = mt.pairs.filter((p) => p.how === "同名自动匹配").length;
         t.status = "已处理";
         t.submitTime = "2026-08-28 12:30:00";
         t.exec = "执行中";
+        t.pairs = mt.pairs.map((p) => ({
+          dy: MT_DY[p.dy].name,
+          ct: MT_CT[p.ct].name,
+          how: p.how,
+        })); // 匹配结果快照：处理详情只读展示
+        t.result =
+          `共确认 ${mt.pairs.length} 组房型匹配（同名自动匹配 ${autoN} 组、人工点选 ${mt.pairs.length - autoN} 组），AI 正在建立两侧房型对应关系` +
+          (miss.length
+            ? `；${miss.length} 个携程房型无对应抖音物理房型，已按缺失形成「房型新增」任务`
+            : "；全部携程房型均有对应，不生成新增任务");
+        resumeAfterMatch(); // 前置条件满足：恢复被「房型匹配」暂停的受限步骤诊断
         toast(
           miss.length
             ? "匹配结果已确认，AI 正在建立两侧房型对应关系；" +
@@ -5105,6 +6029,160 @@
       }
       function setRtNetWired(v) {
         rtNetWired = v;
+        render();
+      }
+      /* 创建房型「楼层」字段（按抖音来客真实页面）：每条楼层记录单选 固定值/区间（固定值＝1 个数字输入、区间＝2 个数字输入中间「至」），可添加多条、每条可单独删除 */
+      let rtFloors = [{ md: "range", a: "6", b: "8" }];
+      function rtFloorMode(i, m) {
+        rtFloors[i].md = m;
+        render();
+      }
+      function rtFloorAdd() {
+        rtFloors.push({ md: "fix", a: "", b: "" });
+        render();
+      }
+      function rtFloorDel(i) {
+        if (rtFloors.length <= 1) return toast("楼层至少保留 1 条记录");
+        rtFloors.splice(i, 1);
+        render();
+      }
+      function rtFloorCtl() {
+        return (
+          rtFloors
+            .map(
+              (f, i) => `<div class="fl-ent"><a class="fl-del" title="删除该条楼层" onclick="rtFloorDel(${i})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg></a><div class="fl-md"><label class="gb-radio"><input type="radio" name="rtFlMd${i}"${f.md === "fix" ? " checked" : ""} onchange="rtFloorMode(${i},'fix')">固定值</label><label class="gb-radio"><input type="radio" name="rtFlMd${i}"${f.md === "range" ? " checked" : ""} onchange="rtFloorMode(${i},'range')">区间</label></div><div class="fl-row"><input class="gb-in gb-num" type="text" value="${f.a}" placeholder="请输入">${f.md === "range" ? `<span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="${f.b}" placeholder="请输入">` : ""}<span class="gb-unit">层</span></div></div>`,
+            )
+            .join("") +
+          `<a class="exlink" onclick="rtFloorAdd()">＋ 添加楼层</a><span class="gb-unit">已按右侧携程值预填，可修改；固定值＝单一楼层，区间＝连续楼层段，可添加多条</span>`
+        );
+      }
+      /* 创建房型「面积」字段（按抖音来客真实页面）：必填，固定值＝1 个数字输入，区间＝2 个数字输入中间「至」（单位已在标签中，不再重复展示） */
+      let rtArea = { md: "range", a: "20.00", b: "25.00" };
+      function rtAreaMode(m) {
+        rtArea.md = m;
+        render();
+      }
+      function rtAreaCtl() {
+        return (
+          `<div class="fl-row"><label class="gb-radio"><input type="radio" name="rtAreaMd"${rtArea.md === "fix" ? " checked" : ""} onchange="rtAreaMode('fix')">固定值</label><label class="gb-radio"><input type="radio" name="rtAreaMd"${rtArea.md === "range" ? " checked" : ""} onchange="rtAreaMode('range')">区间</label></div>` +
+          `<div class="fl-row"><input class="gb-in gb-num" type="text" value="${rtArea.a}" placeholder="请输入">${rtArea.md === "range" ? `<span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="${rtArea.b}" placeholder="请输入">` : ""}<span class="gb-unit">已按右侧携程值预填，可修改</span></div>`
+        );
+      }
+      /* 创建房型「窗户」字段（按抖音来客真实页面）：有窗/部分房间有窗/无窗，选前两者时展开浅灰「窗型」子面板（9 个单选，各项带 ? 说明图标） */
+      let rtWin = "有窗";
+      let rtWinType = "落地窗";
+      const RT_WIN_TYPES = ["正常窗户", "天窗", "封闭窗", "暗窗", "走廊窗", "飘窗", "落地窗", "装饰性假窗", "窗户较小"];
+      function rtWinSet(v) {
+        rtWin = v;
+        render();
+      }
+      function rtWinTypeSet(v) {
+        rtWinType = v;
+        render();
+      }
+      function rtWinCtl() {
+        return (
+          `<div class="fl-row"><label class="gb-radio"><input type="radio" name="rtWin"${rtWin === "有窗" ? " checked" : ""} onchange="rtWinSet('有窗')">有窗</label><label class="gb-radio"><input type="radio" name="rtWin"${rtWin === "部分房间有窗" ? " checked" : ""} onchange="rtWinSet('部分房间有窗')">部分房间有窗</label><label class="gb-radio"><input type="radio" name="rtWin"${rtWin === "无窗" ? " checked" : ""} onchange="rtWinSet('无窗')">无窗</label></div>` +
+          (rtWin === "无窗"
+            ? ""
+            : `<div class="fl-sub"><div class="fl-sub-t">窗型<i class="fl-star">*</i></div><div class="fl-row">${RT_WIN_TYPES.map((t) => `<label class="gb-radio"><input type="radio" name="rtWinType"${rtWinType === t ? " checked" : ""} onchange="rtWinTypeSet('${t}')">${t}</label><i class="fl-q" title="窗型说明：${t}">?</i>`).join("")}</div></div>`) +
+          `<span class="gb-unit">已按右侧携程值预填，可修改</span>`
+        );
+      }
+      /* 创建房型「床型」字段（按抖音来客真实页面）：1张床/2张床/多张床；2张床再分 相同床/不同床；多张床支持多条「床型×床宽×数量」行（行间「且」）并可添加多个类型 */
+      let rtBedCnt = "1";
+      let rtBedDual = "same";
+      let rtBedOne = { t: "大床", w: "2.00" };
+      let rtBedTwo = [
+        { t: "大床", w: "2.00" },
+        { t: "单人床", w: "1.35" },
+      ];
+      let rtBedMany = [[{ t: "大床", w: "2.00", q: "1" }]];
+      const RT_BED_TYPES = ["大床", "双人床", "单人床", "圆形床", "水床", "榻榻米", "上下铺", "沙发床", "加床", "婴儿床"];
+      function rtBedCntSet(v) {
+        rtBedCnt = v;
+        render();
+      }
+      function rtBedDualSet(v) {
+        rtBedDual = v;
+        render();
+      }
+      function rtBedOneSet(k, v) {
+        rtBedOne[k] = v;
+        render();
+      }
+      function rtBedTwoSet(i, k, v) {
+        rtBedTwo[i][k] = v;
+        render();
+      }
+      function rtBedManySet(g, i, k, v) {
+        rtBedMany[g][i][k] = v;
+        render();
+      }
+      function rtBedManyAddRow() {
+        rtBedMany[rtBedMany.length - 1].push({ t: "", w: "", q: "1" });
+        render();
+      }
+      function rtBedManyDelRow(g, i) {
+        if (rtBedMany[g].length <= 1) return toast("每个类型至少保留 1 条床型");
+        rtBedMany[g].splice(i, 1);
+        render();
+      }
+      function rtBedManyAddType() {
+        rtBedMany.push([{ t: "", w: "", q: "1" }]);
+        render();
+      }
+      function rtBedManyDelType(g) {
+        if (rtBedMany.length <= 1) return toast("至少保留 1 个类型");
+        rtBedMany.splice(g, 1);
+        render();
+      }
+      function rtBedCtl() {
+        const sel = (v, oc) => `<select class="gb-sl" onchange="${oc}"><option value="">床型</option>${RT_BED_TYPES.map((t) => `<option${v === t ? " selected" : ""}>${t}</option>`).join("")}</select>`;
+        const trash = (oc, tip) => `<a class="fl-del-i" title="${tip}" onclick="${oc}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg></a>`;
+        if (rtBedCnt === "1") {
+          return (
+            `<div class="fl-row"><label class="gb-radio"><input type="radio" name="rtBedCnt" checked onchange="rtBedCntSet('1')">1张床</label><label class="gb-radio"><input type="radio" name="rtBedCnt"${rtBedCnt === "2" ? " checked" : ""} onchange="rtBedCntSet('2')">2张床</label><label class="gb-radio"><input type="radio" name="rtBedCnt"${rtBedCnt === "n" ? " checked" : ""} onchange="rtBedCntSet('n')">多张床</label></div>` +
+            `<div class="fl-sub"><div class="fl-sub-t">床型设置<i class="fl-star">*</i></div><div class="fl-row">${sel(rtBedOne.t, "rtBedOneSet('t',this.value)")}<input class="gb-in gb-num" type="text" value="${rtBedOne.w}" placeholder="床宽"><span class="gb-unit">米</span></div></div>` +
+            `<span class="gb-unit">已按右侧携程值预填，可修改</span>`
+          );
+        }
+        if (rtBedCnt === "2") {
+          return (
+            `<div class="fl-row"><label class="gb-radio"><input type="radio" name="rtBedCnt" onchange="rtBedCntSet('1')">1张床</label><label class="gb-radio"><input type="radio" name="rtBedCnt" checked onchange="rtBedCntSet('2')">2张床</label><label class="gb-radio"><input type="radio" name="rtBedCnt"${rtBedCnt === "n" ? " checked" : ""} onchange="rtBedCntSet('n')">多张床</label></div>` +
+            `<div class="fl-sub"><div class="fl-sub-t">双床类型<i class="fl-star">*</i></div><div class="fl-row"><label class="gb-radio"><input type="radio" name="rtBedDual"${rtBedDual === "same" ? " checked" : ""} onchange="rtBedDualSet('same')">相同床</label><label class="gb-radio"><input type="radio" name="rtBedDual"${rtBedDual === "diff" ? " checked" : ""} onchange="rtBedDualSet('diff')">不同床</label></div>` +
+            (rtBedDual === "same"
+              ? `<div class="fl-sub-t">床型设置<i class="fl-star">*</i></div><div class="fl-row">${sel(rtBedOne.t, "rtBedOneSet('t',this.value)")}<input class="gb-in gb-num" type="text" value="${rtBedOne.w}" placeholder="床宽"><span class="gb-unit">米</span></div>`
+              : rtBedTwo
+                  .map((b, i) => `<div class="fl-sub-t">床型${i + 1}<i class="fl-star">*</i></div><div class="fl-row">${sel(b.t, `rtBedTwoSet(${i},'t',this.value)`)}<input class="gb-in gb-num" type="text" value="${b.w}" placeholder="床宽"><span class="gb-unit">米</span></div>`)
+                  .join("")) +
+            `</div><span class="gb-unit">已按右侧携程值预填，可修改</span>`
+          );
+        }
+        return (
+          `<div class="fl-row"><label class="gb-radio"><input type="radio" name="rtBedCnt" onchange="rtBedCntSet('1')">1张床</label><label class="gb-radio"><input type="radio" name="rtBedCnt" onchange="rtBedCntSet('2')">2张床</label><label class="gb-radio"><input type="radio" name="rtBedCnt" checked onchange="rtBedCntSet('n')">多张床</label></div>` +
+          rtBedMany
+            .map(
+              (grp, g) => `<div class="fl-sub">${rtBedMany.length > 1 ? `<a class="fl-del" title="删除该类型" onclick="rtBedManyDelType(${g})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg></a>` : ""}${grp.map((b, i) => `<div class="fl-row">${i > 0 ? `<span class="fl-and">且</span>` : ""}<span class="gb-unit">床型${i + 1}<i class="fl-star">*</i></span>${sel(b.t, `rtBedManySet(${g},${i},'t',this.value)`)}<input class="gb-in gb-num" type="text" value="${b.w}" placeholder="床宽"><span class="gb-unit">米</span><input class="gb-in gb-num" type="text" value="${b.q}" placeholder="数量"><span class="gb-unit">张</span>${trash(`rtBedManyDelRow(${g},${i})`, "删除该条床型")}</div>`).join("")}<a class="exlink" onclick="rtBedManyAddRow()">＋ 添加床型</a></div>`,
+            )
+            .join("") +
+          `<a class="exlink" onclick="rtBedManyAddType()">＋ 添加类型</a><span class="gb-unit">(若房型存在如大床房或双床房不确定的情况，可添加类型)</span>`
+        );
+      }
+      /* 创建预售房型「商品售卖时段」（按抖音来客真实页面）：全日房＝现行表单；钟点房＝顶部蓝色发布提示（可关闭）＋新增「连住时长/使用时段」，预售房型名称改为「系统生成-自定义」两段式（系统段＝连住时长-物理房型名） */
+      let psSlot = "day";
+      let psHours = "";
+      let psTipOn = true;
+      function psSlotSet(v) {
+        psSlot = v;
+        render();
+      }
+      function psHoursSet(v) {
+        psHours = v;
+        render();
+      }
+      function psTipOff() {
+        psTipOn = false;
         render();
       }
       const taskDetailCfg = {
@@ -5947,16 +7025,17 @@
         },
         景观大床房2天1晚团购补充任务: {
           advice:
-            "团购商品覆盖检查：携程第二低价格房型「景观大床房」要求覆盖 2天1晚 与 三天两晚 团购，三天两晚已在售、2天1晚 缺失。已按抖音来客「创建商品」页面七大分组（基础信息／商家信息／商品详情／售卖信息／交易规则／销售策略／消费提示）预填补充方案，全部内容可修改，提交后 AI 按确认结果写入抖音来客。",
+            "团购商品覆盖检查：携程第二低价格房型「景观大床房」要求覆盖 2天1晚 团购（三天两晚已在售），当前 2天1晚 缺失。已按抖音来客「创建商品」页面七大分组（商品类型／商家信息／商品详情／售卖信息／交易规则／销售策略／消费提示）预填补充方案，全部内容可修改，提交后 AI 按确认结果写入抖音来客。携程暂无房型图与套餐图，须由用户上传后才能提交。",
           src: [
             ["检查项", "团购 · 商品覆盖 · 第二低价格房型"],
-            ["覆盖要求", "景观大床房 2天1晚 ＋ 三天两晚"],
-            ["当前状态", "三天两晚已在售 · 2天1晚 缺失"],
+            ["覆盖要求", "景观大床房 2天1晚"],
+            ["当前状态", "缺失（三天两晚已在售）"],
             ["建议售价", "¥303（划线价 ¥399 · 按携程对比结果预填）"],
+            ["套餐图", "携程暂无 · 须用户上传"],
           ],
           ignore: "此次忽略",
           gbuy: {
-            tip: "识别到抖音来客团购缺失景观大床房两天一晚预售，下面将进行补充。",
+            tip: "识别到抖音来客团购缺失景观大床房2天1晚套餐，下面将进行补充。",
             plans: [
               {
                 room: "景观大床房",
@@ -5968,8 +7047,8 @@
                 nights: "1",
                 list: "399",
                 price: "303",
-                img: true,
-                holiday: "节假日不可用（全年节假日均不可入住）",
+                img: false,
+                holiday: "不限",
                 book: "需要提前预约 · 提前 1 天",
                 tin: "14:00",
                 tout: "12:00",
@@ -5983,7 +7062,7 @@
         },
         豪华景观双床房三天两晚团购补充任务: {
           advice:
-            "团购商品覆盖检查：携程最高价房型「豪华景观双床房」要求覆盖 三天两晚 团购，当前缺失。已按抖音来客「创建商品」页面七大分组（基础信息／商家信息／商品详情／售卖信息／交易规则／销售策略／消费提示）预填补充方案，全部内容可修改，提交后 AI 按确认结果写入抖音来客。携程暂无房型图与套餐图，须由用户上传后才能提交。",
+            "团购商品覆盖检查：携程最高价房型「豪华景观双床房」要求覆盖 三天两晚 团购，当前缺失。已按抖音来客「创建商品」页面七大分组（商品类型／商家信息／商品详情／售卖信息／交易规则／销售策略／消费提示）预填补充方案，全部内容可修改，提交后 AI 按确认结果写入抖音来客。携程暂无房型图与套餐图，须由用户上传后才能提交。",
           src: [
             ["检查项", "团购 · 商品覆盖 · 最高价房型"],
             ["覆盖要求", "豪华景观双床房 三天两晚"],
@@ -6206,10 +7285,10 @@
             ruleIdx: 2,
           },
         ),
-        /* 日历房新增·商务大床房：房型管理已存在但日历房未上架，认定为缺失日历房、单独形成 1 条新增任务（与规则表 2.2.1.1「日历房房型与早餐份数」缺失日历房一致）：房型下拉选择当前缺少的房型管理房型，早餐份数按携程预填（无早 → 0 份）、房价按诊断时携程实时房价预填，确认后 AI 新增并上架；该房型无下架日历房占用引用，直接新增、无需先删 */
+        /* 日历房新增·商务大床房：房型管理已存在但日历房未上架，认定为缺失日历房、单独形成 1 条新增任务（与规则表 2.2.1.1「日历房房型与早餐份数」缺失日历房一致）：房型预选当前缺少的房型管理房型（选择器交互同团购「住｜住宿」）、早餐份数与房价按诊断时携程数据预填、名称随份数自动生成；该房型无下架日历房占用引用，直接新增、无需先删 */
         "日历房新增·商务大床房": {
           advice:
-            "日历房「房型集合」诊断：抖音来客房型管理已存在「商务大床房·重庆西站免费接站」，但「日历房」未上架该房型（其余 6 个房型已上架 10 个日历房），认定为缺失日历房，按规则单独形成 1 条新增任务、不与其他房型合并。新增表单按抖音来客「新建日历房」页面（商品信息 → 设置价量态 两步）展示，已按携程预填：早餐份数（携程当前无早 → 预填 0 份）、房价（诊断时携程实时价 ¥339 / 晚），均可核对修改；该房型无已下架日历房占用物理房型引用，确认后直接新增并上架。提交后 AI 在抖音来客「商品管理（日历房）」新增该房型日历房并上架，写入并校验成功后任务完成；已上架日历房的现有房价不在本任务内修改（由房价房态管理节点诊断）。",
+            "日历房「房型集合」诊断：抖音来客房型管理已存在「商务大床房·重庆西站免费接站」，但「日历房」未上架该房型（其余 6 个房型已上架 10 个日历房），认定为缺失日历房，按规则单独形成 1 条新增任务、不与其他房型合并。新增表单按抖音来客「新建日历房」页面（商品信息 → 设置价量态 两步）展示，已按携程预填：早餐份数（无早＝0 份）、房价（诊断时携程实时价 ¥339 / 晚），可核对修改；日历房名称随早餐份数与退改规则自动生成。该房型无已下架日历房占用物理房型引用，确认后直接新增并上架。提交后 AI 在抖音来客「商品管理（日历房）」新增该房型日历房并上架，写入并校验成功后任务完成；已上架日历房的现有房价不在本任务内修改（由房价房态管理节点诊断）。",
           src: [
             [
               "缺失房型",
@@ -6268,7 +7347,7 @@
         房型匹配任务: {
           noAdvice: true,
           src: [
-            ["检查节点", "房型管理 · 抖音物理房型 ⇄ 携程在售房型"],
+            ["检查节点", "房型匹配 · 抖音物理房型 ⇄ 携程在售房型"],
             ["抖音来客", "「房型管理」物理房型 7 个 · 诊断时采集"],
             ["携程用户端", "在售房型 8 个 · 诊断时采集"],
             ["匹配方式", "用户手动点选逐对匹配 · 已匹配卡片不再显示在选择池"],
@@ -6284,7 +7363,7 @@
           noAdvice: true,
           src: [
             ["缺失房型", "电竞大床房 · 携程在售 ¥369 / 晚"],
-            ["生成方式", "「房型管理」诊断时生成 · 与「房型匹配任务」相互独立"],
+            ["生成方式", "「房型匹配」步骤诊断时生成 · 与「房型匹配任务」相互独立"],
             ["抖音房型管理", "无对应房型 · 走「手动创建」"],
             ["总间数", "携程不提供 · 须由用户填写"],
           ],
@@ -6862,6 +7941,182 @@
         toast("图片已上传（演示）");
         render();
       }
+      /* 团购「创建商品」商品售卖时段（按抖音来客真实页面）：全日房＝现行表单；钟点房＝商品详情顶部蓝色发布提示（可关闭），发布前提与预售房型一致 */
+      let gbSlot = "day";
+      let gbTipOn = true;
+      function gbSlotSet(v) {
+        gbSlot = v;
+        render();
+      }
+      function gbTipOff() {
+        gbTipOn = false;
+        render();
+      }
+      /* 库存数量：选「限库存」才展示团购库存数量；预约有效期：指定天数/指定日期切换 */
+      let gbStock = "unlimited";
+      let gbValid = "days";
+      function gbStockSet(v) {
+        gbStock = v;
+        render();
+      }
+      function gbValidSet(v) {
+        gbValid = v;
+        render();
+      }
+      /* 取消预约规则：限时免费退 / 阶梯退 / 不可取消或变更，各自展开不同子项 */
+      let gbCancel = "free";
+      function gbCancelSet(v) {
+        gbCancel = v;
+        render();
+      }
+      /* 限购规则：三个勾选可叠加，勾选后展开灰色卡片子行 */
+      let gbLimit = { single: true, buy: false, use: false };
+      function gbLimitSet(k, v) {
+        gbLimit[k] = v;
+        render();
+      }
+      /* 可入住日期：指定天数 / 指定日期（日期范围 + 双月日历） */
+      let gbStay = "days";
+      function gbStaySet(v) {
+        gbStay = v;
+        render();
+      }
+      /* 不可入住日期：三个勾选可叠加（null = 未交互，回退任务数据默认值） */
+      let gbHol = { week: null, fest: null, date: null };
+      const gbHolOn = (k, dataDef) => (gbHol[k] === null ? dataDef : gbHol[k]);
+      function gbHolSet(k, v) {
+        gbHol[k] = v;
+        render();
+      }
+      /* 餐食：「添加餐食」内联卡片（类型方块 + 每餐份数）与已添加餐食列表 */
+      let gbMeals = [];
+      let gbMealType = "早餐";
+      let gbMealOpen = false;
+      const GBMEALS = ["早餐", "午餐", "晚餐", "正餐", "下午茶", "夜宵"];
+      function gbMealToggle() {
+        gbMealOpen = !gbMealOpen;
+        if (gbMealOpen) gbMealType = "早餐";
+        render();
+      }
+      function gbMealPick(el) {
+        gbMealType = el.textContent;
+        el.parentElement.querySelectorAll(".gb-wtag").forEach((t) => t.classList.remove("on"));
+        el.classList.add("on");
+      }
+      function gbMealOk() {
+        const q = Math.max(1, Math.min(5, parseInt(($("#gbMealQty") || {}).value || "1", 10) || 1));
+        gbMeals.push({ type: gbMealType, qty: q });
+        gbMealOpen = false;
+        render();
+      }
+      function gbMealDel(k) {
+        gbMeals.splice(k, 1);
+        render();
+      }
+      /* 使用时段：全天可用 / 仅指定时间可用（时间段可增删多行） */
+      let gbTuse = "all";
+      let gbTms = [["09:00", "18:00"]];
+      function gbTuseSet(v) {
+        gbTuse = v;
+        render();
+      }
+      function gbTmAdd() {
+        gbTms.push(["09:00", "18:00"]);
+        render();
+      }
+      function gbTmDel(k) {
+        if (gbTms.length > 1) {
+          gbTms.splice(k, 1);
+          render();
+        }
+      }
+      function gbTmSet(k, j, v) {
+        gbTms[k][j] = v;
+      }
+      /* 礼遇：已添加礼遇列表（确定后落条目，计数联动） */
+      let gbPrivs = [];
+      function gbPrivOk(i) {
+        const nm = ($("#gbPrivName") || {}).value || "权益项目";
+        const q = Math.max(1, parseInt(($("#gbPrivQty") || {}).value || "1", 10) || 1);
+        gbPrivs.push({ name: nm.slice(0, 12), qty: q });
+        gbPriv[i] = false;
+        render();
+      }
+      function gbPrivDel(k) {
+        gbPrivs.splice(k, 1);
+        render();
+      }
+      /* 住宿：「添加预售房型」弹窗 —— 仅展示本酒店的预售房型，单选一个 */
+      const GBROOM_MAP = {
+        620011: ["豪华景观双床房", "景观大床房", "尚宽商务大床房", "尚宽标准双床房", "亲子主题双床房"],
+      };
+      const gbRoomsOf = () => (typeof activeHotel !== "undefined" && activeHotel && GBROOM_MAP[activeHotel.id]) || GBROOM_MAP["620011"];
+      const gbStoreName = () =>
+        typeof activeHotel !== "undefined" && activeHotel ? `${activeHotel.name}（${activeHotel.sub}）` : "本酒店";
+      let gbRoom = "";
+      let gbRoomCur = "";
+      let gbRoomOpen = false;
+      function gbRoomToggle(pr) {
+        gbRoomOpen = !gbRoomOpen;
+        if (gbRoomOpen) {
+          const rooms = gbRoomsOf();
+          gbRoomCur = rooms.includes(gbRoom) ? gbRoom : rooms.includes(pr) ? pr : rooms[0];
+        }
+        render();
+      }
+      function gbRoomOk() {
+        gbRoom = gbRoomCur;
+        gbRoomOpen = false;
+        render();
+      }
+      /* 加价政策：无需加价/需加价；需加价 → 加价方式 + 加价规则（智能/手动添加） */
+      let gbAddp = "none";
+      let gbAddMode = "smart";
+      function gbAddpSet(v) {
+        gbAddp = v;
+        render();
+      }
+      function gbAddModeSet(v) {
+        gbAddMode = v;
+        render();
+      }
+      function gbAddClear() {
+        const t = $("#gbAddTa");
+        if (t) {
+          t.value = "";
+          t.nextElementSibling.textContent = "0 / 500";
+        }
+      }
+      /* 额外费用：无/有；有 → 费用名称+金额行（可添加多行） */
+      let gbFee = "none";
+      let gbFees = [{ name: "加床", amt: "100" }];
+      function gbFeeSet(v) {
+        gbFee = v;
+        render();
+      }
+      function gbFeeAdd() {
+        gbFees.push({ name: "", amt: "" });
+        render();
+      }
+      function gbFeeSet2(k, j, v) {
+        gbFees[k][j] = v;
+      }
+      /* 预约激励：开关控制展开（权益类型/内容/对顾客展示/权益有效期） */
+      let gbIncent = false;
+      function gbIncentSet() {
+        gbIncent = !gbIncent;
+        render();
+      }
+      const gbCal = (y, m, sel, arr) => {
+        const off = (new Date(y, m, 1).getDay() + 6) % 7;
+        const n = new Date(y, m + 1, 0).getDate();
+        let cells = ["一", "二", "三", "四", "五", "六", "日"].map((w) => `<span class="gb-cal-w">${w}</span>`).join("");
+        for (let k = 0; k < off; k++) cells += '<span class="gb-cal-d"></span>';
+        for (let d = 1; d <= n; d++) cells += `<span class="gb-cal-d${d === sel ? " sel" : ""}">${d}</span>`;
+        const title = `${y}年${m + 1}月`;
+        const t = arr === "l" ? `<span class="gb-cal-arr" onclick="toast('演示原型：切换上一月')">‹</span>${title}` : arr === "r" ? `${title}<span class="gb-cal-arr" onclick="toast('演示原型：切换下一月')">›</span>` : title;
+        return `<div class="gb-cal-m"><div class="gb-cal-t">${t}</div><div class="gb-cal-g">${cells}</div></div>`;
+      };
       const gbNeedImg = (c) =>
         !!(c.gbuy && c.gbuy.plans.some((p) => !p.img && !(gbImgN[p.room] > 0)));
       /* 装修审核整改：处理方式仅「删除」，无逐张选择状态（与规则表 1.3.1.1 一致） */
@@ -6900,14 +8155,70 @@
         calPick[k] = v;
         render();
       }
+      /* 日历房新增「入离时间 / 退改规则」子配置（按抖音来客「新建日历房」真实页面）：时间下拉 00:00–24:00 整点、天数 0–30；退改规则联动日历房名称后缀 */
+      const CAL_TIMES = Array.from({ length: 25 }, (_, i) => String(i).padStart(2, "0") + ":00");
+      const CAL_DAYS = Array.from({ length: 31 }, (_, i) => String(i));
+      const CAL_RULE_SUF = ["任意退", "限时退", "阶梯退", "不可取消"];
+      const calRuleSuf = () => CAL_RULE_SUF[calPick.arule ?? 0];
+      const calTSel = (attrs, cur, ph) => `<select class="gb-sl" ${attrs}>${ph ? '<option value="">请选择</option>' : ""}${CAL_TIMES.map((t) => `<option${(cur || (ph ? "" : "00:00")) === t ? " selected" : ""}>${t}</option>`).join("")}</select>`;
+      const calDSel = (attrs, cur) => `<select class="gb-sl" ${attrs}><option value="">请选择</option>${CAL_DAYS.map((d) => `<option${cur === d ? " selected" : ""}>${d}</option>`).join("")}</select>`;
+      /* 阶梯退规则行（默认 1 条，可增删，上限 10 条） */
+      const calLad = () => (calPick.alad = calPick.alad || [{ d: "", t: "", p: "" }]);
+      function calLadSet(i, k, v) {
+        calLad()[i][k] = v;
+        render();
+      }
+      function calLadAdd() {
+        if (calLad().length >= 10) return toast("阶梯退规则最多 10 条");
+        calPick.alad.push({ d: "", t: "", p: "" });
+        render();
+      }
+      function calLadDel(i) {
+        calPick.alad.splice(i, 1);
+        render();
+      }
+      /* 「入离时间」选「限制」后的时间子行：最早入住时间 后，最晚离店时间 前（默认 00:00） */
+      const calTimeSub = () =>
+        (calPick.atime ?? 0) !== 1
+          ? ""
+          : `<div class="cal-sub" style="background:var(--surface-2);border-radius:8px;padding:8px 12px"><div class="cal-sub" style="padding-left:0">最早入住时间${calTSel(`onchange="setCalPick('atimeIn',this.value)"`, calPick.atimeIn)}<span>后，</span>最晚离店时间${calTSel(`onchange="setCalPick('atimeOut',this.value)"`, calPick.atimeOut)}<span>前</span><span class="gb-unit">限制后最早入住时间与最晚离店时间对买家可见</span></div></div>`;
+      /* 「接单后买家可免费取消」开关（四种退改规则通用，默认开启；开启后选 30/60 分钟内） */
+      const calAfterSub = () =>
+        `<div class="cal-sub" style="padding-left:0"><label class="gb-sw"><input type="checkbox"${(calPick.aftersw ?? 1) ? " checked" : ""} onchange="setCalPick('aftersw',this.checked?1:0)"><i></i></label><b>接单后买家可免费取消</b><span class="gb-unit">当此规则与选择的退改规则冲突时，以对买家更有利的规则生效</span><a class="exlink" onclick="toast('演示原型：查看免费取消示例说明')">查看示例</a></div>` +
+        ((calPick.aftersw ?? 1)
+          ? `<div class="cal-sub" style="padding-left:0"><label class="gb-radio"><input type="radio" name="cal-afterswT"${(calPick.afterswT ?? 0) === 0 ? " checked" : ""} onchange="setCalPick('afterswT',0)">30分钟内</label><label class="gb-radio"><input type="radio" name="cal-afterswT"${(calPick.afterswT ?? 0) === 1 ? " checked" : ""} onchange="setCalPick('afterswT',1)">60分钟内</label><span class="gb-unit">接单后买家可在所选时长内免费取消</span></div>`
+          : "");
+      /* 「退改规则」子配置：限时免费取消＝入住 N 天 T 前可免费取消；阶梯退＝费用收取方式＋多条阶梯＋兜底规则；各规则均含「接单后买家可免费取消」 */
+      const calRuleSub = () => {
+        const box = `<div class="cal-sub" style="background:var(--surface-2);border-radius:8px;padding:10px 12px">`;
+        if ((calPick.arule ?? 0) === 1)
+          return `${box}<div class="cal-sub" style="padding-left:0">入住${calDSel(`onchange="setCalPick('aruleD',this.value)"`, calPick.aruleD)}<span>天</span>${calTSel(`onchange="setCalPick('aruleT',this.value)"`, calPick.aruleT, true)}<span>前，可免费取消，逾期不可取消</span></div><div class="cal-sub" style="padding-left:0"><span class="gb-unit">商品下单转化预计提升15%，消费者退款咨询预计少20%</span></div>${calAfterSub()}</div>`;
+        if ((calPick.arule ?? 0) === 2) {
+          const lad = calLad();
+          const bad = lad.some((x) => x.d === "" || x.t === "" || x.p === "");
+          const ds = lad.map((x) => x.d).filter((d) => d !== "").map(Number);
+          const bd = ds.length ? `${Math.min(...ds)} 天` : "-天-";
+          return `${box}<div class="cal-sub" style="padding-left:0"><span class="gb-unit" style="color:var(--ink)">费用收取方式</span><select class="gb-sl"><option>按整单百分比</option></select></div>${lad
+            .map(
+              (x, i) => `<div class="cal-sub" style="padding-left:0">入住${calDSel(`onchange="calLadSet(${i},'d',this.value)"`, x.d)}<span>天</span>${calTSel(`onchange="calLadSet(${i},'t',this.value)"`, x.t, true)}<span>前取消，收取</span><input class="gb-in gb-num" type="text" value="${x.p}" oninput="calLadSet(${i},'p',this.value.replace(/[^0-9]/g,'').slice(0,3))"><span class="gb-unit">%</span><span>整单房费</span>${lad.length > 1 ? `<a class="exlink" onclick="calLadDel(${i})">删除</a>` : ""}</div>`,
+            )
+            .join("")}<div class="cal-sub" style="padding-left:0"><a class="exlink" onclick="calLadAdd()">＋ 添加阶梯</a><span class="gb-unit">${lad.length}/10</span></div><div class="cal-sub" style="padding-left:0"><span class="gb-unit">兜底规则：入住前 ${bd} 后 至入住日当天24点取消，收取 100% 整单房费</span>${bad ? '<span class="gb-err">请填写完整的阶梯退规则</span>' : ""}</div>${calAfterSub()}</div>`;
+        }
+        return `${box}${calAfterSub()}</div>`;
+      };
+      /* 日历房新增「适用房型」选择物理房型：交互与团购「住｜住宿」选择预售房型一致（已选 chip＋内嵌单选列表＋取消/确定），选择结果存 calPick.aroom */
+      function calRoomToggle(def) {
+        calPick.aroomOpen = calPick.aroomOpen ? 0 : 1;
+        if (calPick.aroomOpen) calPick.aroomCur = calPick.aroom || def;
+        render();
+      }
+      function calRoomOk() {
+        calPick.aroom = calPick.aroomCur;
+        calPick.aroomOpen = 0;
+        render();
+      }
       /* 团购核对表单：按抖音来客「创建商品」真实页面七大分组绘制（基础信息/商家信息/商品详情/售卖信息/交易规则/销售策略/消费提示），选择项为选择项、输入项为输入框，全部可修改 */
-      const GROOMS = [
-        "景观棋牌娱乐房",
-        "景观大床房",
-        "商务大床房",
-        "悦享双床房",
-        "豪华景观双床房",
-      ];
+      const GBTIMES = Array.from({ length: 48 }, (_, k) => `${String(Math.floor(k / 2)).padStart(2, "0")}:${k % 2 ? "30" : "00"}`);
       const GHOLIDAYS = [
         ["中秋节", "2026-09-25 至 09-27"],
         ["国庆节", "2026-10-01 至 10-07"],
@@ -7034,7 +8345,53 @@
           : taskData[taskIdx] || taskData[0];
         let main = "",
           actions = "";
-        if (t.kind === "route" || t.name === "找店指引素材补充") {
+        if (t.master || t.name === "房型管理任务（总体）") {
+          /* 「房型管理任务（总体）」：小任务清单 + 统一提交（小任务的「提交」仅暂存） */
+          const smalls = taskData.filter(
+            (x) => x.path.startsWith("房型管理 · ") && !x.master,
+          );
+          const pend = smalls.filter((x) => x.status === "待处理");
+          const drafted = pend.filter((x) => x.draft);
+          const undrafted = pend.filter((x) => !x.draft);
+          const finished = smalls.filter((x) => x.status !== "待处理");
+          const stTag = (x) =>
+            x.status !== "待处理"
+              ? `<i class="tag ${x.exec === "已忽略" ? "gray" : "green"}">${x.exec === "已忽略" ? "已忽略" : "已处理"}</i>`
+              : x.draft
+                ? '<i class="tag" style="background:#e0f2fe;color:#0369a1">已暂存</i>'
+                : '<i class="tag red">待处理</i>';
+          main = `<div class="section"><h3>1　总体提交说明</h3>
+        <p class="review-tip">「房型管理」类别采用「小任务暂存＋总体统一提交」：各小任务（房型新增、字段核对修改等）在其处理页点击「提交」仅暂存、不落已处理；全部小任务暂存（或单独忽略）后，在本总体任务中统一提交。统一提交后「房型管理」类别全部任务视为已处理，AI 进入抖音来客执行，诊断自动继续：日历房、预售房型（团购在「预售房型」任务处理后继续，房价房态管理保持最后）。</p>
+        <div class="source">
+          <div><small>小任务总数</small><b>${smalls.length}</b></div>
+          <div><small>已暂存</small><b style="color:#0369a1">${drafted.length}</b></div>
+          <div><small>未暂存</small><b style="color:#b91c1c">${undrafted.length}</b></div>
+          <div><small>已处理 / 已忽略</small><b>${finished.length}</b></div>
+        </div>
+      </div>
+      <div class="section"><h3>2　小任务清单（点「去处理」进入对应小任务，提交即暂存）</h3>
+        <div class="tgrid thead" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr"><span>任务名称</span><span>任务路径</span><span>任务诊断时间</span><span style="text-align:right">状态与操作</span></div>
+        ${
+          smalls.length
+            ? smalls
+                .map((x) => {
+                  const ti = todoTasks().indexOf(x);
+                  return `<div class="tgrid trow" style="grid-template-columns:2fr 1.1fr .95fr 1.9fr">
+          <div class="tcell-title"><b>${x.name}</b><small>${x.status === "待处理" && x.draft ? "已暂存 · 待统一提交" : "已完成数据比对，等待人工确认"}</small></div>
+          <span>${x.path}</span><span>${x.diagTime}</span>
+          <span style="text-align:right;white-space:nowrap">${stTag(x)}${x.status === "待处理" && btnOn("handle") ? ` <button class="btn btn-primary btn-sm" style="margin-left:8px" onclick="openTask(${ti})">去处理</button>` : ""}</span>
+        </div>`;
+                })
+                .join("")
+            : `<div class="tcat-empty">本类别暂无小任务</div>`
+        }
+      </div>`;
+          actions =
+            (roTask
+              ? ""
+              : `<span class="gb-unit" style="align-self:center">未暂存 ${undrafted.length} 个 · 统一提交后「房型管理」全部任务落已处理并自动续诊</span>
+        ${btnOn("submit") ? `<button class="btn btn-primary" ${undrafted.length ? ` disabled title="还有 ${undrafted.length} 个小任务未暂存，请逐个处理后暂存"` : ""} onclick="rtMasterSubmit()">提交全部房型管理任务（${pend.length}）</button>` : ""}`);
+        } else if (t.kind === "route" || t.name === "找店指引素材补充") {
           main = `<div class="section"><h3>设置找店指引</h3>
         ${
           guideMode == null
@@ -7114,58 +8471,72 @@
             (p, i) => `<div class="gb-card">
           <div class="gb-head"><b>${p.room} · ${p.tag}<small>${p.name}</small></b>
             <label class="act-sel"><span>新增意向</span><select onchange="setGbSel('m${i}',this.value)"><option${(gbSel["m" + i] || "确认新增") === "确认新增" ? " selected" : ""}>确认新增</option><option${gbSel["m" + i] === "暂不新增" ? " selected" : ""}>暂不新增</option></select></label></div>
-          <div class="gb-sec">基础信息</div>
-          ${gbRow("商品品类", `<select class="gb-sl">${gbOpts(["住宿"], "住宿")}</select><span class="gb-unit">›</span><select class="gb-sl">${gbOpts(["酒店宾馆"], "酒店宾馆")}</select><span class="gb-unit">›</span><select class="gb-sl">${gbOpts(["经济型酒店", "舒适型酒店", "高档酒店", "豪华酒店"], p.cat.split("/")[2])}</select><span class="gb-unit">三级级联选择 · 与门店品类一致，系统带出</span>`)}
-          ${gbRow("商品类型", `<select class="gb-sl">${gbOpts(["预售券", "团购"], p.ptype)}</select><span class="gb-unit">预售券＝先售后约；团购＝到店核销</span>`)}
-          ${gbRow("发布细则", `<span class="gb-unit">可发布：住宿＋酒店内餐饮、酒店自身权益打包；不可发布：住宿打包旅游服务、代理门票等</span>`)}
+          <div class="gb-sec">商品类型</div>
+          ${gbRow("商品品类", `${p.cat.split("/").map((seg, k) => `${k > 0 ? `<span class="gb-unit">›</span>` : ""}<select class="gb-sl"><option selected>${seg}</option></select>`).join("")}<span class="gb-unit">三级级联选择 · 与门店品类一致，系统带出</span>`)}
+          ${gbRow("商品类型", `<select class="gb-sl"><option${p.ptype === "预售券" ? " selected" : ""}>预售券</option><option${p.ptype === "团购" ? " selected" : ""}>团购</option></select><span class="gb-unit">预售券 = 先售后约；团购 = 到店核销</span>`)}
           <div class="gb-sec">商家信息</div>
           ${gbRow("商家名称", `<input class="gb-in" type="text" value="${activeHotel.name}" readonly><span class="gb-unit">随账号自动带出</span>`)}
-          ${gbRow("收款方式", `<label class="gb-radio"><input type="radio" name="gbpay${i}" checked>整单统一收款（线上收款）</label><span class="gb-unit">系统带出</span>`)}
+          ${gbRow(`收款方式<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="gbpay${i}" checked>总部统一收款</label><span class="gb-unit">系统带出 · 固定不可修改</span>`)}
           <div class="gb-sec">商品详情</div>
-          ${gbRow("商品名称", `<input class="gb-in" type="text" style="flex:1;min-width:220px" maxlength="60" value="${p.name}" oninput="this.nextElementSibling.textContent=this.value.length+' / 60'"><span class="gb-unit">${p.name.length} / 60</span><span class="gb-unit">命名规则：房型＋早餐＋地标 · AI 已预填</span>`)}
-          ${gbRow("关联房型", `<select class="gb-sl">${gbOpts(GROOMS, p.room)}</select><span class="gb-unit">从已配置的房型中选择，一个商品搭配一个房型</span>`)}
-          ${gbRow("包含数量", `<input class="gb-in gb-num" type="text" value="${p.nights}"><span class="gb-unit">间 / 夜</span>`)}
-          ${gbRow("餐食", `<label class="gb-radio"><input type="radio" name="meal${i}" checked>早餐</label><label class="gb-radio"><input type="radio" name="meal${i}">其它</label><span class="gb-unit">数量</span><input class="gb-in gb-num" type="text" value="${p.mealQty}"><span class="gb-unit">份</span>`)}
-          ${gbRow(
-            "娱乐 · 礼遇",
-            `${
+          ${gbSlot === "hour" && gbTipOn ? `<div class="ps-tip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>请至少维护近3个月内30天的房价/房量，且需房态设置为“有房”状态，才可发布哦<a class="ps-tip-x" title="关闭提示" onclick="gbTipOff()">×</a></div>` : ""}
+          ${gbRow(`商品售卖时段<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="gb-slot${i}"${gbSlot === "day" ? " checked" : ""} onchange="gbSlotSet('day')">全日房</label><label class="gb-radio"><input type="radio" name="gb-slot${i}"${gbSlot === "hour" ? " checked" : ""} onchange="gbSlotSet('hour')">钟点房</label>`)}
+          ${gbSlot === "hour" ? gbRow("连住时长", `<select class="gb-sl"><option value="">请选择</option>${[1, 2, 3, 4, 5, 6, 8, 12].map((h) => `<option>${h}</option>`).join("")}</select><span class="gb-unit">小时</span><span class="gb-unit">选择钟点房后，商品名称建议如「电竞房3小时+欢迎水果+mini吧畅饮」</span>`) : ""}
+          ${gbRow(`商品名称<i class="fl-star">*</i>`, `<input class="gb-in" type="text" style="flex:1;min-width:220px" maxlength="60" value="${p.name}" placeholder="请输入，如【元旦预售】亲子主题房1晚+欢迎水果+2大1小自助早餐" oninput="this.nextElementSibling.textContent=this.value.length+' / 60'"><span class="gb-unit">${p.name.length} / 60</span><div class="gb-hints"><span class="gb-unit">建议商品名称结构为“【元旦预售】亲子主题房1晚+2大1小自助餐”，商品名称需与商品内容保持一致 · AI 已按携程对比结果预填</span><span class="gb-unit">不得涉及“介绍酒店周边景点/设施（如：距海边5分钟）”的信息</span><span class="gb-unit">不得含有错别字及特殊符号</span></div>`)}
+          ${gbRow(`商品搭配<i class="fl-star">*</i>`, `<div class="fl-sub">
+            <div class="fl-sub-t">住｜住宿<i class="fl-star">*</i><i class="fl-q" title="商品套餐所包含的房型，一个商品只能选择一个房型">?</i></div>
+            <div class="gb-qtyrow"><div class="gb-roomsel" style="width:auto"><b>${gbRoom || p.room}<small>1 间 · 商品套餐所包含的房型</small></b><a class="exlink" onclick="toast('演示原型：可移除后重新选择预售房型')">移除</a></div><a class="exlink" onclick="gbRoomToggle('${p.room}')">＋ 添加预售房型</a><select class="gb-sl">${gbOpts(["1选1"], "1选1")}</select><span class="gb-unit">可选范围</span><span class="gb-unit">共 ${gbRoomsOf().length} 个预售房型（仅本酒店）</span></div>
+            ${gbRoomOpen ? `<div class="gb-privbox"><div class="gb-prow"><input class="gb-in" type="text" placeholder="搜索房型名称/ID" style="flex:1;min-width:0"></div><div class="gb-roomlist">${gbRoomsOf().map((r) => `<label class="gb-roomit"><input type="radio" name="gbRoomPick" value="${r}"${r === gbRoomCur ? " checked" : ""} onchange="gbRoomCur=this.value"><b>${r}</b><small>${gbStoreName()} · 预售房型</small></label>`).join("")}</div><div class="gb-prow"><span class="gb-unit">仅展示本酒店房型 · 共 ${gbRoomsOf().length} 个预售房型</span><a class="exlink" onclick="gbRoomToggle()">取消</a><a class="exlink" onclick="gbRoomOk()">确定</a></div></div>` : ""}
+            <div class="fl-sub-t">餐｜餐食<i class="fl-q" title="请填写酒店自身提供的餐食服务">?</i></div>
+            <div class="gb-qtyrow"><div class="gb-roomsel" style="width:auto"><b>早餐<small>× ${p.mealQty} 份</small></b><a class="exlink" onclick="toast('演示原型：可移除后重新添加餐食')">移除</a></div>${gbMeals.map((m, k) => `<div class="gb-roomsel" style="width:auto"><b>${m.type}<small>× ${m.qty} 份</small></b><a class="exlink" onclick="gbMealDel(${k})">移除</a></div>`).join("")}<a class="exlink" onclick="gbMealToggle()">＋ 添加餐食(${gbMeals.length}/15)</a></div>
+            ${gbMealOpen ? `<div class="gb-privbox"><div class="gb-prow"><span class="gb-unit">餐食类型</span><div class="gb-mtags">${GBMEALS.map((t) => `<span class="gb-wtag${t === gbMealType ? " on" : ""}" onclick="gbMealPick(this)">${t}</span>`).join("")}</div></div><div class="gb-prow"><span class="gb-unit">每餐份数</span><input id="gbMealQty" class="gb-in gb-num" type="text" value="1" style="width:64px"><span class="gb-unit">份</span></div><div class="gb-prow"><span class="gb-unit">每人每餐份数，最多可设置 5 份</span><a class="exlink" onclick="gbMealToggle()">取消</a><a class="exlink" onclick="gbMealOk()">确定</a></div></div>` : ""}
+            <span class="gb-unit">请填写酒店/民宿自身提供的餐食服务，例如早餐、午餐、晚餐、正餐、下午茶、夜宵等</span>
+            <div class="fl-sub-t">享｜礼遇</div>
+            <div class="gb-qtyrow">${gbPrivs.map((v, k) => `<div class="gb-roomsel" style="width:auto"><b>${v.name}<small>× ${v.qty} 份</small></b><a class="exlink" onclick="gbPrivDel(${k})">移除</a></div>`).join("")}<a class="exlink" onclick="gbPrivToggle(${i})">＋ 添加项目(${gbPrivs.length}/15)</a></div>
+            ${
               gbPriv[i]
                 ? `<div class="gb-privbox">
-            <div class="gb-prow"><span class="gb-unit">项目名称</span><input class="gb-in" type="text" maxlength="12" placeholder="如酒店往返接驳巴士" oninput="this.nextElementSibling.textContent=this.value.length+' / 12'"><small class="count">0 / 12</small></div>
-            <div class="gb-prow"><span class="gb-unit">数量</span><input class="gb-in gb-num" type="text" value="1"><span class="gb-unit">份</span><span class="gb-unit">划线价</span><input class="gb-in gb-num" type="text" placeholder="选填"><span class="gb-unit">元 · 选填</span></div>
-            <div class="gb-prow"><span class="gb-unit">图片说明</span><span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片')">＋ 上传</span><span class="gb-unit">0 / 1 · 建议清晰优质图，比例 4:3</span></div>
-            <div class="gb-prow"><a class="exlink" onclick="gbPrivToggle(${i})">取消</a><a class="exlink" onclick="toast('已添加礼遇项目（演示）');gbPrivToggle(${i})">确定</a></div>
-            <span class="gb-unit">仅填写酒店自身提供、所有权归属酒店的权益（娱乐项目、出行服务、礼宾服务等）；餐食与房型请填入对应模块</span>
-          </div>`
-                : `<span class="gb-unit">未添加</span><button class="btn-add-via" style="margin-bottom:0" onclick="gbPrivToggle(${i})">＋ 添加项目</button>`
-            }`,
-          )}
-          ${gbRow("商品图片", p.img ? `<span class="gb-thumb">携程房型图 × 3</span><span class="gb-unit">已预填（至少 3 张）</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a>` : gbImgN[p.room] ? `<span class="gb-thumb">已上传 × ${gbImgN[p.room]}</span><span class="gb-unit">至少 3 张 · 可继续上传</span><a class="exlink" onclick="upGbImg('${p.room}')">继续上传</a>` : `<span class="gb-upload" onclick="upGbImg('${p.room}')">＋ 上传</span><span class="gb-unit gb-req">至少 3 张 · 携程暂无房型图，须由用户上传</span>`)}
-          ${gbRow("套餐图", p.img ? `<span class="gb-thumb">房型图</span><span class="gb-unit">已按携程预填 1 张（0 / 5）</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a>` : gbImgN[p.room] ? `<span class="gb-thumb">已上传 × ${gbImgN[p.room]}</span><span class="gb-unit">0 / 5 · 可继续上传</span><a class="exlink" onclick="upGbImg('${p.room}')">继续上传</a>` : `<span class="gb-upload" onclick="upGbImg('${p.room}')">＋ 上传</span><span class="gb-unit gb-req">携程暂无套餐图，须由用户上传后才能提交</span>`)}
-          ${gbRow("图文详情", `<span class="gb-unit">仅支持图片、可拖动排序 · 已按携程图集预填（演示）</span><a class="exlink" onclick="toast('演示原型：打开图文详情编辑')">编辑</a>`)}
-          ${gbRow("划线价", `<input class="gb-in gb-num" type="text" value="${p.list}"><span class="gb-unit">元</span>`)}
-          ${gbRow("销售价", `<input class="gb-in gb-num" type="text" value="${p.price}"><span class="gb-unit">元 · 已按携程对比结果预填，可修改 · 支持立减/折扣展示</span>`, true)}
+              <div class="gb-prow"><span class="gb-unit">项目名称</span><input id="gbPrivName" class="gb-in" type="text" maxlength="12" placeholder="如酒店往返接驳巴士" oninput="this.nextElementSibling.textContent=this.value.length+' / 12'"><small class="count">0 / 12</small></div>
+              <div class="gb-prow"><span class="gb-unit">数量</span><input id="gbPrivQty" class="gb-in gb-num" type="text" value="1"><span class="gb-unit">份</span><span class="gb-unit">划线价</span><input class="gb-in gb-num" type="text" placeholder="选填"><span class="gb-unit">元 · 选填</span></div>
+              <div class="gb-prow"><span class="gb-unit">图片说明</span><span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片')">＋ 上传</span><span class="gb-unit">0 / 1 · 建议清晰优质图，比例 4:3</span></div>
+              <div class="gb-prow"><a class="exlink" onclick="gbPrivToggle(${i})">取消</a><a class="exlink" onclick="gbPrivOk(${i})">确定</a></div>
+            </div>`
+                : ""
+            }
+            <div class="gb-hints"><span class="gb-unit">请填写酒店/民宿自身提供，且所有权归属酒店/民宿本身的权益，如娱乐项目、出行服务、礼宾服务及其他附加权益</span><span class="gb-unit">请不要在“享-礼遇”模块中填写餐食、房型信息，餐食与房型信息应填写到对应的“享｜餐食”、“住｜住宿”模块<a class="exlink" onclick="toast('演示原型：查看示例')">查看示例</a></span></div>
+          </div>`)}
+          ${gbRow(`包含数量<i class="fl-star">*</i>`, `<input class="gb-in gb-num" type="text" value="1" readonly style="background:var(--surface-2);color:var(--ink-3);cursor:not-allowed"><span class="gb-unit">间</span><input class="gb-in gb-num" type="text" value="${p.nights}"><span class="gb-unit">夜</span><label class="gb-radio"><input type="checkbox" checked>可分次预约</label><i class="fl-q" title="开启后多个间夜可拆分为多次预约使用">?</i><span class="gb-unit gb-req">间夜数量 支持输入1-30夜</span>`)}
+          ${gbRow(`划线价<i class="fl-star">*</i>`, `<input class="gb-in gb-num" type="text" value="${p.list}" placeholder="请输入"><span class="gb-unit">元</span>`)}
+          ${gbRow(`售价<i class="fl-star">*</i>`, `<a class="exlink" onclick="toast('演示原型：查看平台服务费规则')">平台服务费规则</a><input class="gb-in gb-num" type="text" value="${p.price}" placeholder="请输入"><span class="gb-unit">元 · 已按携程对比结果预填，可修改</span>`, true)}
+          ${gbRow(`套餐图<i class="fl-star">*</i>`, `${p.img ? `<span class="gb-thumb">携程房型图 × 3</span><span class="gb-unit">已预填 3 / 5 · 至少 3 张</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a>` : gbImgN[p.room] ? `<span class="gb-thumb">已上传 × ${gbImgN[p.room]}</span><span class="gb-unit">${Math.min(gbImgN[p.room], 5)} / 5 · 可继续上传</span><a class="exlink" onclick="upGbImg('${p.room}')">继续上传</a>` : `<span class="gb-upload" onclick="upGbImg('${p.room}')">＋ 点击上传</span><span class="gb-unit">0 / 5</span><span class="gb-unit gb-req">套餐图字段必填 · 携程暂无套餐图，须由用户上传后才能提交</span>`}<div class="gb-hints"><span class="gb-unit">图片 5M 以内 · 建议分辨率 375*280px · 比例 4:3 · 推荐使用多角度的优质房间图片，突出商品卖点</span><span class="gb-unit"><a class="exlink" onclick="toast('演示原型：查看优质图片建议')">优质图片建议</a>　<a class="exlink" onclick="toast('演示原型：查看示例')">查看示例</a></span></div>`)}
+          ${gbRow("图文长图", `<span class="gb-upload" onclick="toast('演示原型：打开本地文件选择图片')">＋ 点击上传</span><span class="gb-unit">0 / 10</span><div class="gb-hints"><span class="gb-unit">为顾客提供更详尽的图文长图，可以提升顾客的购买意愿；上传后的图片会按序号顺序无缝拼接<a class="exlink" onclick="toast('演示原型：查看示例')">查看示例</a> · 演示：已按携程图集预填</span></div>`)}
           <div class="gb-sec">售卖信息</div>
-          ${gbRow("活动生效范围", `<select class="gb-sl">${gbOpts(["不限制", "仅限直播间", "仅限短视频挂载"], "不限制")}</select>`)}
-          ${gbRow("库存类型", `<label class="gb-radio"><input type="radio" name="stk${i}" checked>不限库存</label><label class="gb-radio"><input type="radio" name="stk${i}">限库存</label><span class="gb-unit">不限库存＝售完可继续售卖</span>`)}
-          ${gbRow("售卖日期", `<input class="gb-in gb-time" type="date" value="2026-09-19"><span class="gb-unit">至</span><input class="gb-in gb-time" type="date" value="2027-09-18"><span class="gb-unit">最长 365 天</span>`)}
-          ${gbRow("自动延期售卖", `<label class="gb-radio"><input type="radio" name="ext${i}" checked>自动跟随</label><label class="gb-radio"><input type="radio" name="ext${i}">不跟随</label><span class="gb-unit">售卖日期到期后自动延期，保持商品在线</span>`)}
-          ${gbRow("预售有效期", `<select class="gb-sl">${gbOpts(["指定天数 · 自购买起 365 天内可预约使用", "指定日期 · 至 2027-09-18"], "指定天数 · 自购买起 365 天内可预约使用")}</select>`)}
+          ${gbRow(`活动投放渠道限制<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="ch${i}" checked>不限制</label><label class="gb-radio"><input type="radio" name="ch${i}">仅直播间</label><label class="gb-radio"><input type="radio" name="ch${i}">仅线下</label><label class="gb-radio"><input type="radio" name="ch${i}">仅线上</label><label class="gb-radio"><input type="radio" name="ch${i}">仅团购商城</label><label class="gb-radio"><input type="radio" name="ch${i}">直播间+获客卡</label><label class="gb-radio"><input type="radio" name="ch${i}">仅活动报名</label><label class="gb-radio"><input type="radio" name="ch${i}">仅抖省省</label>`)}
+          ${gbRow(`库存数量<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="stk${i}"${gbStock === "unlimited" ? " checked" : ""} onchange="gbStockSet('unlimited')">不限库存</label><label class="gb-radio"><input type="radio" name="stk${i}"${gbStock === "limited" ? " checked" : ""} onchange="gbStockSet('limited')">限库存</label>${gbStock === "limited" ? `<span class="gb-unit">团购库存数量</span><input class="gb-in gb-num" type="text" value="500"><span class="gb-unit">份</span>` : ""}`)}
+          ${gbRow(`售卖日期<i class="fl-star">*</i>`, `<input class="gb-in gb-time" type="text" value="2026/09/24 10:58" placeholder="开始日期"><span class="gb-unit">~</span><input class="gb-in gb-time" type="text" value="2027/09/18 23:59" placeholder="结束日期"><span class="gb-unit">已选中 360 天 · 该日期为套餐在抖音端展示售卖的日期，可设置的最大售卖天数360天</span>`)}
+          ${gbRow(`自动延期售卖<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="ext${i}" checked>不延期</label><label class="gb-radio"><input type="radio" name="ext${i}">自动延期</label><span class="gb-unit">选择“自动延期”时，商品售卖日期到期后自动延长30天（可入住日期、预约有效期同时延长）</span>`)}
+          ${gbRow(`预约有效期<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="bkv${i}"${gbValid === "days" ? " checked" : ""} onchange="gbValidSet('days')">指定天数</label><label class="gb-radio"><input type="radio" name="bkv${i}"${gbValid === "date" ? " checked" : ""} onchange="gbValidSet('date')">指定日期</label>${gbValid === "days" ? `<span class="gb-unit">自购买日起</span><select class="gb-sl">${gbOpts(["360天"], "360天")}</select><span class="gb-unit">内可发起预约</span><span class="gb-unit">最早可预约日期：2026-09-24 · 最晚可预约日期：2027-09-18</span>` : ""}`)}
+          ${gbValid === "date" ? gbRow("开始日期", `<span class="gb-unit" style="color:var(--ink-3)">购买后立即可发起预约</span><span class="gb-unit">为保障用户消费体验，预约有效期开始日期已统一为“购买后立即可发起预约”</span>`) : ""}
+          ${gbValid === "date" ? gbRow("截止日期", `<input class="gb-in gb-time" type="text" value="2027-09-18"><span class="gb-unit">该日期为用户购买完券后，可使用券进行预约的时间范围（当券在预约有效期截止时间未进行预约，系统将自动退款给用户）</span>`) : ""}
           <div class="gb-sec">交易规则</div>
-          ${gbRow("可入住日期", `<select class="gb-sl">${gbOpts(["指定天数 · 自购买起 365 天内可入住", "指定日期 · 至 2027-09-18"], "指定天数 · 自购买起 365 天内可入住")}</select>`)}
-          ${gbRow("不可入住日期", `<select class="gb-sl">${gbOpts(["节假日不可用（全年节假日均不可入住）", "每周不可用（自选星期）", "指定日期不可用", "不限"], p.holiday)}</select>${p.holiday.indexOf("节假日不可用") === 0 ? `<div class="gb-hol"><b>全量节假日区间（默认全部勾选，可调整）</b>${GHOLIDAYS.map((h) => `<label class="gb-hol-it"><input type="checkbox" checked>${h[0]}<span>${h[1]}</span></label>`).join("")}</div>` : ""}`)}
-          ${gbRow("使用时段", `<label class="gb-radio"><input type="radio" name="tuse${i}" checked>全天可用</label><label class="gb-radio"><input type="radio" name="tuse${i}">指定时段</label>`)}
-          ${gbRow("加价分销", `<label class="gb-radio"><input type="radio" name="addp${i}" checked>无需加价（全时段不加价）</label><label class="gb-radio"><input type="radio" name="addp${i}">需加价</label><span class="gb-unit">须与商品名称中的「周末不加价」承诺一致</span>`)}
-          ${gbRow("限购规则", `<select class="gb-sl">${gbOpts(["限制购买 · 每人每种库存限购 1 件", "不限购"], "限制购买 · 每人每种库存限购 1 件")}</select>`)}
-          ${gbRow("预约规则", `<select class="gb-sl">${gbOpts(["需要提前预约 · 提前 1 天", "需要提前预约 · 提前 2 天", "不需要提前预约"], p.book)}</select>`)}
-          ${gbRow("取消预约规则", `<select class="gb-sl">${gbOpts(["预约成功后可随时免费取消", "预约成功后限时免费取消", "不可取消"], "预约成功后可随时免费取消")}</select><span class="gb-unit">未预约订单随时可全额退款</span>`)}
-          ${gbRow("发票信息", `<label class="gb-radio"><input type="radio" name="inv${i}" checked>由商家开票</label><label class="gb-radio"><input type="radio" name="inv${i}">由平台开票</label>`)}
+          ${gbRow(`可入住日期<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="ind${i}"${gbStay === "days" ? " checked" : ""} onchange="gbStaySet('days')">指定天数</label><label class="gb-radio"><input type="radio" name="ind${i}"${gbStay === "date" ? " checked" : ""} onchange="gbStaySet('date')">指定日期</label>${gbStay === "days" ? `<span class="gb-unit">自购买日起</span><select class="gb-sl">${gbOpts(["360天"], "360天")}</select><span class="gb-unit">内可入住</span><span class="gb-unit">最早可入住日期：2026-09-24 · 最晚可入住日期：2027-09-18</span>` : `<div class="gb-daterange"><input class="gb-in gb-time" type="text" value="2026-09-24" style="width:112px"><span class="gb-unit">~</span><input class="gb-in gb-time" type="text" value="2027-09-18" style="width:112px"></div><div class="gb-cal">${gbCal(2026, 8, 24, "l")}${gbCal(2026, 9, null, "r")}<div class="gb-cal-ftr"><button class="btn btn-primary" style="padding:5px 16px;font-size:12px" onclick="toast('演示原型：确定日期范围')">确定</button></div></div>`}`)}
+          ${gbRow("不可入住日期", `<div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="checkbox"${gbHolOn("week", p.holiday.indexOf("每周不可用") === 0) ? " checked" : ""} onchange="gbHolSet('week', this.checked)">每周不可用</label></div>${gbHolOn("week", p.holiday.indexOf("每周不可用") === 0) ? `<div class="gb-limitcard">${["周一", "周二", "周三", "周四", "周五", "周六", "周日"].map((w) => `<span class="gb-wtag${w === "周六" || w === "周日" ? " on" : ""}" onclick="this.classList.toggle('on')">${w}</span>`).join("")}<span class="gb-unit">星期 · 可多选</span></div>` : ""}<div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="checkbox"${gbHolOn("fest", p.holiday.indexOf("节假日不可用") === 0) ? " checked" : ""} onchange="gbHolSet('fest', this.checked)">节假日不可用</label></div>${gbHolOn("fest", p.holiday.indexOf("节假日不可用") === 0) ? `<div class="gb-limitcard col"><div class="gb-qtyrow"><select class="gb-sl"><option>请选择节日范围</option>${GHOLIDAYS.map((h) => `<option>${h[0]}</option>`).join("")}</select><span class="gb-unit">仅可选择当年的节假日，跨年节假日需选择下一年</span></div><div class="gb-hol"><b>全量节假日区间（默认全部勾选，可调整）</b>${GHOLIDAYS.map((h) => `<label class="gb-hol-it"><input type="checkbox" checked>${h[0]}<span>${h[1]}</span></label>`).join("")}</div></div>` : ""}<div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="checkbox"${gbHolOn("date", p.holiday.indexOf("指定日期不可用") === 0 || p.holiday === "固定日期不可用") ? " checked" : ""} onchange="gbHolSet('date', this.checked)">指定日期不可用</label></div>${gbHolOn("date", p.holiday.indexOf("指定日期不可用") === 0 || p.holiday === "固定日期不可用") ? `<div class="gb-limitcard"><input class="gb-in gb-time" type="text" value="2027-01-01" style="width:112px"><a class="exlink" onclick="toast('演示原型：添加指定不可用日期')">添加日期(1/10)</a><span class="gb-unit">不可入住日期被拆分为多段区间，未检出差异，保持当前配置</span></div>` : ""}<span class="gb-unit">三个条件独立勾选，可叠加 · 该日期为用户不可预约的入住时间范围</span>`)}
+          ${gbRow(`使用时段<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="tuse${i}"${gbTuse === "all" ? " checked" : ""} onchange="gbTuseSet('all')">全天可用</label><label class="gb-radio"><input type="radio" name="tuse${i}"${gbTuse === "slot" ? " checked" : ""} onchange="gbTuseSet('slot')">仅指定时间可用</label>${gbTuse === "slot" ? gbTms.map((t, k) => `<div class="gb-qtyrow" style="width:100%"><select class="gb-sl" style="width:88px" onchange="gbTmSet(${k},0,this.value)">${gbOpts(GBTIMES, t[0])}</select><span class="gb-unit">~</span><select class="gb-sl" style="width:88px" onchange="gbTmSet(${k},1,this.value)">${gbOpts(GBTIMES, t[1])}</select><a class="gb-del" onclick="gbTmDel(${k})">×</a></div>`).join("") + `<a class="exlink" onclick="gbTmAdd()">＋ 添加时间段</a><span class="gb-unit">请设置可用时间范围</span>` : ""}`)}
+          ${gbRow(`加价政策<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="addp${i}"${gbAddp === "none" ? " checked" : ""} onchange="gbAddpSet('none')">无需加价</label><label class="gb-radio"><input type="radio" name="addp${i}"${gbAddp === "add" ? " checked" : ""} onchange="gbAddpSet('add')">需加价</label>`)}
+          ${gbAddp === "add" ? gbRow(`加价方式<i class="fl-star">*</i>`, `<select class="gb-sl"><option selected>按天固定加价</option></select>`) : ""}
+          ${gbAddp === "add" ? gbRow(`加价规则<i class="fl-star">*</i>`, `<span class="gb-tab${gbAddMode === "smart" ? " on" : ""}" onclick="gbAddModeSet('smart')">智能添加</span><span class="gb-tab${gbAddMode === "manual" ? " on" : ""}" onclick="gbAddModeSet('manual')">手动添加</span>${gbAddMode === "smart" ? `<div class="gb-qtyrow" style="width:100%;align-items:flex-start"><div style="flex:1;min-width:260px"><textarea id="gbAddTa" class="gb-in" style="width:100%;height:64px;padding:7px 10px" maxlength="500" placeholder="请粘贴需识别的加价规则文案" oninput="this.nextElementSibling.textContent=this.value.length+' / 500'"></textarea><span class="gb-unit">0 / 500</span></div><button class="btn btn-primary" style="padding:6px 14px;font-size:12px" onclick="toast('演示原型：开始识别加价规则')">开始识别</button><a class="exlink" onclick="gbAddClear()">清空内容</a></div>` : `<div class="gb-qtyrow" style="width:100%"><span class="gb-unit">加价日期</span><input class="gb-in gb-time" type="text" value="2026-10-01" style="width:112px"><span class="gb-unit">~</span><input class="gb-in gb-time" type="text" value="2026-10-07" style="width:112px"><span class="gb-unit">每日加价</span><input class="gb-in gb-num" type="text" value="50" style="width:64px"><span class="gb-unit">元/晚</span></div><button class="btn btn-primary" style="padding:6px 14px;font-size:12px" onclick="toast('演示原型：添加加价日期规则')">添加</button><a class="exlink" onclick="toast('演示原型：取消本次添加')">取消</a>`}<a class="exlink" onclick="toast('演示原型：添加加价日期')">＋ 添加加价日期</a><span class="gb-unit">加价政策仅对可入住日期生效，加价日期设为不可入住日期时该日期加价不生效</span>`) : ""}
+          ${gbRow("额外费用", `<label class="gb-radio"><input type="radio" name="gbfee${i}"${gbFee === "none" ? " checked" : ""} onchange="gbFeeSet('none')">无</label><label class="gb-radio"><input type="radio" name="gbfee${i}"${gbFee === "has" ? " checked" : ""} onchange="gbFeeSet('has')">有</label>${gbFee === "has" ? gbFees.map((f, k) => `<div class="gb-qtyrow" style="width:100%"><span class="gb-unit">费用名称</span><input class="gb-in" type="text" value="${f.name}" placeholder="如加床" style="width:150px" oninput="gbFeeSet2(${k},'name',this.value)"><span class="gb-unit">金额</span><input class="gb-in gb-num" type="text" value="${f.amt}" placeholder="请输入" style="width:90px" oninput="gbFeeSet2(${k},'amt',this.value)"><span class="gb-unit">元</span></div>`).join("") + `<a class="exlink" onclick="gbFeeAdd()">＋ 添加费用</a><span class="gb-unit">请填写其它收费项目，如加床、延迟退房等</span>` : ""}`)}
+          ${gbRow(`限购规则<i class="fl-star">*</i>`, `<div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="checkbox"${gbLimit.single ? " checked" : ""} onchange="gbLimitSet('single', this.checked)">限制单笔购买</label></div>${gbLimit.single ? `<div class="gb-limitcard"><span class="gb-unit">每人每单最多购买</span><input class="gb-in gb-num" type="text" value="1" style="width:56px"><span class="gb-unit">张</span></div>` : ""}<div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="checkbox"${gbLimit.buy ? " checked" : ""} onchange="gbLimitSet('buy', this.checked)">限制购买</label></div>${gbLimit.buy ? `<div class="gb-limitcard"><span class="gb-unit">每人最多购买</span><input class="gb-in gb-num" type="text" value="1" style="width:56px"><span class="gb-unit">张</span></div>` : ""}<div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="checkbox"${gbLimit.use ? " checked" : ""} onchange="gbLimitSet('use', this.checked)">限制使用</label></div>${gbLimit.use ? `<div class="gb-limitcard"><span class="gb-unit">单次消费最多使用</span><input class="gb-in gb-num" type="text" value="1" style="width:56px"><span class="gb-unit">张</span></div>` : ""}`)}
+          ${gbRow(`预约规则<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="book${i}"${p.book.indexOf("需要提前预约") === 0 ? " checked" : ""}>需要提前预约</label><label class="gb-radio"><input type="radio" name="book${i}"${p.book.indexOf("不需要提前预约") === 0 ? " checked" : ""}>不需要提前预约</label>${p.book.indexOf("需要提前预约") === 0 ? `<span class="gb-unit">需提前</span><input class="gb-in gb-num" type="text" value="1" style="width:56px"><span class="gb-unit">天预约</span>` : ""}`)}
+          ${gbRow(`取消预约规则<i class="fl-star">*</i>`, `<div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="radio" name="cancel${i}"${gbCancel === "free" ? " checked" : ""} onchange="gbCancelSet('free')">预约成功后，限时免费退</label></div><div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="radio" name="cancel${i}"${gbCancel === "ladder" ? " checked" : ""} onchange="gbCancelSet('ladder')">预约成功后，阶梯退</label></div><div class="gb-qtyrow" style="width:100%"><label class="gb-radio"><input type="radio" name="cancel${i}"${gbCancel === "none" ? " checked" : ""} onchange="gbCancelSet('none')">预约成功后，不可取消或变更</label></div><div class="gb-cancelcard">${gbCancel === "free" ? `<span class="gb-promo">商品下单转化预计提升15%，消费者退款咨询预计少20%</span><div class="gb-qtyrow"><span class="gb-unit">入住</span><input class="gb-in gb-num" type="text" value="1" style="width:56px"><span class="gb-unit">天</span><input class="gb-in gb-time" type="text" value="00:00" style="width:76px"><span class="gb-unit">前，买家可免费取消</span></div>` : ""}${gbCancel === "ladder" ? `<span class="gb-promo">商品下单转化预计有提升，消费者退款咨询预计减少</span><div class="gb-qtyrow"><span class="gb-unit">费用收取方式</span><select class="gb-sl"><option selected>按整单百分比</option></select></div><div class="gb-qtyrow"><span class="gb-unit">入住</span><select class="gb-sl"><option selected>请选择</option>${["1天", "2天", "3天", "5天", "7天"].map((d) => `<option>${d}</option>`).join("")}</select><select class="gb-sl"><option selected>请选择</option></select><span class="gb-unit">前取消，收取</span><input class="gb-in gb-num" type="text" placeholder="请选择" style="width:72px"><span class="gb-unit">% 整单房费</span><a class="exlink" onclick="toast('演示原型：添加阶梯')">添加阶梯(1/10)</a></div><div class="gb-qtyrow"><span class="gb-unit" style="color:var(--ink-3)">入住日至入住日当天24点取消，收取 100% 整单房费</span></div>` : ""}<div class="gb-qtyrow"><div class="sw on" onclick="this.classList.toggle('on')"></div><span class="gb-unit" style="font-weight:600;color:var(--ink-2)">接单后30分钟内买家可免费取消</span></div><span class="gb-unit">当此规则与选择的取消预约规则冲突时，以对买家更有利的规则生效<a class="exlink" onclick="toast('演示原型：查看示例')">查看示例</a></span></div>`)}
+          ${gbRow("退改规则", `<span class="gb-unit">· 整单未预约，顾客可随时申请退款，过期自动退全额</span>`)}
+          ${gbRow(`发票信息<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="inv${i}" checked>由酒店开票</label><label class="gb-radio"><input type="radio" name="inv${i}">由商家开票</label>`)}
           <div class="gb-sec">销售策略</div>
-          ${gbRow("预约激励", `<label class="gb-sw"><input type="checkbox"><i></i></label><span class="gb-unit">默认关闭 · 未检出差异，保持当前配置</span>`)}
+          ${gbRow(`预约激励<i class="fl-star">*</i>`, `<div class="${gbIncent ? "sw on" : "sw"}" onclick="gbIncentSet()"></div>${gbIncent ? `<div class="gb-qtyrow" style="width:100%"><span class="gb-unit">权益类型</span><select class="gb-sl">${gbOpts(["免费升房", "免费升餐", "游乐升级", "其它权益"], "免费升房")}</select></div><div class="gb-qtyrow" style="width:100%"><span class="gb-unit">权益内容</span><input class="gb-in" type="text" value="免费升级至行政楼层" style="flex:1;min-width:220px"></div><div class="gb-qtyrow" style="width:100%"><span class="gb-unit">对顾客展示</span><label class="gb-radio"><input type="radio" name="incent${i}" checked>展示</label><label class="gb-radio"><input type="radio" name="incent${i}">不展示</label></div><div class="gb-qtyrow" style="width:100%"><span class="gb-unit">权益有效期</span><label class="gb-radio"><input type="radio" name="incv${i}" checked>按入住日期</label><label class="gb-radio"><input type="radio" name="incv${i}">按购买后指定天数</label></div><span class="gb-unit">开启预约激励后，用户在指定时间内预约或入住，可享受所配置的权益升级（组合品除外），可以提升预约转化率</span>` : `<span class="gb-unit">默认关闭 · 未检出差异，保持当前配置</span>`}`)}
           <div class="gb-sec">消费提示</div>
-          ${gbRow("使用规则", `<select class="gb-sl">${gbOpts(["不可与店内其他优惠同享", "可与店内其他优惠同享"], "不可与店内其他优惠同享")}</select>`)}
-          ${gbRow("入住 / 退房时间", `<span class="gb-unit">最早入住</span><input class="gb-in gb-time" type="text" value="${p.tin}"><span class="gb-unit">最晚退房</span><input class="gb-in gb-time" type="text" value="${p.tout}">`)}
-          ${gbRow("其他使用说明", `<textarea class="gb-in" style="flex:1;min-width:260px;height:48px;padding:7px 10px" maxlength="150" oninput="this.nextElementSibling.textContent=this.value.length+' / 150'">${p.usage}</textarea><span class="gb-unit">${p.usage.length} / 150 · 已按携程政策预填，可修改</span>`)}
+          ${gbRow(`使用规则<i class="fl-star">*</i>`, `<label class="gb-radio"><input type="radio" name="use${i}" checked>不可与店内其他优惠同享</label><label class="gb-radio"><input type="radio" name="use${i}">可享用店内其他优惠，详询商家</label>`)}
+          ${gbRow(`最早入住时间<i class="fl-star">*</i>`, `<select class="gb-sl">${gbOpts(GBTIMES, p.tin)}</select><span class="gb-unit">酒店参考入住时间</span>`)}
+          ${gbRow(`最晚退房时间<i class="fl-star">*</i>`, `<select class="gb-sl">${gbOpts(GBTIMES, p.tout)}</select><span class="gb-unit">酒店参考退房时间</span>`)}
+          ${gbRow("其他说明信息", `<textarea class="gb-in" style="flex:1;min-width:260px;height:48px;padding:7px 10px" maxlength="1000" oninput="this.nextElementSibling.textContent=this.value.length+' / 1000'">${p.usage}</textarea><span class="gb-unit">${p.usage.length} / 1000 · 请勿重复录入上述已经维护的字段信息，包括但不限于商品搭配、加价政策、预约政策等 · 已按携程政策预填，可修改</span>`)}
         </div>`,
           )
           .join("")}
@@ -7221,8 +8592,13 @@
         <p class="review-tip">以下方案已按抖音来客「创建预售房型」表单预填，全部内容可修改。</p>
         <div class="gb-card">
           <div class="gb-head"><b>${c.presale.title} · 引流预售房型补充<small>适用房型 ID：${c.presale.room.id}</small></b></div>
-          ${gbRow("商品售卖时段", `<label class="gb-radio"><input type="radio" name="ps-slot" checked>全日房</label><label class="gb-radio"><input type="radio" name="ps-slot">钟点房</label>`)}
-          ${gbRow("预售房型名称", `<input class="gb-in" type="text" maxlength="40" value="${c.presale.room.name}" oninput="this.nextElementSibling.textContent=this.value.length+' / 40'"><small class="count">${c.presale.room.name.length} / 40</small><span class="gb-unit">已按适用房型名称预填，与适用房型名称保持一致，可修改；名称会对用户展示，格式如：高级大床房-五一节预售</span>`, true)}
+          ${psSlot === "hour" && psTipOn ? `<div class="ps-tip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>请至少维护近3个月内30天的房价/房量，且需房态设置为“有房”状态，才可发布哦<a class="ps-tip-x" title="关闭提示" onclick="psTipOff()">×</a></div>` : ""}
+          ${gbRow("商品售卖时段", `<label class="gb-radio"><input type="radio" name="ps-slot"${psSlot === "day" ? " checked" : ""} onchange="psSlotSet('day')">全日房</label><label class="gb-radio"><input type="radio" name="ps-slot"${psSlot === "hour" ? " checked" : ""} onchange="psSlotSet('hour')">钟点房</label>`)}
+          ${psSlot === "hour" ? gbRow("连住时长", `<select class="gb-sl" onchange="psHoursSet(this.value)"><option value="">请选择</option>${[2, 3, 4, 5, 6, 8, 12].map((h) => `<option value="${h}"${psHours === String(h) ? " selected" : ""}>${h}</option>`).join("")}</select><span class="gb-unit">小时</span><span class="gb-unit">钟点房无携程对比基准，连住时长需与酒店确认后选择</span>`) : ""}
+          ${psSlot === "hour" ? gbRow("使用时段", `<select class="gb-sl">${Array.from({ length: 25 }, (_, i) => String(i).padStart(2, "0") + ":00").map((t) => `<option${t === "00:00" ? " selected" : ""}>${t}</option>`).join("")}</select><span class="gb-unit">至</span><select class="gb-sl">${Array.from({ length: 25 }, (_, i) => String(i).padStart(2, "0") + ":00").map((t) => `<option${t === "24:00" ? " selected" : ""}>${t}</option>`).join("")}</select><label class="gb-radio"><input type="checkbox" checked>24小时可用</label><span class="gb-unit">起始时间为最早入住时间，截止时间为最晚离店时间，如8:00-16:00，用户最早可订8:00入住，最晚可订16:00离店</span>`) : ""}
+          ${psSlot === "hour"
+            ? gbRow("预售房型名称", `<input class="gb-in" type="text" disabled value="${psHours ? `${psHours}小时-${c.presale.room.name.split("·")[0]}` : ""}" placeholder="连住时长-物理房型名称（系统生成）"><span class="gb-unit">-</span><input class="gb-in" type="text" maxlength="40" placeholder="自定义部分（必填）" oninput="this.nextElementSibling.textContent=this.value.length+' / 40'"><small class="count">0 / 40</small><span class="gb-unit">名称会对用户展示，为避免客诉请谨慎填写，名称格式如：住3小时-高级大床房-五一节预售</span>`, true)
+            : gbRow("预售房型名称", `<input class="gb-in" type="text" maxlength="40" value="${c.presale.room.name}" oninput="this.nextElementSibling.textContent=this.value.length+' / 40'"><small class="count">${c.presale.room.name.length} / 40</small><span class="gb-unit">已按适用房型名称预填，与适用房型名称保持一致，可修改；名称会对用户展示，格式如：高级大床房-五一节预售</span>`, true)}
           ${gbRow("适用房型", `<div class="gb-roomsel"><b>${c.presale.room.name}<small>ID：${c.presale.room.id} · ${c.presale.room.spec}</small></b><a class="exlink" onclick="toast('演示原型：可移除后重新选择物理房型')">移除</a></div><a class="exlink" onclick="toast('演示原型：打开物理房型列表选择')">＋ 选择物理房型</a>`)}
           ${gbRow("时段", `<input class="gb-in" type="text" value="${c.presale.span}"><a class="exlink" onclick="toast('演示原型：可添加多个售卖时段')">＋ 添加时段</a>`)}
           ${gbRow("适用星期", `<label class="gb-radio"><input type="checkbox" checked>全选</label>${["周一", "周二", "周三", "周四", "周五", "周六", "周日"].map((w) => `<label class="gb-radio"><input type="checkbox" checked>${w}</label>`).join("")}<span class="gb-unit">实际选中 ${c.presale.days}</span>`)}
@@ -7430,10 +8806,10 @@
             ${gbRow("英文名称", `<input class="gb-in" type="text" placeholder="请补充"><span class="gb-unit">右侧未提供，请补充，可留空</span>`)}
             ${gbRow("房型图片", `<span class="gb-thumb">携程房型图 1</span><span class="gb-thumb">携程房型图 2</span><a class="exlink" onclick="toast('演示原型：打开本地文件选择图片，直接上传替换')">上传替换</a><span class="gb-unit">已按右侧房型图预填 2 张（最多 10 张、第 1 张为头图），可替换</span>`)}
             ${gbRow("总间数", `<input id="rtQty" class="gb-in gb-num" type="text" placeholder="请填写" oninput="rtQtySync(this.value)"><span class="gb-unit gb-req">间 · 右侧携程不提供，须填写后才能提交</span>`, true)}
-            ${gbRow("楼层", `<input class="gb-in gb-num" type="text" value="6"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="8"><span class="gb-unit">层 · 已按右侧携程值预填，可修改</span>`)}
-            ${gbRow("面积（㎡）", `<input class="gb-in gb-num" type="text" value="20.00"><span class="gb-unit">至</span><input class="gb-in gb-num" type="text" value="25.00"><span class="gb-unit">已按右侧携程值预填，可修改</span>`)}
-            ${gbRow("窗户", `<input class="gb-in" type="text" value="有窗 · 落地窗"><span class="gb-unit">已按右侧携程值预填，可修改</span>`)}
-            ${gbRow("床型", `<input class="gb-in" type="text" value="大床 2.00 米 × 1张"><span class="gb-unit">已按右侧携程值预填，可修改</span>`)}
+            ${gbRow(`楼层<i class="fl-star">*</i>`, rtFloorCtl())}
+            ${gbRow(`面积（㎡）<i class="fl-star">*</i>`, rtAreaCtl())}
+            ${gbRow(`窗户<i class="fl-star">*</i>`, rtWinCtl())}
+            ${gbRow(`床型<i class="fl-star">*</i>`, rtBedCtl())}
             ${gbRow("最大可住人数", `<input class="gb-in gb-num" type="text" value="2"><span class="gb-unit">人 · 已按右侧携程值预填，可修改</span>`)}
             ${gbRow("吸烟政策", `<label class="gb-radio"><input type="radio" name="rtSmkNew" checked>可吸烟</label><label class="gb-radio"><input type="radio" name="rtSmkNew">不可吸烟</label><label class="gb-radio"><input type="radio" name="rtSmkNew">部分房间可吸烟</label><span class="gb-unit">已按右侧携程值预选，可改选</span>`)}
             ${gbRow("网络", `<label class="gb-radio"><input type="radio" name="rtNetPick"${rtNet === 1 ? " checked" : ""} onchange="setRtNet(1)">可上网</label><label class="gb-radio"><input type="radio" name="rtNetPick"${rtNet === 2 ? " checked" : ""} onchange="setRtNet(2)">部分房间可上网</label><label class="gb-radio"><input type="radio" name="rtNetPick"${rtNet === 0 ? " checked" : ""} onchange="setRtNet(0)">不可上网</label><span class="gb-unit">已按右侧携程信息预选「可上网」，可改选</span>${rtNet !== 0 ? `<div class="rt-net-sub"><label class="gb-radio"><input type="checkbox"${rtNetWifi ? " checked" : ""} onchange="setRtNetWifi(this.checked?1:0)">WIFI</label><select class="gb-sl"${rtNetWifi ? "" : " disabled"}><option selected>免费</option><option>收费</option></select><label class="gb-radio"><input type="checkbox"${rtNetWired ? " checked" : ""} onchange="setRtNetWired(this.checked?1:0)">有线网络</label><select class="gb-sl"${rtNetWired ? "" : " disabled"}><option selected>免费</option><option>收费</option></select></div>` : ""}`)}
@@ -7514,16 +8890,18 @@
       </div>`
                                 : c.calAdd
                                   ? `<div class="section"><h3>${c.src ? 2 : 1}　缺失日历房 · 新增并上架（按抖音来客「新建日历房」页面表单）</h3>
-        <p class="review-tip">「房型管理」存在、日历房未上架的房型认定为缺失日历房，每个缺失房型单独形成 1 条新增任务。表单按「商品信息 → 设置价量态」两步展示，与抖音来客「商品管理 › 日历房 › 新建日历房」页面一致；房型、早餐份数、房价三项已按携程预填（高亮）并可核对修改；该房型无已下架日历房占用物理房型引用，确认后直接新增并上架；已上架日历房的现有房价不在本任务内修改（由「房价房态管理」节点诊断）。</p>
+        <p class="review-tip">「房型管理」存在、日历房未上架的房型认定为缺失日历房，每个缺失房型单独形成 1 条新增任务。表单按「商品信息 → 设置价量态」两步展示，与抖音来客「商品管理 › 日历房 › 新建日历房」页面一致；房型、房价、早餐份数三项已按携程预填（高亮）并可核对修改，日历房名称随早餐份数与退改规则自动生成；该房型无已下架日历房占用物理房型引用，确认后直接新增并上架；已上架日历房的现有房价不在本任务内修改（由「房价房态管理」节点诊断）。</p>
         <div class="gb-card">
           <div class="gb-head"><b>商品信息<small>步骤 1/2 · 新建日历房 · 物理房型 ID：${c.calAdd.room.id} · ${c.calAdd.room.spec}</small></b><i class="tag red">日历房未上架 · 缺失</i></div>
           ${gbRow("抖音当前状态", `<b>未上架（无日历房）</b><span class="gb-unit">携程当前早餐份数：${c.calAdd.ctripMeal} · 诊断时实时房价 ¥${c.calAdd.ctripPrice} / 晚 · 无已下架日历房占用引用</span>`)}
           ${gbRow("商品售卖时段", calRadios("asale", ["全日房", "钟点房"], 0, "新增默认全日房，可改选"))}
-          ${gbRow("日历房名称", `<input class="gb-in" type="text" value="${c.calAdd.room.name}-${c.calAdd.meal}份早餐-任意退" disabled><span class="gb-unit">系统自动生成，物理房型名称-早餐-退改规则 · 名称仅对商家侧展示，随早餐份数与退改规则自动更新</span>`)}
-          ${gbRow("适用房型", `<select class="gb-sl">${c.calAdd.opts.map((o) => `<option${o === c.calAdd.room.name ? " selected" : ""}>${o}</option>`).join("")}</select><span class="gb-unit">已选中当前缺少的「房型管理」房型，可改选；日历房只能选择房型管理已存在的房型</span>`, true)}
-          ${gbRow("早餐份数", `<input class="gb-in gb-num" type="text" value="${c.calAdd.meal}"><span class="gb-unit">份 · 已按携程当前早餐份数预填（携程无早餐时预填 0 份），可修改；只能填入正整数（最小 0 份）</span>`, true)}
-          ${gbRow("入离时间", calRadios("atime", ["不限制", "限制"], 0, "新增默认不限制，可改选"))}
-          ${gbRow("退改规则", calRadios("arule", CAL_RULES, 0, "新增默认「随时免费取消」，可改选；选限时免费取消 / 阶梯退后可在页面继续配置具体规则"))}
+          ${(calPick.asale ?? 0) === 1 ? gbRow("连住时长", `<select class="gb-sl" onchange="setCalPick('asaleH',this.value)"><option value="">请选择</option>${[2, 3, 4, 5, 6, 8, 12].map((h) => `<option value="${h}"${(calPick.asaleH || "") === String(h) ? " selected" : ""}>${h}</option>`).join("")}</select><span class="gb-unit">小时</span>${calPick.asaleH ? "" : '<span class="gb-err">请设置连住时长</span>'}<span class="gb-unit">钟点房无携程对比基准，连住时长需与酒店确认后选择</span>`) : ""}
+          ${(calPick.asale ?? 0) === 1 ? gbRow("使用时段", `<select class="gb-sl">${Array.from({ length: 25 }, (_, i) => String(i).padStart(2, "0") + ":00").map((t) => `<option${t === "00:00" ? " selected" : ""}>${t}</option>`).join("")}</select><span class="gb-unit">至</span><select class="gb-sl">${Array.from({ length: 25 }, (_, i) => String(i).padStart(2, "0") + ":00").map((t) => `<option${t === "24:00" ? " selected" : ""}>${t}</option>`).join("")}</select><label class="gb-radio"><input type="checkbox" checked>24小时可用</label><span class="gb-unit">起始时间为最早入住时间，截止时间为最晚离店时间，如8:00-16:00，用户最早可订8:00入住，最晚可订16:00离店</span>`) : ""}
+          ${gbRow("日历房名称", `<input class="gb-in" type="text" value="${c.calAdd.room.name}-${(calPick.ameal ?? c.calAdd.meal) || "0"}份早餐-${calRuleSuf()}" disabled><span class="gb-unit">系统自动生成，物理房型名称-早餐-退改规则 · 名称仅对商家侧展示，随早餐份数与退改规则自动更新</span>`)}
+          ${gbRow("适用房型", `<div class="gb-roomsel"><b>${calPick.aroom || c.calAdd.room.name}<small>${(calPick.aroom || c.calAdd.room.name) === c.calAdd.room.name ? `ID：${c.calAdd.room.id} · ${c.calAdd.room.spec}` : "来自「房型管理」的物理房型 · 规格以房型管理为准"}</small></b><a class="exlink" onclick="toast('演示原型：可移除后重新选择物理房型')">移除</a></div><a class="exlink" onclick="calRoomToggle('${c.calAdd.room.name}')">＋ 选择物理房型</a>${calPick.aroomOpen ? `<div class="gb-privbox"><div class="gb-prow"><input class="gb-in" type="text" placeholder="搜索房型名称/ID" style="flex:1;min-width:0"></div><div class="gb-roomlist">${c.calAdd.opts.map((o) => `<label class="gb-roomit"><input type="radio" name="calRoomPick" value="${o}"${o === (calPick.aroomCur || c.calAdd.room.name) ? " checked" : ""} onchange="setCalPick('aroomCur',this.value)"><b>${o}</b><small>${gbStoreName()} · 房型管理${o === c.calAdd.room.name ? " · 本次缺失" : ""}</small></label>`).join("")}</div><div class="gb-prow"><span class="gb-unit">仅展示本酒店「房型管理」已有房型 · 共 ${c.calAdd.opts.length} 个 · 单选</span><a class="exlink" onclick="calRoomToggle()">取消</a><a class="exlink" onclick="calRoomOk()">确定</a></div></div>` : ""}<span class="gb-unit">${(calPick.aroom || c.calAdd.room.name) === c.calAdd.room.name ? "已选中当前缺少的「房型管理」房型，可改选" : "已改选「房型管理」其他房型"}；日历房只能选择房型管理已存在的房型</span>`, true)}
+          ${gbRow(`早餐份数<i class="fl-star">*</i>`, `<input class="gb-in gb-num" type="text" value="${calPick.ameal ?? c.calAdd.meal}" oninput="setCalPick('ameal',this.value.replace(/[^0-9]/g,'').slice(0,2))"><span class="gb-unit">份 · 按携程当前早餐份数预填，可修改；日历房名称随份数自动更新</span>`, true)}
+          ${gbRow("入离时间", calRadios("atime", ["不限制", "限制"], 0, "新增默认不限制，可改选") + calTimeSub())}
+          ${gbRow("退改规则", calRadios("arule", CAL_RULES, 0, "新增默认「随时免费取消」，可改选；选限时免费取消 / 阶梯退后在下方继续配置具体规则") + calRuleSub())}
           ${gbRow("连住天数限制", `<input class="gb-in gb-num" type="text" value="1"><span class="gb-unit">天 到</span><input class="gb-in gb-num" type="text" value="90"><span class="gb-unit">天 · 范围 1–90 天，可修改</span>`)}
           ${gbRow("提前预订天数限制", `<span class="gb-unit">提前</span><input class="gb-in gb-num" type="text" value="0"><span class="gb-unit">天 至</span><input class="gb-in gb-num" type="text" value="365"><span class="gb-unit">天 可预订 · 范围 0–365 天，可修改</span>`)}
           ${gbRow("发票信息", calRadios("ainv", ["由酒店开票"], 0, "新增默认"))}
@@ -7538,10 +8916,10 @@
           ${gbRow("适用时段", `<input class="gb-in" type="date" value="2026-09-19"><span class="gb-unit">～</span><input class="gb-in" type="date" value="2027-03-18"><a class="exlink" onclick="toast('演示原型：可添加日期段')">＋ 添加日期段</a>`)}
           ${gbRow("适用时间范围", ["全选", "周一", "周二", "周三", "周四", "周五", "周六", "周日"].map((d) => `<label class="gb-radio"><input type="checkbox" checked>${d}</label>`).join("") + '<span class="gb-unit">默认全选，可按需勾选</span>')}
           ${gbRow("实际选择时间", `<b>180天</b><span class="gb-unit">按上方时段与星期自动计算，只读</span>`)}
-          ${gbRow("房价设置方式", calRadios("apm", ["不区分周末", "区分周末"], 0, "选「区分周末」时按周末 / 非周末分别设置房价"))}
+          ${gbRow(`房价设置方式<i class="fl-star">*</i>`, calRadios("apm", ["不区分周末", "区分周末"], 0, "") + ((calPick.apm ?? 0) === 1 ? `<select class="gb-sl" onchange="setCalPick('apmWk',this.value)"><option value="">请选择</option>${["周六、周日", "仅周六", "仅周日"].map((w) => `<option${(calPick.apmWk || "") === w ? " selected" : ""}>${w}</option>`).join("")}</select><span class="gb-unit">选择周末范围，按周末 / 平日分别设置房价；周末价需高于平日价</span>` : `<span class="gb-unit">选「区分周末」时选择周末范围，按周末 / 非周末分别设置房价</span>`))}
           <div class="gb-kv"><small>房价房量房态</small><div class="gb-ctl"><table class="cal-tbl">
             <tr><th>日历房</th><th>房价</th><th>基础房量</th></tr>
-            <tr><td>${c.calAdd.room.name}-${c.calAdd.meal}份早餐-任意退</td><td><input class="gb-in gb-num" type="text" value="${c.calAdd.price}"><span class="gb-unit">元 · 按诊断时携程实时房价 ¥${c.calAdd.ctripPrice} 预填，可修改；仅新增时使用该价格，后续调价由「房价房态管理」节点诊断</span></td><td>${calRadios("abaseN", ["无", "有"], 0)}</td></tr>
+            <tr><td>${c.calAdd.room.name}-${(calPick.ameal ?? c.calAdd.meal) || "0"}份早餐-${calRuleSuf()}</td><td><input class="gb-in gb-num" type="text" value="${c.calAdd.price}"><span class="gb-unit">元 · 按诊断时携程实时房价 ¥${c.calAdd.ctripPrice} 预填，可修改；仅新增时使用该价格，后续调价由「房价房态管理」节点诊断</span></td><td>${calRadios("abaseN", ["无", "有"], 0)}</td></tr>
           </table></div></div>
         </div>
       </div>`
@@ -7712,7 +9090,7 @@
                     : c.faudit
                       ? "<button class=\"btn btn-primary\" onclick=\"finishTask('执行中','已提交审核，AI 正在使用替换图片在抖音来客重新提交设施审核，提交成功并完成结果校验后任务标记为已完成；暂无此设施将改为「无」')\">提交审核</button>"
                       : c.calAdd
-                        ? `<button class="btn btn-primary" onclick="finishTask('执行中','新增方案已确认，AI 正在抖音来客「商品管理 › 日历房」新增并上架「商务大床房·重庆西站免费接站」的日历房（房型＋早餐份数＋房价，无下架记录占用引用、直接新增），写入并校验成功后任务完成')">新增并上架</button>`
+                        ? `<button class="btn btn-primary" onclick="finishTask('执行中','新增方案已确认，AI 正在抖音来客「商品管理 › 日历房」新增并上架「商务大床房·重庆西站免费接站」的日历房（房型＋早餐份数＋房价，名称随早餐份数与退改规则自动生成，无下架记录占用引用、直接新增），写入并校验成功后任务完成')">新增并上架</button>`
                         : c.nameEdit
                           ? `<button class="btn btn-primary" ${namePics ? "" : "disabled"} title="${namePics ? "" : "请先上传门头照片：与门店名称在同一页面一并提交"}" onclick="finishTask('执行中','名称与门头照片已提交，AI 正在将变更后名称与门头照片一并写入抖音来客「设置-门店管理」并校验（一致性已由人工核对，AI 不做自动核对）')">提交</button>`
                           : c.offline
@@ -7721,10 +9099,42 @@
             : ""
         }`;
         }
+        /* 「房型管理」小任务处理页：提交按钮改为「暂存」并附说明（真正的提交在「房型管理任务（总体）」统一进行） */
+        if (
+          !roTask &&
+          t.path &&
+          t.path.startsWith("房型管理 · ") &&
+          !t.master &&
+          taskData.some((x) => x.master && x.status === "待处理")
+        ) {
+          actions =
+            actions.replaceAll(">提交</button>", ">暂存</button>") +
+            '<span class="gb-unit" style="align-self:center">「房型管理」小任务提交仅暂存，请在「房型管理任务（总体）」统一提交</span>';
+        }
+        /* 已处理 · 处理详情（只读快照）：展示处理结果；房型匹配任务展示确认的匹配结果列表 */
+        if (roTask) {
+          if (roTask.pairs) {
+            main = `<div class="section"><h3>匹配结果（已确认）</h3>
+        <p class="review-tip">该任务处理时确认的房型匹配结果：左为抖音来客物理房型、右为携程采集房型，AI 已建立两侧对应关系（数据快照，只读）。</p>
+        <div class="gb-card">
+          <div class="gb-head"><b>匹配成功列表<small>抖音物理房型 ⇄ 携程采集房型 · 成对展示</small></b><i class="tag green">${roTask.pairs.length} 组已匹配</i></div>
+          <div class="mt-list">
+            ${roTask.pairs.map((p) => `<div class="mt-row">
+              <div class="mt-cell"><b>${p.dy}</b></div>
+              <span class="mt-x">⇄</span>
+              <div class="mt-cell"><b>${p.ct}</b></div>
+              <i class="tag ${p.how === "人工点选匹配" ? "blue" : "gray"}">${p.how}</i>
+            </div>`).join("")}
+          </div>
+        </div>
+      </div>`;
+          }
+        }
         return `<div class="page">
     <button class="back" onclick="${roTask ? "closeRo()" : "go('tasks')"}">${roTask ? "‹ 返回已处理" : "‹ 返回任务列表"}</button>
     <div class="page-head"><div><h1>${t.name}</h1><p>${t.path} · 当前酒店：${activeHotel.name}</p></div>${roTask ? `<i class="tag ${roTask.exec === "执行中" ? "" : execTag(roTask.exec)}"${roTask.exec === "执行中" ? ' style="background:var(--primary-soft);color:var(--primary)"' : ""}>${roTask.exec}</i>` : '<i class="tag red">待处理</i>'}</div>
-    ${roTask ? `<div class="notice"><span class="notice-icon">ⓘ</span><div><b>处理详情 · 数据快照</b><span>以下为该任务处理时的数据，仅供查看，不可编辑。</span></div></div>` : ""}
+    ${roTask ? `<div class="notice"><span class="notice-icon">ⓘ</span><div><b>处理详情 · 数据快照</b><span>以下为该任务处理时的数据与处理结果，仅供查看，不可编辑。</span></div></div>` : ""}
+    ${roTask && roTask.res ? `<div class="notice" style="border-color:#bbf7d0;background:#f0fdf4"><span class="notice-icon" style="color:#15803d">✓</span><div><b style="color:#15803d">处理结果 · ${roTask.exec}</b><span style="color:#166534">${roTask.res}</span></div></div>` : ""}
     ${roTask && roTask.reason ? `<div class="notice" style="border-color:#fecaca;background:#fef2f2"><span class="notice-icon" style="color:#b91c1c">✕</span><div><b style="color:#b91c1c">执行失败</b><span style="color:#b91c1c">失败原因：${roTask.reason}</span></div></div>` : ""}
     <main${roTask ? ' class="ro"' : ""}>
       ${main}
@@ -7770,7 +9180,7 @@
         "日历房新增·商务大床房": [
           "日历房 · 商务大床房 · 日历房未上架（缺失新增）",
         ],
-        房型匹配任务: ["房型管理 · 抖音物理房型 ⇄ 携程在售房型逐一匹配"],
+        房型匹配任务: ["房型匹配 · 抖音物理房型 ⇄ 携程在售房型逐一匹配"],
         "房型新增·电竞大床房": ["房型管理 · 电竞大床房"],
         "房型信息核对·亲子家庭房": ["房型管理 · 亲子家庭房"],
         头图相册补充任务: ["门店装修 · 头图和相册"],
@@ -7899,7 +9309,10 @@
           };
         });
         const hasCur =
-          diagRun && diagRun.phase === "done" && taskData.length > 0; // 最新一次诊断完成后即计入已处理
+          diagRun &&
+          taskData.length > 0 &&
+          (diagRun.phase === "done" || // 诊断全部完成
+            taskData.some((t) => t.status === "已处理")); // 诊断中断（闸门等待）时，已提交/忽略的任务（如房型匹配任务）也计入已处理
         if (hasCur) {
           const tasks = taskData.map((t) => ({
             name: t.name,
@@ -7907,6 +9320,8 @@
             exec: t.status === "待处理" ? "待处理" : t.exec,
             cls: t.status === "待处理" ? "gray" : execTag(t.exec),
             reason: "",
+            res: t.result || "", // 处理结果：提交/忽略时记录的快照说明
+            pairs: t.pairs || null, // 房型匹配任务：确认的匹配对快照
           }));
           const c = (st) => tasks.filter((t) => t.exec === st).length;
           runs.push({
@@ -7924,7 +9339,7 @@
         }
         return runs.reverse();
       }
-      /* 处理详情：数据快照纯展示（只读），执行失败任务展示失败原因 */
+      /* 处理详情：数据快照纯展示（只读），含处理结果；执行失败任务展示失败原因 */
       function viewTask(ri, ti) {
         const t = diagRuns()[ri].tasks[ti];
         roTask = {
@@ -7932,6 +9347,8 @@
           path: t.path,
           exec: t.exec,
           reason: t.reason || "",
+          res: t.res || "",
+          pairs: t.pairs || null,
         };
         go("detail");
       }
@@ -8812,6 +10229,8 @@
               : "douyin";
         method = "sms";
         reauth = false;
+        ctripLink = "";
+        ctripRecog = null;
         modal();
       }
       function modal() {
@@ -8843,12 +10262,30 @@
           }
       <label class="auth-field"><span>${method === "sms" ? "手机号" : "账号"}</span><input value="138 8888 6620"></label>
       ${method === "sms" ? `<label class="auth-field"><span>验证码</span><div class="code"><input placeholder="请输入 6 位验证码"><button onclick="this.textContent='已发送 59s'">获取验证码</button></div></label>` : `<label class="auth-field"><span>密码</span><input type="password" placeholder="请输入密码"></label>`}
+      ${platform === "ctrip" ? `<label class="auth-field"><span>携程官网链接</span><div class="code"><input value="${ctripLink}" placeholder="请输入该酒店携程官网的链接，如 https://hotels.ctrip.com/xxxxxx" oninput="ctripLink=this.value;ctripRecog=null;var b=document.getElementById('ctripRecog');if(b)b.remove()"><button onclick="recognizeCtrip()">识别</button></div></label>
+      ${ctripRecog ? (ctripRecog.err ? `<div class="recog err" id="ctripRecog"><div class="r-msg">✕ ${ctripRecog.err}</div></div>` : `<div class="recog" id="ctripRecog"><div class="r-row"><span>酒店ID</span><b>${ctripRecog.id}</b></div><div class="r-row"><span>酒店名称</span><b>${ctripRecog.name}</b></div><div class="r-tip">识别结果不可编辑 · 请人工核对酒店名称，避免绑定到错误的酒店</div></div>`) : ""}` : ""}
       <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="authorize()">确认授权</button>`
     }
     <div class="modal-foot">授权成功后将自动保活一段时间，具体时长以平台实际会话为准。</div>
   </div></div>`;
       }
+      /* 携程官网链接识别：从链接中解析酒店ID；ID 有效才允许绑定，名称供人工核对 */
+      function recognizeCtrip() {
+        const m = (ctripLink || "").match(/hotelId=(\d+)|\/hotel\/(\d+)/i);
+        const id = m ? m[1] || m[2] : "";
+        if (!id) {
+          ctripRecog = { err: "未识别到有效酒店ID，无法绑定；请粘贴该酒店的携程官网链接（链接需含 hotelId 或 /hotel/数字）" };
+        } else {
+          /* 演示：模拟从链接页面读取酒店名称，实际以携程页面展示为准 */
+          ctripRecog = { id, name: hotels[authIndex].name };
+        }
+        modal();
+      }
       function authorize() {
+        if (platform === "ctrip" && (!ctripRecog || ctripRecog.err)) {
+          toast("请先识别携程官网链接，识别到有效酒店ID后才能授权绑定");
+          return;
+        }
         hotels[authIndex][platform] = "ok";
         reauth = false;
         toast(`${platform === "douyin" ? "抖音来客" : "携程官网"}授权成功`);
@@ -8859,6 +10296,8 @@
         if (e && e.target !== e.currentTarget) return;
         $("#modalRoot").innerHTML = "";
         authIndex = null;
+        ctripLink = "";
+        ctripRecog = null;
       }
 
       function render() {
