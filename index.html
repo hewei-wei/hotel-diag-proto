@@ -2721,6 +2721,55 @@
       .hstat.clickable:hover b {
         opacity: 0.75;
       }
+      /* 采集失败数：可点击弹窗查看；有失败项时琥珀卡片高亮 + 呼吸动效引导点击 */
+      .hstat.cfail-hint {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        border-radius: 10px;
+        padding: 10px 14px;
+        margin: -11px -15px;
+      }
+      .hstat.cfail-hint:hover {
+        box-shadow: 0 2px 12px rgba(217, 119, 6, 0.22);
+      }
+      .hstat.cfail-hint:hover b {
+        opacity: 1;
+      }
+      .hstat.cfail-hint small {
+        color: #b45309;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .hstat.cfail-hint .cfail-go {
+        display: inline-flex;
+        align-items: center;
+        height: 18px;
+        padding: 0 7px;
+        border-radius: 9px;
+        background: #fef3c7;
+        border: 1px solid #fcd34d;
+        color: #b45309;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .hstat.cfail-hint:hover .cfail-go {
+        background: #fde68a;
+      }
+      @keyframes cfailPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.38);
+        }
+        60% {
+          box-shadow: 0 0 0 7px rgba(245, 158, 11, 0);
+        }
+      }
+      .hstat.cfail-hint.pulse {
+        animation: cfailPulse 2s ease-out infinite;
+      }
       .stb {
         display: inline-flex;
         align-items: center;
@@ -3075,6 +3124,152 @@
         font-size: 11.5px;
         color: var(--ink-4);
         padding: 8px 0 4px;
+      }
+      /* V2：诊断记录下拉切换（右上角）+ 记录摘要条；历史记录移出「已处理」页签 */
+      .run-switch {
+        margin-left: auto;
+        position: relative;
+      }
+      .run-mask {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+      }
+      .run-switch-btn {
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 32px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        background: var(--surface);
+        font-size: 12px;
+        color: var(--ink-3);
+        cursor: pointer;
+      }
+      .run-switch-btn:hover {
+        border-color: var(--primary-line);
+      }
+      .run-switch-btn b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .run-switch-btn .chev {
+        font-size: 10px;
+        color: var(--ink-4);
+        font-style: normal;
+      }
+      .run-menu {
+        position: absolute;
+        right: 0;
+        top: 38px;
+        z-index: 2;
+        min-width: 264px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        box-shadow: var(--shadow-lg);
+        padding: 6px;
+        max-height: 340px;
+        overflow: auto;
+      }
+      .run-menu-cap {
+        font-size: 11px;
+        color: var(--ink-4);
+        padding: 6px 8px 3px;
+      }
+      .run-menu-search {
+        width: auto;
+        height: 32px;
+        margin: 4px 4px 8px;
+      }
+      .run-menu-search input {
+        min-width: 0;
+      }
+      .run-menu-empty {
+        font-size: 12px;
+        color: var(--ink-3);
+        padding: 12px 10px;
+        text-align: center;
+      }
+      .run-menu button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 8px 10px;
+        border-radius: var(--r-sm);
+        font-size: 12.5px;
+        color: var(--ink-2);
+      }
+      .run-menu button:hover {
+        background: var(--surface-2);
+      }
+      .run-menu button.active {
+        background: var(--primary-soft);
+        color: var(--primary);
+        font-weight: 600;
+      }
+      .run-menu button span {
+        display: block;
+      }
+      .run-menu button small {
+        display: block;
+        font-size: 11px;
+        color: var(--ink-4);
+        margin-top: 2px;
+        font-weight: 400;
+      }
+      .rsum {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding: 13px 18px;
+        margin-bottom: 12px;
+        background: var(--surface-2);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+      }
+      .rsum-main b {
+        font-size: 14px;
+      }
+      .rsum-main small {
+        display: block;
+        font-size: 11.5px;
+        color: var(--ink-4);
+        margin-top: 3px;
+      }
+      .rsum-stats {
+        display: flex;
+        gap: 18px;
+        font-size: 12px;
+        color: var(--ink-3);
+        flex-wrap: wrap;
+      }
+      .rsum-stats b {
+        font-size: 14px;
+        margin-left: 3px;
+      }
+      .lt-line.lthead {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--ink-3);
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--line);
+        padding: 11px 0;
+      }
+      .hist-hint {
+        font-size: 12px;
+        color: var(--ink-3);
+        background: var(--surface-2);
+        border: 1px dashed var(--line);
+        border-radius: var(--r-sm);
+        padding: 9px 14px;
+        margin-bottom: 12px;
       }
       /* 处理详情只读态：数据快照纯展示，控件不可编辑 */
       .ro input,
@@ -4462,6 +4657,7 @@
           return;
         it.state = "retry";
         render();
+        if (statModal) openStat(statModal); // 弹窗内发起重试：立即刷新为「重新采集中」
         diagT.push(
           setTimeout(() => {
             it.retryN = (it.retryN || 0) + 1;
@@ -4478,20 +4674,31 @@
               toast("采集失败（携程），已重试 " + it.retryN + "/5 次");
             }
             render();
+            if (statModal) openStat(statModal); // 重采解析后同步刷新弹窗（成功项移出采集失败列表）
           }, 400),
         );
       }
       /* 点击进度统计查看检查项详情 */
+      let statModal = null; // 当前打开的统计弹窗类型（null=未打开）：重试采集状态变化后据此刷新弹窗内容
       function statRows(k) {
         const m = {
           all: () => true,
-          cfail: isCfail,
+          cfail: (s) => isCfail(s) || s === "retry", // 重采中的条目保持在采集失败列表内（其重采仅源于采集失败）
           pass: (s) => s === "pass",
           fail: (s) => s === "fail",
         }[k];
         return diagSteps.flatMap((s, si) =>
           s.items
-            .map((it, ii) => ({ s, it, st: diagRun.steps[si].items[ii].state }))
+            .map(
+              (it, ii) => ({
+                s,
+                it,
+                st: diagRun.steps[si].items[ii].state,
+                run: diagRun.steps[si].items[ii],
+                si,
+                ii,
+              }),
+            )
             .filter((r) => m(r.st)),
         );
       }
@@ -4507,10 +4714,33 @@
           fail: "不通过检查项",
         }[k];
         const rows = statRows(k);
+        statModal = k;
+        /* 采集失败行内重试（与步骤明细同规则）：仅携程采集失败且非房间相关数据可单独重采（最多5次）；
+           抖音来客/双平台失败不提供重试，提示前往平台检查；房间相关数据不提供重试 */
+        const statRight = (r) => {
+          let right =
+            r.st === "retry"
+              ? '<span class="spinner"></span><span style="color:var(--primary)">重新采集中</span>'
+              : isCfail(r.st)
+                ? ST_LABEL[r.st]
+                : ST_LABEL[r.st] ||
+                  '<span style="color:var(--ink-4)">' +
+                    (r.st === "running" ? "诊断中" : "未诊断") +
+                    "</span>";
+          if (k === "cfail" && (r.st === "cfail_douyin" || r.st === "cfail_both"))
+            right +=
+              '<span class="cf-hint">请前往抖音来客检查此项是否符合标准</span>';
+          if (k === "cfail" && r.st === "cfail_ctrip" && r.it[6] !== 1)
+            right += r.run.retryDead
+              ? '<span class="cf-hint">采集异常，请联系技术管理员</span>'
+              : ` <button class="btn btn-outline" style="height:24px;padding:0 10px;font-size:12px;margin-left:8px" onclick="retryCollect(${r.si},${r.ii})">重试${r.run.retryN ? `（${r.run.retryN}/5）` : ""}</button>`;
+          return right;
+        };
         $("#modalRoot").innerHTML =
           `<div class="modal-mask" onclick="closeAccModal(event)"><div class="modal" onclick="event.stopPropagation()" style="width:560px">
       <h3>${title}（${rows.length}）</h3>
-      <div style="max-height:60vh;overflow:auto;margin-top:6px">${rows.map((r) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${r.s.name} · ${r.it[0]}</span><span style="font-size:12px;white-space:nowrap">${isCfail(r.st) ? ST_LABEL[r.st] : ST_LABEL[r.st] || '<span style="color:var(--ink-4)">' + (r.st === "running" ? "诊断中" : r.st === "retry" ? "重新采集中" : "未诊断") + "</span>"}</span></div>`).join("") || '<p style="color:var(--ink-3);font-size:13px">暂无</p>'}</div>
+      ${k === "cfail" ? '<p style="margin:8px 0 0;font-size:12.5px;color:#b45309;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:8px 12px">⚠ 采集失败表示平台数据未能成功获取，该项未参与本次诊断判定、不计入通过/不通过。携程采集失败且非房间相关数据可在此单独重采（最多 5 次，重采后按实际数据计入诊断结果）；抖音来客采集失败请前往抖音来客检查后重新诊断。</p>' : ""}
+      <div style="max-height:60vh;overflow:auto;margin-top:6px">${rows.map((r) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${r.s.name} · ${r.it[0]}</span><span style="font-size:12px;white-space:nowrap">${statRight(r)}</span></div>`).join("") || '<p style="color:var(--ink-3);font-size:13px">暂无</p>'}</div>
       <div class="m-foot"><button class="btn btn-outline" onclick="closeAccModal()">关闭</button></div>
     </div></div>`;
       }
@@ -4567,6 +4797,53 @@
         initRediag();
         toast("已开始重新诊断");
         runStep(0);
+      }
+      /* 人工暂停【C20】：运行中的诊断点击「暂停诊断」即中断本轮——进行中步骤标「已暂停」，未完成检查项不再执行；
+         已完成步骤、检查结果与已生成任务全部保留；与闸门等待不同，暂停后不自动续诊，通过「继续诊断」从断点续跑同一轮 */
+      function pauseDiag() {
+        if (!diagRun || diagRun.phase !== "running") return;
+        diagT.forEach(clearTimeout);
+        diagT = [];
+        const si = diagRun.steps.findIndex((s) => s.state === "running");
+        if (si >= 0) {
+          diagRun.steps[si].state = "paused";
+          diagRun.steps[si].items.forEach((it) => {
+            if (it.state === "running") it.state = "pending"; // 未完成检查项回退为未检，不留下半个结果
+          });
+          diagRun.focus = si;
+        }
+        diagRun.phase = "paused";
+        toast(
+          "诊断已暂停：本轮诊断中断，已完成步骤与已生成任务保留；可点击「继续诊断」从中断处继续",
+        );
+        render();
+      }
+      /* 继续诊断【C20】：暂停态点击「继续诊断」从断点续跑同一轮——「已暂停」步骤回到诊断中，从首个未检的检查项继续；
+         已完成的检查结果与已生成任务不变；继续沿用同一轮诊断，不重新扣减诊断频率次数 */
+      function continueDiag() {
+        if (!diagRun || diagRun.phase !== "paused") return;
+        const si = diagRun.steps.findIndex((s) => s.state === "paused");
+        diagRun.phase = "running";
+        if (si >= 0) {
+          diagRun.steps[si].state = "running";
+          diagRun.focus = si;
+          const ii = diagRun.steps[si].items.findIndex(
+            (it) => it.state === "pending",
+          );
+          toast(
+            `继续诊断：从「${diagSteps[si].name}」中断处继续，已完成结果保留`,
+          );
+          runItem(si, Math.max(ii, 0));
+        } else {
+          // 暂停发生在步骤间隙（上一步完成、下一步调度前被暂停）：从最后完成的步骤之后继续调度
+          let last = 0;
+          diagRun.steps.forEach((s, i) => {
+            if (s.state === "done") last = i;
+          });
+          toast("继续诊断：从中断处继续");
+          advanceDiag(last);
+        }
+        render();
       }
       function scrollStep() {
         const el =
@@ -4716,6 +4993,7 @@
       /* 「房型匹配任务」确认后：中断在「房型匹配」的步骤收口为完成，恢复受限步骤诊断（房型管理 → 命中闸门 2 再暂停） */
       function resumeAfterMatch() {
         if (!diagRun || !diagRun.matchGate || !matchTaskDone()) return;
+        if (diagRun.phase === "paused") return; // 人工暂停后不再自动续诊【C20】
         const mSi = diagSteps.findIndex((s) => s.name === "房型匹配");
         if (diagRun.steps[mSi].state === "matchwait")
           diagRun.steps[mSi].state = "done";
@@ -4748,6 +5026,7 @@
       }
       /* 「房型管理」任务全部处理（提交/忽略）后：恢复日历房、预售房型诊断（团购、房价房态管理命中闸门 3 再暂停） */
       function resumeAfterRt() {
+        if (diagRun && diagRun.phase === "paused") return; // 人工暂停后不再自动续诊【C20】
         if (!diagRun || !diagRun.rtGate || !rtTasksDone()) return;
         diagRun.rtGate = false; // 闸门已放行即消费，避免后续任务状态变化重复触发、绕过闸门 3
         let si = diagSteps.findIndex((s) => s.name === "日历房");
@@ -4776,6 +5055,7 @@
       }
       /* 「预售房型」任务全部处理（提交/忽略）后：恢复团购、房价房态管理诊断 */
       function resumeAfterPs() {
+        if (diagRun && diagRun.phase === "paused") return; // 人工暂停后不再自动续诊【C20】
         if (!diagRun || !diagRun.psGate || !psTasksDone()) return;
         diagRun.psGate = false; // 闸门已放行即消费，避免后续任务状态变化重复触发
         let si = diagSteps.findIndex((s) => s.name === "团购");
@@ -4950,10 +5230,11 @@
       <button class="sub-back" onclick="go('hotels')">‹ 返回酒店管理</button>
       <div class="sub-hotel"><b>${activeHotel.name}</b><small>${activeHotel.sub}</small></div>
       <nav>${tabs.map((x) => `<button class="${view === x[0] || (view === "detail" && x[0] === "tasks") ? "active" : ""}" onclick="go('${x[0]}')">${x[1]}${x[0] === "tasks" && todoTasks().length ? `<em>${todoTasks().length}</em>` : ""}</button>`).join("")}</nav>
+      ${view === "tasks" || view === "diag" ? runSwitchHtml() : ""}
     </div>`
             : "";
       }
-      function go(v) {
+      function go(v, keepRun) {
         const vk = { hotels: 0, diag: 1, tasks: 2, detail: 2 }[v];
         if (isSysView(v) && !users[curUser].admin) {
           toast("仅管理员可访问系统管理");
@@ -4965,6 +5246,14 @@
         }
         view = v;
         if (v === "hotels") activeHotel = null;
+        /* 从其他页面进入诊断任务页/诊断工作台时回到「当前诊断」视角（从只读详情返回除外） */
+        if ((v === "tasks" || v === "diag") && !keepRun && selRun !== "cur") {
+          selRun = "cur";
+          runMenuOpen = false;
+          runQuery = "";
+          taskQuery = "";
+          taskExec = "全部";
+        }
         render();
       }
       function diagnose(i) {
@@ -5062,6 +5351,7 @@
         ).length;
         const passed = allItems.filter((it) => it.state === "pass").length;
         const failed = allItems.filter((it) => it.state === "fail").length;
+        const cfailN = allItems.filter((it) => isCfail(it.state)).length;
         const runningIdx = diagRun.steps.findIndex(
           (s) => s.state === "running",
         );
@@ -5079,6 +5369,8 @@
               : `共 ${diagSteps.length} 个步骤、${total} 项检查，点击“开始诊断”逐项执行 · 还可诊断 ${left} 次`
             : diagRun.phase === "running"
               ? `诊断中 · 第 ${curIdx + 1}/${diagSteps.length} 步 ${diagSteps[curIdx].name}`
+              : diagRun.phase === "paused"
+              ? `诊断已暂停：本轮诊断已人工中断，已完成步骤与已生成任务保留；可点击「继续诊断」从中断处继续，或重新发起新一轮诊断`
               : diagRun.phase === "matchwait"
                 ? "诊断已中断在「房型匹配」步骤：检查完成并生成「房型匹配任务」· 完成任务后继续房型管理及后续受限步骤（商家经营分、评价回复不受限）"
                 : diagRun.phase === "rtwait"
@@ -5096,6 +5388,8 @@
             ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待房型管理任务</i>'
             : rs.state === "pswait"
             ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待预售房型任务</i>'
+            : rs.state === "paused"
+            ? '<i class="tag" style="background:#fef3c7;color:#b45309">已暂停</i>'
             : rs.state === "running"
             ? '<i class="tag" style="background:var(--primary-soft);color:var(--primary)">诊断中</i>'
             : rs.state === "done"
@@ -5120,7 +5414,9 @@
                   ? '<button class="btn btn-primary btn-start" onclick="startDiag()">▶　开始诊断</button>'
                   : ""
               : diagRun.phase === "running"
-                ? '<button class="btn btn-primary btn-start" disabled><span class="spinner" style="margin:0"></span>　诊断中，请稍候</button>'
+                ? `<button class="btn btn-primary btn-start" disabled><span class="spinner" style="margin:0"></span>　诊断中，请稍候</button>${btnOn("startDiag") ? '<button class="btn btn-outline" style="height:46px;padding:0 24px" onclick="pauseDiag()">⏸　暂停诊断</button>' : ""}`
+                : diagRun.phase === "paused"
+                ? `${btnOn("startDiag") ? '<button class="btn btn-primary btn-start" onclick="continueDiag()">▶　继续诊断</button>' : ""}${btnOn("viewTasks") && diagRun.added.length ? `<button class="btn btn-outline" style="height:46px;padding:0 24px" onclick="go('tasks')">查看任务（${diagRun.added.length}）</button>` : ""}${btnOn("reDiag") ? `<button class="btn btn-outline" style="height:46px;padding:0 24px" onclick="resetDiag()" ${limited ? "disabled" : ""}>重新诊断</button>` : ""}`
                 : `${btnOn("viewTasks") ? `<button class="btn btn-primary btn-start" onclick="go('tasks')">查看任务（${diagRun.added.length}）</button>` : ""}${btnOn("reDiag") ? `<button class="btn btn-outline" style="height:46px;padding:0 24px" onclick="resetDiag()" ${limited ? "disabled" : ""}>重新诊断</button>` : ""}${note}`
           }
         </div>
@@ -5128,7 +5424,7 @@
       <div class="hero-progress"><div class="pbar"><i style="width:${pct}%"></i></div><b class="hero-pct">${pct}%</b></div>
       <div class="hero-stats">
         <div class="hstat clickable" onclick="openStat('all')"><small>检查数</small><b>${total}</b></div>
-        <div class="hstat clickable" onclick="openStat('cfail')"><small>采集失败数</small><b style="color:#b45309">${allItems.filter((it) => isCfail(it.state)).length}</b></div>
+        <div class="hstat clickable${cfailN ? " cfail-hint pulse" : ""}" onclick="openStat('cfail')" title="点击查看采集失败的检查项"><small>采集失败数${cfailN ? '<span class="cfail-go">⚠ 点击查看</span>' : ""}</small><b style="color:#b45309">${cfailN}</b></div>
         <div class="hstat clickable" onclick="openStat('pass')"><small>通过数</small><b style="color:var(--ok)">${passed}</b></div>
         <div class="hstat clickable" onclick="openStat('fail')"><small>不通过数</small><b style="color:#b91c1c">${failed}</b></div>
         <div class="hstat clickable" onclick="openStat('tasks')"><small>生成任务数</small><b style="color:#b91c1c">${diagRun.added.length}</b></div>
@@ -5174,6 +5470,19 @@
         : ""
     }
 
+    ${
+      diagRun.phase === "paused"
+        ? `<div class="panel" style="margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;border:1px solid var(--warn-line);background:var(--warn-bg);padding:14px 18px">
+      <div style="font-size:20px;line-height:1.3">⏸</div>
+      <div style="flex:1">
+        <b style="font-size:14px;color:#b45309">诊断已暂停：本轮诊断已人工中断</b>
+        <p style="margin:4px 0 0;font-size:13px;color:var(--ink-2)">已完成 ${diagRun.steps.filter((s) => s.state === "done").length}/${diagSteps.length} 步，进行中步骤已中断；已生成的 ${diagRun.added.length} 个任务全部保留，可继续在「诊断任务」页处理。人工暂停后诊断不会自动恢复（已触发的前置等待也不再自动续诊）；点击「继续诊断」从断点续跑本轮诊断，已完成结果保留、不重新扣减诊断次数；也可重新发起新的完整诊断，受诊断频率限制（7天内2次、每24小时1次）。</p>
+        <div style="margin-top:10px">${btnOn("startDiag") ? '<button class="btn btn-primary" style="height:36px;padding:0 18px;font-size:13px" onclick="continueDiag()">▶　继续诊断</button>' : ""}${btnOn("viewTasks") && diagRun.added.length ? '<button class="btn btn-outline" style="height:36px;padding:0 18px;font-size:13px" onclick="go(\'tasks\')">查看任务</button>' : ""}</div>
+      </div>
+    </div>`
+        : ""
+    }
+
     <div class="detail-grid" style="grid-template-columns:1fr 360px">
       <main>
         <div class="section" style="margin-bottom:0">
@@ -5196,6 +5505,8 @@
                     ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待房型管理任务</i>'
                     : st.state === "pswait"
                     ? '<i class="tag" style="background:#fef3c7;color:#b45309">等待预售房型任务</i>'
+                    : st.state === "paused"
+                    ? '<i class="tag" style="background:#fef3c7;color:#b45309">已暂停</i>'
                     : st.state === "running"
                     ? '<i class="tag" style="background:var(--primary-soft);color:var(--primary)">诊断中</i>'
                     : st.state === "done"
@@ -5220,6 +5531,8 @@
                     ? `前置：「房型管理」任务全部处理后继续（共 ${n} 项）`
                     : st.state === "pswait"
                     ? `前置：「预售房型」任务全部处理后继续（共 ${n} 项）`
+                    : st.state === "paused"
+                    ? `已检 ${dn}/${n} 项 · 人工中断，结果保留`
                     : st.state === "running"
                     ? `已检 ${dn}/${n} 项`
                     : st.state === "done"
@@ -5535,13 +5848,27 @@
         const execOpts = ["全部", "执行中", "执行成功", "执行失败", "已忽略"];
         return `<div class="page">
     <div class="page-head"><div><h1>诊断任务</h1><p>本次诊断生成的任务，逐项确认后 AI 才会进入抖音来客执行修改</p></div></div>
-    <div class="tabs">
+    ${
+      selRun === "cur"
+        ? `<div class="tabs">
       <button class="${taskTab === "todo" ? "active" : ""}" onclick="setTaskTab('todo')">待处理 ${todoShown.length}</button>
       <button class="${taskTab === "done" ? "active" : ""}" onclick="setTaskTab('done')">已处理 ${done.length}</button>
-    </div>
+    </div>`
+        : '<div class="hist-hint">正在查看历史诊断记录（只读），可在右上角下拉切换回当前诊断</div>'
+    }
     <div class="panel">
       ${
-        taskTab === "todo"
+        selRun !== "cur"
+          ? (() => {
+              /* 历史诊断记录：下拉选中某次后只读平铺该次任务明细（无分组展开行），搜索/筛选仅作用于该次 */
+              const r = histRuns()[selRun];
+              return runDetailHtml(
+                r,
+                r.tasks.map((t, ti) => ({ ...t, ti })),
+                selRun,
+              );
+            })()
+          : taskTab === "todo"
           ? (() => {
               /* 待处理任务按诊断步骤分类：房价房态单独一类、排在日历房后；具体子任务折叠在大类内（类别与顺序按需求固定） */
               const CATS = [
@@ -5604,66 +5931,19 @@
                     .join("")
                 : '<div class="empty-state"><i>✓</i>暂无待处理任务</div>';
             })()
-          : `<div class="panel-toolbar">
-          <label class="search">⌕<input id="taskSearch" value="${attr(taskQuery)}" placeholder="搜索任务名称" oninput="setTaskQuery(this.value)"></label>
-          <div class="seg">${execOpts.map((s) => `<button class="${taskExec === s ? "active" : ""}" onclick="setTaskExec('${s}')">${s}</button>`).join("")}</div>
-        </div>
-        ${(() => {
-          const filtering = taskExec !== "全部" || taskQuery.trim() !== "";
-          const list = diagRuns()
-            .map((r, ri) => ({
-              r,
-              ri,
-              rows: r.tasks
-                .map((t, ti) => ({ ...t, ti }))
-                .filter(
-                  (t) =>
-                    (taskExec === "全部" || t.exec === taskExec) &&
-                    t.name.includes(taskQuery.trim()),
-                ),
-            }))
-            .filter((v) => !filtering || v.rows.length);
-          return list.length
-            ? `<div class="lcard">
-        <div class="rgrid rhead"><span>任务ID</span><span>诊断名称</span><span class="rnum">生成任务数</span><span class="rnum">执行中数量</span><span class="rnum">执行成功数</span><span class="rnum">执行失败数</span><span class="rnum">已忽略数</span><span>诊断时间</span><span style="text-align:right">操作</span></div>
-        ${list
-          .map(({ r, ri, rows }) => {
-            const open = filtering || runOpen === ri;
-            return `<div class="rgrid rrow" onclick="toggleRun(${ri})">
-          <span class="rname"><b>${r.id}</b><small>后端生成 · 全局唯一</small></span>
-          <span class="rname"><b>${r.name}</b></span>
-          <span class="rnum"><b>${r.total}</b></span>
-          <span class="rnum"><b style="color:${r.runn ? "var(--primary)" : "var(--ink-4)"}">${r.runn}</b></span>
-          <span class="rnum"><b style="color:${r.ok ? "#15803d" : "var(--ink-4)"}">${r.ok}</b></span>
-          <span class="rnum"><b style="color:${r.fail ? "#b91c1c" : "var(--ink-4)"}">${r.fail}</b></span>
-          <span class="rnum"><b style="color:${r.ign ? "var(--ink)" : "var(--ink-4)"}">${r.ign}</b></span>
-          <span>${r.time}</span>
-          <span style="text-align:right"><button class="lbtn">${open ? "收起" : "展开"}</button></span>
-        </div>
-        ${
-          open
-            ? `<div class="lpanel">
-          <div class="lt-cap">${r.name} · 诊断时间 ${r.time} · 共 ${rows.length} 条任务明细</div>
-          ${rows
-            .map(
-              (t) => `<div class="lt-line">
-            <span><b>${t.name}</b>${t.reason ? `<small class="fail-reason">失败原因：${t.reason}</small>` : ""}${t.res && t.exec !== "待处理" ? `<small class="fail-reason" style="color:#15803d">处理结果：${t.res}</small>` : ""}</span>
-            <span>${t.path}</span>
-            <span><i class="tag ${t.cls}"${t.exec === "执行中" ? ' style="background:var(--primary-soft);color:var(--primary)"' : ""}>${t.exec}</i></span>
-            <span style="text-align:right">${btnOn("runDetail") ? `<button class="lbtn" onclick="event.stopPropagation();viewTask(${ri},${t.ti})">详情</button>` : ""}</span>
-          </div>`,
-            )
-            .join("")}
-        </div>`
-            : ""
-        }`;
-          })
-          .join("")}
-      </div>`
-            : done.length === 0
-              ? '<div class="empty-state"><i>✓</i>暂无已处理诊断，提交或忽略任务后该次诊断会展示在这里</div>'
-              : '<div class="empty-state"><i>⌕</i>未找到匹配的任务，请调整搜索内容或筛选条件</div>';
-        })()}`
+          : (() => {
+              /* 当次已处理：仅展示本次诊断已提交/忽略的任务；等待期有提交/忽略即可查看（历史记录已移至右上角下拉切换） */
+              const r = curRun();
+              if (!r)
+                return '<div class="empty-state"><i>✓</i>本次诊断暂无已处理任务，提交或忽略任务后展示在这里</div>';
+              return runDetailHtml(
+                r,
+                r.tasks
+                  .map((t, ti) => ({ ...t, ti }))
+                  .filter((t) => t.exec !== "待处理"),
+                "cur",
+              );
+            })()}
       }
     </div>
   </div>`;
@@ -9280,15 +9560,42 @@
           ],
         },
       ];
-      let runOpen = 0,
+      let roTask = null;
+      /* V2 交互：历史诊断记录移出「已处理」页签，改为右上角下拉切换查看；
+         「已处理」页签仅展示当次诊断已提交/忽略的任务；搜索与执行状态筛选均只作用于当前选中的那次记录 */
+      let selRun = "cur",
+        runMenuOpen = false,
+        runQuery = ""; // 下拉内搜索：按诊断名称 / 任务ID / 诊断时间过滤记录选项
+      function setSelRun(v) {
+        selRun = v;
+        runMenuOpen = false;
+        runQuery = "";
+        taskQuery = "";
+        taskExec = "全部";
         roTask = null;
-      function toggleRun(i) {
-        runOpen = runOpen === i ? null : i;
         render();
       }
-      /* 已处理诊断记录：历史诊断 + 当次诊断（诊断完成后即出现当次记录；未处理任务以待处理状态展示，历史记录不含执行中） */
-      function diagRuns() {
-        const runs = DIAG_LOG.map((r, i) => {
+      /* 下拉选项统一入口：诊断任务页就地切换；诊断工作台上选历史记录则跳转任务页查看该次（工作台仅展示当前诊断进度），选当前诊断留在工作台 */
+      function pickRun(v) {
+        setSelRun(v);
+        if (view !== "tasks" && view !== "detail" && v !== "cur")
+          go("tasks", true);
+      }
+      function toggleRunMenu() {
+        runMenuOpen = !runMenuOpen;
+        if (!runMenuOpen) runQuery = ""; // 收起即清空下拉搜索
+        render();
+      }
+      function setRunQuery(next) {
+        runQuery = next;
+        render();
+        const input = $("#runSearch");
+        input.focus();
+        input.setSelectionRange(next.length, next.length);
+      }
+      /* 历史诊断记录（不含当次），时间倒序；均为终态快照，不含执行中 */
+      function histRuns() {
+        return DIAG_LOG.map((r, i) => {
           const cnt = (st) => r.ts.filter((t) => t[1] === st).length;
           return {
             id: RUN_IDS[i],
@@ -9307,41 +9614,142 @@
               reason: t[2] || "",
             })),
           };
-        });
-        const hasCur =
-          diagRun &&
-          taskData.length > 0 &&
-          (diagRun.phase === "done" || // 诊断全部完成
-            taskData.some((t) => t.status === "已处理")); // 诊断中断（闸门等待）时，已提交/忽略的任务（如房型匹配任务）也计入已处理
-        if (hasCur) {
-          const tasks = taskData.map((t) => ({
-            name: t.name,
-            path: t.path,
-            exec: t.status === "待处理" ? "待处理" : t.exec,
-            cls: t.status === "待处理" ? "gray" : execTag(t.exec),
-            reason: "",
-            res: t.result || "", // 处理结果：提交/忽略时记录的快照说明
-            pairs: t.pairs || null, // 房型匹配任务：确认的匹配对快照
-          }));
-          const c = (st) => tasks.filter((t) => t.exec === st).length;
-          runs.push({
-            id: RUN_IDS[5],
-            name: `第${runs.length + 1}次诊断（20260828）`,
-            time:
-              taskData[taskData.length - 1].submitTime || "2026-08-28 12:30:00",
-            total: taskData.length,
-            runn: c("执行中"),
-            ok: c("执行成功"),
-            fail: c("执行失败"),
-            ign: c("已忽略"),
-            tasks,
-          });
+        }).reverse();
+      }
+      /* 当次诊断记录：诊断完成后出现；等待期已有提交/忽略任务也计入（待处理小任务只计入总数，不进「已处理」明细） */
+      function curRun() {
+        if (
+          !diagRun ||
+          taskData.length === 0 ||
+          !(
+            diagRun.phase === "done" || // 诊断全部完成
+            taskData.some((t) => t.status === "已处理") // 诊断中断（闸门等待）时，已提交/忽略的任务（如房型匹配任务）也计入
+          )
+        )
+          return null;
+        const tasks = taskData.map((t) => ({
+          name: t.name,
+          path: t.path,
+          exec: t.status === "待处理" ? "待处理" : t.exec,
+          cls: t.status === "待处理" ? "gray" : execTag(t.exec),
+          reason: "",
+          res: t.result || "", // 处理结果：提交/忽略时记录的快照说明
+          pairs: t.pairs || null, // 房型匹配任务：确认的匹配对快照
+        }));
+        const c = (st) => tasks.filter((t) => t.exec === st).length;
+        return {
+          id: RUN_IDS[5],
+          name: `第${histRuns().length + 1}次诊断（20260828）`,
+          time:
+            taskData[taskData.length - 1].submitTime || "2026-08-28 12:30:00",
+          total: taskData.length,
+          runn: c("执行中"),
+          ok: c("执行成功"),
+          fail: c("执行失败"),
+          ign: c("已忽略"),
+          tasks,
+        };
+      }
+      /* 右上角「诊断记录」下拉（诊断任务页与诊断工作台右上角展示），切换当前诊断与历史诊断记录；
+         下拉内置搜索框：按诊断名称 / 任务ID / 诊断时间过滤选项，仅用于定位要查看的次，不改变任务明细搜索的作用域 */
+      function runSwitchHtml() {
+        const hist = histRuns();
+        const curName = `第${hist.length + 1}次诊断（20260828）`;
+        const sel =
+          selRun === "cur" ? `当前诊断 · ${curName}` : hist[selRun].name;
+        const q = runQuery.trim().toLowerCase();
+        const qDigits = q.replace(/\D/g, "");
+        const hit = (text, time) =>
+          !q ||
+          `${text}`.toLowerCase().includes(q) ||
+          (qDigits.length >= 4 &&
+            `${time || ""}`.replace(/\D/g, "").includes(qDigits)); // 时间支持 20260827 / 0827 等紧凑写法
+        const cur = curRun();
+        const curMeta = cur
+          ? { id: cur.id, time: cur.time }
+          : { id: RUN_IDS[5], time: "2026-08-28 12:30:00" };
+        const curHit = hit(`当前诊断 ${curName} ${curMeta.id}`, curMeta.time);
+        const hists = hist
+          .map((r, i) => ({ r, i, ok: hit(`${r.name} ${r.id}`, r.time) }))
+          .filter((v) => v.ok);
+        return `<div class="run-switch">
+      ${runMenuOpen ? '<div class="run-mask" onclick="toggleRunMenu()"></div>' : ""}
+      <button class="run-switch-btn" onclick="toggleRunMenu()"><span>诊断记录</span><b>${sel}</b><i class="chev">▾</i></button>
+      ${
+        runMenuOpen
+          ? `<div class="run-menu">
+        <label class="search run-menu-search">⌕<input id="runSearch" value="${attr(runQuery)}" placeholder="搜索诊断名称 / ID / 时间" oninput="setRunQuery(this.value)"></label>
+        ${
+          !curHit && !hists.length
+            ? '<div class="run-menu-empty">未找到匹配的诊断记录，请调整名称 / ID / 时间关键词</div>'
+            : `${curHit
+                ? `<div class="run-menu-cap">切换查看的诊断记录</div>
+        <button class="${selRun === "cur" ? "active" : ""}" onclick="pickRun('cur')"><span>当前诊断 · ${curName}</span><small>ID ${curMeta.id} · 待处理 ${todoTasks().length} · 已处理 ${doneTasks().length}</small></button>`
+                : ""
         }
-        return runs.reverse();
+        ${
+          hists.length
+            ? `<div class="run-menu-cap">历史诊断记录（时间倒序${q ? ` · 命中 ${hists.length} 条` : ""}）</div>
+        ${hists
+          .map(
+            ({ r, i }) =>
+              `<button class="${selRun === i ? "active" : ""}" onclick="pickRun(${i})"><span>${r.name}</span><small>${r.id} · ${r.time} · 生成任务 ${r.total} 条</small></button>`,
+          )
+          .join("")}`
+            : ""
+        }`
+        }
+      </div>`
+          : ""
+      }
+    </div>`;
+      }
+      /* 诊断记录详情：摘要条 + 任务明细平铺（不再用分组行+展开）；ri 为 "cur" 或历史下标，搜索/筛选仅作用于该次 */
+      function runDetailHtml(r, rows, ri) {
+        const execOpts = ["全部", "执行中", "执行成功", "执行失败", "已忽略"];
+        const filtering = taskExec !== "全部" || taskQuery.trim() !== "";
+        const shown = rows.filter(
+          (t) =>
+            (taskExec === "全部" || t.exec === taskExec) &&
+            t.name.includes(taskQuery.trim()),
+        );
+        return `<div class="rsum">
+      <div class="rsum-main"><b>${r.name}</b><small>任务ID ${r.id} · 诊断时间 ${r.time}</small></div>
+      <div class="rsum-stats"><span>生成任务数<b>${r.total}</b></span><span>执行中<b style="color:${r.runn ? "var(--primary)" : "var(--ink-4)"}">${r.runn}</b></span><span>执行成功<b style="color:${r.ok ? "#15803d" : "var(--ink-4)"}">${r.ok}</b></span><span>执行失败<b style="color:${r.fail ? "#b91c1c" : "var(--ink-4)"}">${r.fail}</b></span><span>已忽略<b style="color:${r.ign ? "var(--ink)" : "var(--ink-4)"}">${r.ign}</b></span></div>
+    </div>
+    <div class="panel-toolbar">
+      <label class="search">⌕<input id="taskSearch" value="${attr(taskQuery)}" placeholder="搜索任务名称" oninput="setTaskQuery(this.value)"></label>
+      <div class="seg">${execOpts
+        .map(
+          (s) =>
+            `<button class="${taskExec === s ? "active" : ""}" onclick="setTaskExec('${s}')">${s}</button>`,
+        )
+        .join("")}</div>
+    </div>
+    ${
+      shown.length
+        ? `<div class="lcard">
+        <div class="lt-line lthead"><span>任务名称</span><span>任务路径</span><span>状态</span><span style="text-align:right">操作</span></div>
+        ${shown
+          .map(
+            (t) => `<div class="lt-line">
+          <span><b>${t.name}</b>${t.reason ? `<small class="fail-reason">失败原因：${t.reason}</small>` : ""}${t.res && t.exec !== "待处理" ? `<small class="fail-reason" style="color:#15803d">处理结果：${t.res}</small>` : ""}</span>
+          <span>${t.path}</span>
+          <span><i class="tag ${t.cls}"${t.exec === "执行中" ? ' style="background:var(--primary-soft);color:var(--primary)"' : ""}>${t.exec}</i></span>
+          <span style="text-align:right">${btnOn("runDetail") ? `<button class="lbtn" onclick="viewTask('${ri}',${t.ti})">详情</button>` : ""}</span>
+        </div>`,
+          )
+          .join("")}
+      </div>`
+        : filtering
+          ? '<div class="empty-state"><i>⌕</i>未找到匹配的任务，请调整搜索内容或筛选条件</div>'
+          : '<div class="empty-state"><i>✓</i>该次诊断暂无任务明细</div>'
+    }`;
       }
       /* 处理详情：数据快照纯展示（只读），含处理结果；执行失败任务展示失败原因 */
       function viewTask(ri, ti) {
-        const t = diagRuns()[ri].tasks[ti];
+        const r = ri === "cur" ? curRun() : histRuns()[Number(ri)];
+        const t = r.tasks[ti];
         roTask = {
           name: t.name,
           path: t.path,
@@ -9354,7 +9762,7 @@
       }
       function closeRo() {
         roTask = null;
-        go("tasks");
+        go("tasks", true); // 返回时保持下拉选中的诊断记录
       }
 
       /* ===== 系统管理：用户管理 / 角色管理 / 菜单管理 / 我的信息（RBAC 标准；表格样式对齐 Ant Design Pro） ===== */
@@ -9389,6 +9797,7 @@
       /* ----- 通用：用户菜单 / 弹窗关闭 / 切换账号 ----- */
       function closeAccModal() {
         $("#modalRoot").innerHTML = "";
+        statModal = null;
         newAccOpen = false;
         accHotelsFor = null;
         editUserFor = null;
